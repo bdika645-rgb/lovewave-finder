@@ -11,6 +11,7 @@ import Messages from "./pages/Messages";
 import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Discover from "./pages/Discover";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -25,6 +26,11 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/discover" element={
+              <ProtectedRoute>
+                <Discover />
+              </ProtectedRoute>
+            } />
             <Route path="/members" element={<Members />} />
             <Route path="/member/:id" element={<MemberProfile />} />
             <Route path="/messages" element={
