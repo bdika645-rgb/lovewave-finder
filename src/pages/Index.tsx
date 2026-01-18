@@ -6,12 +6,15 @@ import FAQSection from "@/components/FAQSection";
 import StatsSection from "@/components/StatsSection";
 import DatingTipsSection from "@/components/DatingTipsSection";
 import PremiumSection from "@/components/PremiumSection";
-import { members } from "@/data/members";
-import { Heart, Shield, Sparkles, Users } from "lucide-react";
+import { useProfiles } from "@/hooks/useProfiles";
+import { Heart, Shield, Sparkles, Users, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
 const Index = () => {
+  // Fetch featured profiles from database (limit to 4)
+  const { profiles, loading } = useProfiles({});
+  const featuredProfiles = profiles.slice(0, 4);
   return (
     <div className="min-h-screen" dir="rtl">
       <Navbar />
@@ -81,11 +84,29 @@ const Index = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {members.map((member) => (
-              <MemberCard key={member.id} member={member} />
-            ))}
-          </div>
+          {loading ? (
+            <div className="flex justify-center py-12">
+              <Loader2 className="w-12 h-12 text-primary animate-spin" />
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {featuredProfiles.map((profile) => (
+                <MemberCard 
+                  key={profile.id} 
+                  member={{
+                    id: profile.id,
+                    name: profile.name,
+                    age: profile.age,
+                    city: profile.city,
+                    bio: profile.bio || "",
+                    image: profile.avatar_url || "/profiles/profile1.jpg",
+                    interests: profile.interests || [],
+                    isOnline: profile.is_online || false,
+                  }}
+                />
+              ))}
+            </div>
+          )}
 
           <div className="text-center mt-12">
             <Link to="/members">
