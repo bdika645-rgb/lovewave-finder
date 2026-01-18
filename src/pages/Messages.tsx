@@ -2,10 +2,11 @@ import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Send, Search, Phone, Video, MoreVertical, Smile, Image, Paperclip } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import profile1 from "@/assets/profiles/profile1.jpg";
 import profile2 from "@/assets/profiles/profile2.jpg";
 import profile3 from "@/assets/profiles/profile3.jpg";
+import { toast } from "sonner";
 
 interface Conversation {
   id: string;
@@ -24,7 +25,7 @@ interface Message {
   time: string;
 }
 
-const conversations: Conversation[] = [
+const initialConversations: Conversation[] = [
   {
     id: "1",
     name: "מיכל",
@@ -54,29 +55,100 @@ const conversations: Conversation[] = [
   },
 ];
 
-const sampleMessages: Message[] = [
-  { id: "1", text: "היי! ראיתי שאנחנו שניים אוהבים קפה ☕", isMine: false, time: "10:30" },
-  { id: "2", text: "היי! כן, קפה זה הדבר הכי חשוב בחיים 😄", isMine: true, time: "10:32" },
-  { id: "3", text: "לגמרי! יש לך מקום מועדף בתל אביב?", isMine: false, time: "10:33" },
-  { id: "4", text: "יש קפה קטן וחמוד ברחוב דיזנגוף, נקרא 'הפינה'", isMine: true, time: "10:35" },
-  { id: "5", text: "היי! איך היום שלך? 😊", isMine: false, time: "עכשיו" },
-];
+const initialMessages: { [key: string]: Message[] } = {
+  "1": [
+    { id: "1", text: "היי! ראיתי שאנחנו שניים אוהבים קפה ☕", isMine: false, time: "10:30" },
+    { id: "2", text: "היי! כן, קפה זה הדבר הכי חשוב בחיים 😄", isMine: true, time: "10:32" },
+    { id: "3", text: "לגמרי! יש לך מקום מועדף בתל אביב?", isMine: false, time: "10:33" },
+    { id: "4", text: "יש קפה קטן וחמוד ברחוב דיזנגוף, נקרא 'הפינה'", isMine: true, time: "10:35" },
+    { id: "5", text: "היי! איך היום שלך? 😊", isMine: false, time: "עכשיו" },
+  ],
+  "2": [
+    { id: "1", text: "היי! ראיתי את הפרופיל שלך ואהבתי 😊", isMine: true, time: "אתמול" },
+    { id: "2", text: "תודה! גם אני אהבתי את שלך", isMine: false, time: "אתמול" },
+    { id: "3", text: "כיף היה לדבר איתך!", isMine: false, time: "לפני שעה" },
+  ],
+  "3": [
+    { id: "1", text: "שלום! מה נשמע?", isMine: false, time: "לפני יומיים" },
+    { id: "2", text: "הכל טוב! ואצלך?", isMine: true, time: "אתמול" },
+    { id: "3", text: "נשמע מעולה, בואי נקבע", isMine: false, time: "אתמול" },
+  ],
+};
 
 const Messages = () => {
+  const [conversations, setConversations] = useState<Conversation[]>(initialConversations);
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(conversations[0]);
   const [messageText, setMessageText] = useState("");
-  const [messages, setMessages] = useState(sampleMessages);
+  const [allMessages, setAllMessages] = useState<{ [key: string]: Message[] }>(initialMessages);
+  const [searchQuery, setSearchQuery] = useState("");
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const currentMessages = selectedConversation ? (allMessages[selectedConversation.id] || []) : [];
+
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [currentMessages]);
 
   const handleSend = () => {
-    if (!messageText.trim()) return;
+    if (!messageText.trim() || !selectedConversation) return;
     
-    setMessages([...messages, {
+    const newMessage: Message = {
       id: Date.now().toString(),
       text: messageText,
       isMine: true,
       time: "עכשיו"
-    }]);
+    };
+
+    // Update messages for this conversation
+    setAllMessages(prev => ({
+      ...prev,
+      [selectedConversation.id]: [...(prev[selectedConversation.id] || []), newMessage]
+    }));
+
+    // Update last message in conversation list
+    setConversations(prev => prev.map(conv => 
+      conv.id === selectedConversation.id 
+        ? { ...conv, lastMessage: messageText, time: "עכשיו" }
+        : conv
+    ));
+
     setMessageText("");
+    toast.success("ההודעה נשלחה!");
+  };
+
+  const handleSelectConversation = (conv: Conversation) => {
+    setSelectedConversation(conv);
+    // Clear unread count when selecting conversation
+    if (conv.unread > 0) {
+      setConversations(prev => prev.map(c => 
+        c.id === conv.id ? { ...c, unread: 0 } : c
+      ));
+    }
+  };
+
+  const filteredConversations = conversations.filter(conv =>
+    conv.name.includes(searchQuery) || conv.lastMessage.includes(searchQuery)
+  );
+
+  const handleCall = () => {
+    toast.info("שיחות קוליות יהיו זמינות בגרסה הבאה");
+  };
+
+  const handleVideoCall = () => {
+    toast.info("שיחות וידאו יהיו זמינות בגרסה הבאה");
+  };
+
+  const handleAttachment = () => {
+    toast.info("שליחת קבצים תהיה זמינה בגרסה הבאה");
+  };
+
+  const handleImage = () => {
+    toast.info("שליחת תמונות תהיה זמינה בגרסה הבאה");
+  };
+
+  const handleEmoji = () => {
+    toast.info("בחירת אימוג'ים תהיה זמינה בגרסה הבאה");
   };
 
   return (
@@ -95,15 +167,17 @@ const Messages = () => {
                   <Input 
                     placeholder="חפש בהודעות..." 
                     className="pr-10 bg-muted/50 border-none"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
                   />
                 </div>
               </div>
               
               <div className="overflow-y-auto h-[calc(100%-100px)]">
-                {conversations.map((conv) => (
+                {filteredConversations.map((conv) => (
                   <button
                     key={conv.id}
-                    onClick={() => setSelectedConversation(conv)}
+                    onClick={() => handleSelectConversation(conv)}
                     className={`w-full p-4 flex items-center gap-3 hover:bg-muted/50 transition-colors ${
                       selectedConversation?.id === conv.id ? "bg-accent" : ""
                     }`}
@@ -136,6 +210,12 @@ const Messages = () => {
                     </div>
                   </button>
                 ))}
+
+                {filteredConversations.length === 0 && (
+                  <div className="p-8 text-center text-muted-foreground">
+                    לא נמצאו שיחות
+                  </div>
+                )}
               </div>
             </div>
 
@@ -158,10 +238,10 @@ const Messages = () => {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="icon">
+                    <Button variant="ghost" size="icon" onClick={handleCall}>
                       <Phone className="w-5 h-5" />
                     </Button>
-                    <Button variant="ghost" size="icon">
+                    <Button variant="ghost" size="icon" onClick={handleVideoCall}>
                       <Video className="w-5 h-5" />
                     </Button>
                     <Button variant="ghost" size="icon">
@@ -172,7 +252,7 @@ const Messages = () => {
 
                 {/* Messages */}
                 <div className="flex-1 overflow-y-auto p-6 space-y-4">
-                  {messages.map((message) => (
+                  {currentMessages.map((message) => (
                     <div
                       key={message.id}
                       className={`flex ${message.isMine ? "justify-start" : "justify-end"}`}
@@ -193,15 +273,16 @@ const Messages = () => {
                       </div>
                     </div>
                   ))}
+                  <div ref={messagesEndRef} />
                 </div>
 
                 {/* Message Input */}
                 <div className="p-4 border-t border-border">
                   <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="icon">
+                    <Button variant="ghost" size="icon" onClick={handleAttachment}>
                       <Paperclip className="w-5 h-5" />
                     </Button>
-                    <Button variant="ghost" size="icon">
+                    <Button variant="ghost" size="icon" onClick={handleImage}>
                       <Image className="w-5 h-5" />
                     </Button>
                     <Input
@@ -211,7 +292,7 @@ const Messages = () => {
                       onKeyPress={(e) => e.key === "Enter" && handleSend()}
                       className="flex-1 h-12 rounded-full bg-muted/50 border-none"
                     />
-                    <Button variant="ghost" size="icon">
+                    <Button variant="ghost" size="icon" onClick={handleEmoji}>
                       <Smile className="w-5 h-5" />
                     </Button>
                     <Button 

@@ -2,7 +2,7 @@ import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import MemberCard from "@/components/MemberCard";
 import { members } from "@/data/members";
-import { Search, SlidersHorizontal, MapPin } from "lucide-react";
+import { Search, SlidersHorizontal, MapPin, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -10,6 +10,12 @@ import { toast } from "sonner";
 const Members = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [showFilters, setShowFilters] = useState(false);
+  
+  // Filter states
+  const [ageFrom, setAgeFrom] = useState("");
+  const [ageTo, setAgeTo] = useState("");
+  const [locationFilter, setLocationFilter] = useState("");
+  const [activeFilters, setActiveFilters] = useState<string[]>([]);
 
   const handleLike = (memberName: string) => {
     toast.success(`שלחת לייק ל${memberName}! 💕`);
@@ -19,11 +25,46 @@ const Members = () => {
     toast(`דילגת על ${memberName}`);
   };
 
-  const filteredMembers = members.filter(member =>
-    member.name.includes(searchQuery) || 
-    member.city.includes(searchQuery) ||
-    member.interests.some(i => i.includes(searchQuery))
-  );
+  const applyFilters = () => {
+    const filters: string[] = [];
+    if (ageFrom) filters.push(`גיל מ-${ageFrom}`);
+    if (ageTo) filters.push(`גיל עד ${ageTo}`);
+    if (locationFilter) filters.push(`מיקום: ${locationFilter}`);
+    
+    setActiveFilters(filters);
+    setShowFilters(false);
+    
+    if (filters.length > 0) {
+      toast.success(`הופעלו ${filters.length} פילטרים`);
+    } else {
+      toast.info("לא נבחרו פילטרים");
+    }
+  };
+
+  const clearFilters = () => {
+    setAgeFrom("");
+    setAgeTo("");
+    setLocationFilter("");
+    setActiveFilters([]);
+    toast.info("הפילטרים נוקו");
+  };
+
+  const filteredMembers = members.filter(member => {
+    // Search filter
+    const matchesSearch = searchQuery === "" || 
+      member.name.includes(searchQuery) || 
+      member.city.includes(searchQuery) ||
+      member.interests.some(i => i.includes(searchQuery));
+    
+    // Age filter
+    const matchesAgeFrom = !ageFrom || member.age >= parseInt(ageFrom);
+    const matchesAgeTo = !ageTo || member.age <= parseInt(ageTo);
+    
+    // Location filter
+    const matchesLocation = !locationFilter || member.city.includes(locationFilter);
+    
+    return matchesSearch && matchesAgeFrom && matchesAgeTo && matchesLocation;
+  });
 
   return (
     <div className="min-h-screen bg-muted/20" dir="rtl">
@@ -55,12 +96,33 @@ const Members = () => {
             <Button 
               variant="outline" 
               size="icon" 
-              className="h-14 w-14 rounded-xl"
+              className={`h-14 w-14 rounded-xl ${activeFilters.length > 0 ? 'bg-primary text-primary-foreground' : ''}`}
               onClick={() => setShowFilters(!showFilters)}
             >
               <SlidersHorizontal className="w-5 h-5" />
             </Button>
           </div>
+
+          {/* Active Filters Tags */}
+          {activeFilters.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-4">
+              {activeFilters.map((filter, index) => (
+                <span 
+                  key={index}
+                  className="inline-flex items-center gap-1 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm"
+                >
+                  {filter}
+                </span>
+              ))}
+              <button 
+                onClick={clearFilters}
+                className="inline-flex items-center gap-1 bg-destructive/10 text-destructive px-3 py-1 rounded-full text-sm hover:bg-destructive/20"
+              >
+                <X className="w-3 h-3" />
+                נקה הכל
+              </button>
+            </div>
+          )}
 
           {/* Filter Panel */}
           {showFilters && (
@@ -69,24 +131,39 @@ const Members = () => {
                 <div>
                   <label className="text-sm font-medium text-foreground mb-2 block">גיל</label>
                   <div className="flex gap-2">
-                    <Input placeholder="מ-" className="h-10" />
-                    <Input placeholder="עד" className="h-10" />
+                    <Input 
+                      placeholder="מ-" 
+                      className="h-10" 
+                      type="number"
+                      value={ageFrom}
+                      onChange={(e) => setAgeFrom(e.target.value)}
+                    />
+                    <Input 
+                      placeholder="עד" 
+                      className="h-10" 
+                      type="number"
+                      value={ageTo}
+                      onChange={(e) => setAgeTo(e.target.value)}
+                    />
                   </div>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-foreground mb-2 block">מיקום</label>
                   <div className="relative">
                     <MapPin className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input placeholder="עיר או אזור" className="pr-10 h-10" />
+                    <Input 
+                      placeholder="עיר או אזור" 
+                      className="pr-10 h-10"
+                      value={locationFilter}
+                      onChange={(e) => setLocationFilter(e.target.value)}
+                    />
                   </div>
                 </div>
-                <div>
-                  <label className="text-sm font-medium text-foreground mb-2 block">מרחק</label>
-                  <Input placeholder="עד כמה ק״מ" className="h-10" />
+                <div className="flex items-end">
+                  <Button variant="hero" className="w-full" onClick={applyFilters}>
+                    החל פילטרים
+                  </Button>
                 </div>
-              </div>
-              <div className="flex justify-end mt-4">
-                <Button variant="hero" size="sm">החל פילטרים</Button>
               </div>
             </div>
           )}
@@ -113,7 +190,12 @@ const Members = () => {
 
         {filteredMembers.length === 0 && (
           <div className="text-center py-16">
-            <p className="text-muted-foreground text-lg">לא נמצאו תוצאות. נסו לשנות את החיפוש.</p>
+            <p className="text-muted-foreground text-lg mb-4">לא נמצאו תוצאות. נסו לשנות את החיפוש.</p>
+            {activeFilters.length > 0 && (
+              <Button variant="outline" onClick={clearFilters}>
+                נקה פילטרים
+              </Button>
+            )}
           </div>
         )}
       </div>

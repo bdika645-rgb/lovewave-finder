@@ -116,9 +116,13 @@ const Login = () => {
                 <input type="checkbox" className="rounded border-border" />
                 <span className="text-muted-foreground">זכור אותי</span>
               </label>
-              <Link to="/forgot-password" className="text-primary hover:underline">
+              <button 
+                type="button" 
+                className="text-primary hover:underline"
+                onClick={() => toast.info("שחזור סיסמה יתאפשר בגרסה הבאה")}
+              >
                 שכחתי סיסמה
-              </Link>
+              </button>
             </div>
 
             <Button variant="hero" size="lg" className="w-full" disabled={isLoading}>
