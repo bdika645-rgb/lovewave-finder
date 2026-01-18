@@ -1,16 +1,28 @@
 import { useParams, Link } from "react-router-dom";
-import { members } from "@/data/members";
+import { useProfileById } from "@/hooks/useProfiles";
+import { useLikes } from "@/hooks/useLikes";
+import { useAuth } from "@/hooks/useAuth";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Heart, MessageCircle, MapPin, Clock, ArrowRight, Star, Share2 } from "lucide-react";
+import { Heart, MessageCircle, MapPin, Clock, ArrowRight, Star, Share2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 const MemberProfile = () => {
   const { id } = useParams();
-  const member = members.find(m => m.id === id);
+  const { profile: member, loading, error } = useProfileById(id || "");
+  const { sendLike, loading: likeLoading } = useLikes();
+  const { user } = useAuth();
 
-  if (!member) {
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" dir="rtl">
+        <Loader2 className="w-12 h-12 text-primary animate-spin" />
+      </div>
+    );
+  }
+
+  if (error || !member) {
     return (
       <div className="min-h-screen flex items-center justify-center" dir="rtl">
         <div className="text-center">
@@ -23,13 +35,57 @@ const MemberProfile = () => {
     );
   }
 
-  const handleLike = () => {
-    toast.success(`שלחת לייק ל${member.name}! 💕`);
+  const handleLike = async () => {
+    if (!user) {
+      toast.error("נא להתחבר כדי לשלוח לייקים");
+      return;
+    }
+
+    const { error, isMatch, alreadyLiked } = await sendLike(member.id);
+    
+    if (error) {
+      toast.error("שגיאה בשליחת הלייק");
+      return;
+    }
+
+    if (alreadyLiked) {
+      toast.info(`כבר שלחת לייק ל${member.name}`);
+      return;
+    }
+
+    if (isMatch) {
+      toast.success(`🎉 יש התאמה! את/ה ו${member.name} אהבתם אחד את השני!`);
+    } else {
+      toast.success(`שלחת לייק ל${member.name}! 💕`);
+    }
   };
 
   const handleMessage = () => {
+    if (!user) {
+      toast.error("נא להתחבר כדי לשלוח הודעות");
+      return;
+    }
     toast.success("נפתח צ'אט חדש!");
   };
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `${member.name} - Spark`,
+          url: window.location.href,
+        });
+      } catch {
+        // User cancelled sharing
+      }
+    } else {
+      await navigator.clipboard.writeText(window.location.href);
+      toast.success("הקישור הועתק!");
+    }
+  };
+
+  const imageUrl = member.avatar_url || "/profiles/profile1.jpg";
+  const lastSeen = member.last_seen ? new Date(member.last_seen).toLocaleString('he-IL') : undefined;
 
   return (
     <div className="min-h-screen bg-muted/20" dir="rtl">
@@ -47,13 +103,13 @@ const MemberProfile = () => {
           <div className="relative">
             <div className="aspect-[3/4] rounded-3xl overflow-hidden shadow-elevated">
               <img 
-                src={member.image} 
+                src={imageUrl} 
                 alt={member.name} 
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 gradient-overlay opacity-30" />
               
-              {member.isOnline && (
+              {member.is_online && (
                 <div className="absolute top-6 right-6 flex items-center gap-2 glass-effect px-4 py-2 rounded-full">
                   <span className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
                   <span className="font-medium text-foreground">מחובר/ת עכשיו</span>
@@ -67,6 +123,7 @@ const MemberProfile = () => {
                 variant="pass"
                 size="icon-xl"
                 className="shadow-elevated"
+                onClick={handleShare}
               >
                 <Share2 className="w-6 h-6" />
               </Button>
@@ -81,6 +138,7 @@ const MemberProfile = () => {
                 size="icon-xl"
                 onClick={handleLike}
                 className="shadow-elevated"
+                disabled={likeLoading}
               >
                 <Heart className="w-6 h-6" />
               </Button>
@@ -100,10 +158,10 @@ const MemberProfile = () => {
                     {member.city}
                   </p>
                 </div>
-                {!member.isOnline && member.lastActive && (
+                {!member.is_online && lastSeen && (
                   <div className="flex items-center gap-2 text-muted-foreground text-sm">
                     <Clock className="w-4 h-4" />
-                    פעיל/ה {member.lastActive}
+                    פעיל/ה {lastSeen}
                   </div>
                 )}
               </div>
@@ -113,29 +171,41 @@ const MemberProfile = () => {
                   קצת עליי
                 </h3>
                 <p className="text-muted-foreground leading-relaxed text-lg">
-                  {member.bio}
+                  {member.bio || "עדיין לא נכתב תיאור"}
                 </p>
               </div>
 
-              <div className="mb-8">
-                <h3 className="font-display text-lg font-semibold text-foreground mb-3">
-                  תחומי עניין
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {member.interests.map((interest) => (
-                    <Badge 
-                      key={interest} 
-                      className="bg-accent text-accent-foreground px-4 py-2 text-sm"
-                    >
-                      {interest}
-                    </Badge>
-                  ))}
+              {member.interests && member.interests.length > 0 && (
+                <div className="mb-8">
+                  <h3 className="font-display text-lg font-semibold text-foreground mb-3">
+                    תחומי עניין
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {member.interests.map((interest) => (
+                      <Badge 
+                        key={interest} 
+                        className="bg-accent text-accent-foreground px-4 py-2 text-sm"
+                      >
+                        {interest}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               <div className="flex gap-4">
-                <Button variant="hero" size="lg" className="flex-1" onClick={handleLike}>
-                  <Heart className="w-5 h-5" />
+                <Button 
+                  variant="hero" 
+                  size="lg" 
+                  className="flex-1" 
+                  onClick={handleLike}
+                  disabled={likeLoading}
+                >
+                  {likeLoading ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <Heart className="w-5 h-5" />
+                  )}
                   שלח לייק
                 </Button>
                 <Button variant="outline" size="lg" className="flex-1" onClick={handleMessage}>

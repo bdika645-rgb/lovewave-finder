@@ -6,8 +6,9 @@ import { Badge } from "@/components/ui/badge";
 import { Camera, Edit2, MapPin, Calendar, Heart, Settings, LogOut, X, Plus, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import profile1 from "@/assets/profiles/profile1.jpg";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
+import { useProfile } from "@/hooks/useProfile";
 
 const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -15,37 +16,68 @@ const Profile = () => {
   const [newInterest, setNewInterest] = useState("");
   const [showAddInterest, setShowAddInterest] = useState(false);
   const navigate = useNavigate();
+  const { signOut } = useAuth();
+  const { profile, loading, updateProfile } = useProfile();
   
-  const [profile, setProfile] = useState({
-    name: "שרה",
-    age: 28,
-    city: "תל אביב",
-    bio: "חובבת אמנות, קפה טוב ושיחות עמוקות. מחפשת מישהו עם חוש הומור ולב טוב 💕",
-    interests: ["אמנות", "מוזיקה", "טיולים", "קפה", "סרטים"],
+  // Local edit state
+  const [editedProfile, setEditedProfile] = useState({
+    name: "",
+    age: 0,
+    city: "",
+    bio: "",
+    interests: [] as string[],
   });
 
+  // Initialize edit state when entering edit mode
+  const startEditing = () => {
+    if (profile) {
+      setEditedProfile({
+        name: profile.name,
+        age: profile.age,
+        city: profile.city,
+        bio: profile.bio || "",
+        interests: profile.interests || [],
+      });
+    }
+    setIsEditing(true);
+  };
+
   const handleSave = async () => {
-    if (!profile.name.trim()) {
+    if (!editedProfile.name.trim()) {
       toast.error("נא להזין שם");
       return;
     }
-    if (profile.age < 18 || profile.age > 120) {
+    if (editedProfile.age < 18 || editedProfile.age > 120) {
       toast.error("גיל לא תקין");
       return;
     }
     
     setIsSaving(true);
-    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    const { error } = await updateProfile({
+      name: editedProfile.name,
+      age: editedProfile.age,
+      city: editedProfile.city,
+      bio: editedProfile.bio,
+      interests: editedProfile.interests,
+    });
+
     setIsSaving(false);
+
+    if (error) {
+      toast.error("שגיאה בשמירת הפרופיל");
+      return;
+    }
+    
     setIsEditing(false);
     toast.success("הפרופיל עודכן בהצלחה!");
   };
 
   const handleAddInterest = () => {
-    if (newInterest.trim() && !profile.interests.includes(newInterest.trim())) {
-      setProfile({
-        ...profile, 
-        interests: [...profile.interests, newInterest.trim()]
+    if (newInterest.trim() && !editedProfile.interests.includes(newInterest.trim())) {
+      setEditedProfile({
+        ...editedProfile, 
+        interests: [...editedProfile.interests, newInterest.trim()]
       });
       setNewInterest("");
       setShowAddInterest(false);
@@ -54,13 +86,14 @@ const Profile = () => {
   };
 
   const handleRemoveInterest = (interest: string) => {
-    setProfile({
-      ...profile,
-      interests: profile.interests.filter(i => i !== interest)
+    setEditedProfile({
+      ...editedProfile,
+      interests: editedProfile.interests.filter(i => i !== interest)
     });
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await signOut();
     toast.success("התנתקת בהצלחה!");
     navigate("/");
   };
@@ -72,6 +105,36 @@ const Profile = () => {
   const handleUploadPhoto = () => {
     toast.info("העלאת תמונות תתאפשר בגרסה הבאה");
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-muted/20">
+        <Loader2 className="w-12 h-12 text-primary animate-spin" />
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-muted/20" dir="rtl">
+        <div className="text-center">
+          <p className="text-muted-foreground mb-4">לא נמצא פרופיל</p>
+          <Button onClick={() => navigate("/")}>חזרה לדף הבית</Button>
+        </div>
+      </div>
+    );
+  }
+
+  const displayProfile = isEditing ? editedProfile : {
+    name: profile.name,
+    age: profile.age,
+    city: profile.city,
+    bio: profile.bio || "",
+    interests: profile.interests || [],
+  };
+
+  const imageUrl = profile.avatar_url || "/profiles/profile1.jpg";
+  const joinedDate = new Date(profile.created_at).toLocaleDateString('he-IL', { month: 'long', year: 'numeric' });
 
   return (
     <div className="min-h-screen bg-muted/20" dir="rtl">
@@ -98,8 +161,8 @@ const Profile = () => {
             <div className="absolute -top-16 right-8">
               <div className="relative">
                 <img 
-                  src={profile1} 
-                  alt={profile.name}
+                  src={imageUrl} 
+                  alt={displayProfile.name}
                   className="w-32 h-32 rounded-full object-cover border-4 border-card shadow-elevated"
                 />
                 <Button 
@@ -117,16 +180,16 @@ const Profile = () => {
               <div className="flex items-start justify-between">
                 <div>
                   <h1 className="font-display text-3xl font-bold text-foreground">
-                    {profile.name}, {profile.age}
+                    {displayProfile.name}, {displayProfile.age}
                   </h1>
                   <p className="flex items-center gap-2 text-muted-foreground mt-1">
                     <MapPin className="w-4 h-4" />
-                    {profile.city}
+                    {displayProfile.city}
                   </p>
                 </div>
                 <Button 
                   variant={isEditing ? "hero" : "outline"}
-                  onClick={() => isEditing ? handleSave() : setIsEditing(true)}
+                  onClick={() => isEditing ? handleSave() : startEditing()}
                   disabled={isSaving}
                 >
                   {isSaving ? (
@@ -159,12 +222,15 @@ const Profile = () => {
               </h3>
               {isEditing ? (
                 <Textarea 
-                  value={profile.bio}
-                  onChange={(e) => setProfile({...profile, bio: e.target.value})}
+                  value={editedProfile.bio}
+                  onChange={(e) => setEditedProfile({...editedProfile, bio: e.target.value})}
                   className="min-h-[120px]"
+                  placeholder="ספר/י קצת על עצמך..."
                 />
               ) : (
-                <p className="text-muted-foreground leading-relaxed">{profile.bio}</p>
+                <p className="text-muted-foreground leading-relaxed">
+                  {displayProfile.bio || "עדיין לא נכתב תיאור"}
+                </p>
               )}
             </div>
 
@@ -174,7 +240,7 @@ const Profile = () => {
                 תחומי עניין
               </h3>
               <div className="flex flex-wrap gap-2">
-                {profile.interests.map((interest) => (
+                {displayProfile.interests.map((interest) => (
                   <Badge 
                     key={interest}
                     className={`bg-accent text-accent-foreground px-4 py-2 ${isEditing ? 'cursor-pointer hover:bg-destructive hover:text-destructive-foreground' : ''}`}
@@ -184,6 +250,9 @@ const Profile = () => {
                     {isEditing && <X className="w-3 h-3 mr-1" />}
                   </Badge>
                 ))}
+                {displayProfile.interests.length === 0 && !isEditing && (
+                  <p className="text-muted-foreground">עדיין לא נבחרו תחומי עניין</p>
+                )}
                 {isEditing && !showAddInterest && (
                   <Button 
                     variant="outline" 
@@ -225,11 +294,11 @@ const Profile = () => {
                   <label className="text-sm text-muted-foreground">שם</label>
                   {isEditing ? (
                     <Input 
-                      value={profile.name}
-                      onChange={(e) => setProfile({...profile, name: e.target.value})}
+                      value={editedProfile.name}
+                      onChange={(e) => setEditedProfile({...editedProfile, name: e.target.value})}
                     />
                   ) : (
-                    <p className="font-medium text-foreground">{profile.name}</p>
+                    <p className="font-medium text-foreground">{displayProfile.name}</p>
                   )}
                 </div>
                 <div>
@@ -237,29 +306,29 @@ const Profile = () => {
                   {isEditing ? (
                     <Input 
                       type="number"
-                      value={profile.age}
-                      onChange={(e) => setProfile({...profile, age: parseInt(e.target.value)})}
+                      value={editedProfile.age}
+                      onChange={(e) => setEditedProfile({...editedProfile, age: parseInt(e.target.value) || 0})}
                     />
                   ) : (
-                    <p className="font-medium text-foreground">{profile.age}</p>
+                    <p className="font-medium text-foreground">{displayProfile.age}</p>
                   )}
                 </div>
                 <div>
                   <label className="text-sm text-muted-foreground">עיר</label>
                   {isEditing ? (
                     <Input 
-                      value={profile.city}
-                      onChange={(e) => setProfile({...profile, city: e.target.value})}
+                      value={editedProfile.city}
+                      onChange={(e) => setEditedProfile({...editedProfile, city: e.target.value})}
                     />
                   ) : (
-                    <p className="font-medium text-foreground">{profile.city}</p>
+                    <p className="font-medium text-foreground">{displayProfile.city}</p>
                   )}
                 </div>
                 <div>
                   <label className="text-sm text-muted-foreground">הצטרפתי</label>
                   <p className="font-medium text-foreground flex items-center gap-1">
                     <Calendar className="w-4 h-4" />
-                    ינואר 2024
+                    {joinedDate}
                   </p>
                 </div>
               </div>
@@ -277,16 +346,16 @@ const Profile = () => {
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground">לייקים שקיבלתי</span>
                   <span className="font-bold text-primary flex items-center gap-1">
-                    <Heart className="w-4 h-4 fill-current" /> 156
+                    <Heart className="w-4 h-4 fill-current" /> 0
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground">צפיות בפרופיל</span>
-                  <span className="font-bold text-foreground">423</span>
+                  <span className="font-bold text-foreground">0</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground">התאמות</span>
-                  <span className="font-bold text-foreground">24</span>
+                  <span className="font-bold text-foreground">0</span>
                 </div>
               </div>
             </div>

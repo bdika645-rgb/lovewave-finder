@@ -1,21 +1,31 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Heart, Mail, Lock, User, Eye, EyeOff, MapPin, Loader2 } from "lucide-react";
+import { Heart, Mail, Lock, User, Eye, EyeOff, MapPin, Loader2, Calendar } from "lucide-react";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
 
 const Register = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     city: "",
+    age: "",
     password: "",
     confirmPassword: "",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { signUp, user, loading } = useAuth();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user && !loading) {
+      navigate("/members", { replace: true });
+    }
+  }, [user, loading, navigate]);
 
   const validateEmail = (email: string) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -45,6 +55,15 @@ const Register = () => {
       toast.error("נא להזין עיר מגורים");
       return;
     }
+    if (!formData.age.trim()) {
+      toast.error("נא להזין גיל");
+      return;
+    }
+    const age = parseInt(formData.age);
+    if (isNaN(age) || age < 18 || age > 120) {
+      toast.error("גיל חייב להיות מספר בין 18 ל-120");
+      return;
+    }
     if (!formData.password.trim()) {
       toast.error("נא להזין סיסמה");
       return;
@@ -60,13 +79,36 @@ const Register = () => {
 
     setIsLoading(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    const { error } = await signUp(
+      formData.email, 
+      formData.password, 
+      formData.name, 
+      formData.city,
+      age
+    );
     
     setIsLoading(false);
+
+    if (error) {
+      if (error.message.includes("User already registered")) {
+        toast.error("משתמש עם אימייל זה כבר רשום");
+      } else {
+        toast.error(error.message);
+      }
+      return;
+    }
+    
     toast.success("נרשמת בהצלחה! ברוכים הבאים ל-Spark 💕");
     navigate("/members");
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen gradient-hero flex items-center justify-center p-6" dir="rtl">
@@ -120,19 +162,38 @@ const Register = () => {
               </div>
             </div>
 
-            <div>
-              <label className="text-sm font-medium text-foreground mb-2 block">
-                עיר
-              </label>
-              <div className="relative">
-                <MapPin className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <Input
-                  type="text"
-                  placeholder="איפה אתם גרים?"
-                  value={formData.city}
-                  onChange={(e) => setFormData({...formData, city: e.target.value})}
-                  className="pr-10 h-12"
-                />
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium text-foreground mb-2 block">
+                  עיר
+                </label>
+                <div className="relative">
+                  <MapPin className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  <Input
+                    type="text"
+                    placeholder="עיר מגורים"
+                    value={formData.city}
+                    onChange={(e) => setFormData({...formData, city: e.target.value})}
+                    className="pr-10 h-12"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-foreground mb-2 block">
+                  גיל
+                </label>
+                <div className="relative">
+                  <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  <Input
+                    type="number"
+                    placeholder="גיל"
+                    value={formData.age}
+                    onChange={(e) => setFormData({...formData, age: e.target.value})}
+                    className="pr-10 h-12"
+                    min="18"
+                    max="120"
+                  />
+                </div>
               </div>
             </div>
 

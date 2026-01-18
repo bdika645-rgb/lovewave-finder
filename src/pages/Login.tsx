@@ -1,9 +1,10 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Heart, Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -11,6 +12,16 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const { signIn, user, loading } = useAuth();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user && !loading) {
+      const from = (location.state as any)?.from?.pathname || "/members";
+      navigate(from, { replace: true });
+    }
+  }, [user, loading, navigate, location]);
 
   const validateEmail = (email: string) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -39,13 +50,33 @@ const Login = () => {
 
     setIsLoading(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    const { error } = await signIn(email, password);
     
     setIsLoading(false);
+
+    if (error) {
+      if (error.message.includes("Invalid login credentials")) {
+        toast.error("אימייל או סיסמה שגויים");
+      } else if (error.message.includes("Email not confirmed")) {
+        toast.error("נא לאשר את האימייל לפני ההתחברות");
+      } else {
+        toast.error(error.message);
+      }
+      return;
+    }
+    
     toast.success("התחברת בהצלחה! 🎉");
-    navigate("/members");
+    const from = (location.state as any)?.from?.pathname || "/members";
+    navigate(from, { replace: true });
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen gradient-hero flex items-center justify-center p-6" dir="rtl">
