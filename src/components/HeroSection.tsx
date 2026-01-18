@@ -1,4 +1,4 @@
-import { Heart, MessageCircle, Users, Sparkles } from "lucide-react";
+import { Crown, Diamond, Star, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import heroBg from "@/assets/hero-bg.jpg";
@@ -6,41 +6,47 @@ import heroBg from "@/assets/hero-bg.jpg";
 const HeroSection = () => {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Background Image with Overlay */}
+      {/* Background Image with Dark Overlay */}
       <div className="absolute inset-0">
         <img 
           src={heroBg} 
-          alt="Romantic couple at sunset" 
-          className="w-full h-full object-cover"
+          alt="Elegant couple" 
+          className="w-full h-full object-cover opacity-40"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/70" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background" />
+        <div className="absolute inset-0 bg-gradient-to-r from-purple-deep/30 via-transparent to-purple-deep/30" />
       </div>
+
+      {/* Decorative Elements */}
+      <div className="absolute top-1/4 left-10 w-32 h-32 bg-gold/5 rounded-full blur-3xl animate-pulse-soft" />
+      <div className="absolute bottom-1/4 right-10 w-40 h-40 bg-purple-glow/10 rounded-full blur-3xl animate-float" />
 
       {/* Content */}
       <div className="relative z-10 container mx-auto px-6 text-center">
         <div className="animate-fade-in">
-          <div className="flex items-center justify-center gap-2 mb-6">
-            <Heart className="w-8 h-8 text-primary fill-primary animate-pulse-soft" />
-            <span className="text-primary-foreground/80 font-body text-lg tracking-wide">
-              מצא את האהבה שלך
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 glass-gold px-5 py-2 rounded-full mb-8">
+            <Diamond className="w-4 h-4 text-primary" />
+            <span className="text-primary font-medium text-sm tracking-wide">
+              חוויית היכרויות יוקרתית
             </span>
           </div>
           
-          <h1 className="font-display text-5xl md:text-7xl lg:text-8xl font-bold text-primary-foreground mb-6 leading-tight">
-            התחברו.<br />
-            <span className="text-gradient">התאהבו.</span>
+          <h1 className="font-display text-5xl md:text-7xl lg:text-8xl font-bold text-foreground mb-6 leading-tight">
+            מפגשים<br />
+            <span className="text-gradient">ברמה אחרת.</span>
           </h1>
           
-          <p className="font-body text-lg md:text-xl text-primary-foreground/80 max-w-2xl mx-auto mb-10 leading-relaxed">
-            הצטרפו לקהילה הגדולה ביותר של רווקים ורווקות בישראל. 
-            מצאו את ההתאמה המושלמת שלכם היום.
+          <p className="font-body text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-12 leading-relaxed">
+            הצטרפו לקהילה האקסקלוסיבית של רווקים ורווקות נבחרים. 
+            כאן הקשרים נוצרים ברמה הכי גבוהה.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link to="/members">
-              <Button variant="hero" size="xl">
-                <Sparkles className="w-5 h-5" />
-                התחילו עכשיו
+              <Button variant="hero" size="xl" className="gap-3">
+                <Crown className="w-5 h-5" />
+                הצטרפו לאליטה
               </Button>
             </Link>
             <Link to="/members">
@@ -52,29 +58,29 @@ const HeroSection = () => {
         </div>
 
         {/* Stats */}
-        <div className="mt-20 grid grid-cols-3 gap-8 max-w-2xl mx-auto animate-slide-up">
-          <div className="glass-effect rounded-2xl p-6">
-            <Users className="w-8 h-8 text-primary mx-auto mb-2" />
-            <p className="font-display text-3xl font-bold text-foreground">50K+</p>
-            <p className="text-muted-foreground text-sm">משתמשים פעילים</p>
+        <div className="mt-24 grid grid-cols-3 gap-6 max-w-3xl mx-auto animate-slide-up">
+          <div className="glass-effect rounded-2xl p-6 card-hover border border-gold/10">
+            <Users className="w-8 h-8 text-primary mx-auto mb-3" />
+            <p className="font-display text-4xl font-bold text-gradient">15K+</p>
+            <p className="text-muted-foreground text-sm mt-1">חברים נבחרים</p>
           </div>
-          <div className="glass-effect rounded-2xl p-6">
-            <Heart className="w-8 h-8 text-primary mx-auto mb-2" />
-            <p className="font-display text-3xl font-bold text-foreground">12K+</p>
-            <p className="text-muted-foreground text-sm">התאמות מוצלחות</p>
+          <div className="glass-effect rounded-2xl p-6 card-hover border border-gold/10">
+            <Diamond className="w-8 h-8 text-primary mx-auto mb-3" />
+            <p className="font-display text-4xl font-bold text-gradient">8K+</p>
+            <p className="text-muted-foreground text-sm mt-1">זוגות מאושרים</p>
           </div>
-          <div className="glass-effect rounded-2xl p-6">
-            <MessageCircle className="w-8 h-8 text-primary mx-auto mb-2" />
-            <p className="font-display text-3xl font-bold text-foreground">1M+</p>
-            <p className="text-muted-foreground text-sm">הודעות ביום</p>
+          <div className="glass-effect rounded-2xl p-6 card-hover border border-gold/10">
+            <Star className="w-8 h-8 text-primary mx-auto mb-3" />
+            <p className="font-display text-4xl font-bold text-gradient">98%</p>
+            <p className="text-muted-foreground text-sm mt-1">שביעות רצון</p>
           </div>
         </div>
       </div>
 
       {/* Scroll Indicator */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-float">
-        <div className="w-6 h-10 border-2 border-primary-foreground/40 rounded-full flex justify-center pt-2">
-          <div className="w-1 h-2 bg-primary-foreground/60 rounded-full animate-pulse" />
+        <div className="w-6 h-10 border-2 border-primary/40 rounded-full flex justify-center pt-2">
+          <div className="w-1 h-2 bg-primary/60 rounded-full animate-pulse" />
         </div>
       </div>
     </section>

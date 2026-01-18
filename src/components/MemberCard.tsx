@@ -1,4 +1,4 @@
-import { Heart, X, MapPin, Sparkles } from "lucide-react";
+import { Heart, X, MapPin, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
@@ -12,21 +12,27 @@ interface MemberCardProps {
 
 const MemberCard = ({ member, onLike, onPass }: MemberCardProps) => {
   return (
-    <div className="group relative bg-card rounded-3xl overflow-hidden shadow-card card-hover">
+    <div className="group relative bg-card rounded-2xl overflow-hidden shadow-card card-hover border border-gold/10">
       {/* Image */}
       <Link to={`/member/${member.id}`}>
         <div className="relative aspect-[3/4] overflow-hidden">
           <img
             src={member.image}
             alt={member.name}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
           />
-          <div className="absolute inset-0 gradient-overlay opacity-60" />
+          <div className="absolute inset-0 gradient-overlay" />
           
+          {/* VIP Badge */}
+          <div className="absolute top-4 left-4 flex items-center gap-2 glass-gold px-3 py-1.5 rounded-full">
+            <Crown className="w-3 h-3 text-primary" />
+            <span className="text-xs font-medium text-primary">VIP</span>
+          </div>
+
           {/* Online Status */}
           {member.isOnline && (
             <div className="absolute top-4 right-4 flex items-center gap-2 glass-effect px-3 py-1.5 rounded-full">
-              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+              <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
               <span className="text-xs font-medium text-foreground">מחובר/ת</span>
             </div>
           )}
@@ -35,30 +41,33 @@ const MemberCard = ({ member, onLike, onPass }: MemberCardProps) => {
           <div className="absolute bottom-0 left-0 right-0 p-6">
             <div className="flex items-end justify-between">
               <div>
-                <h3 className="font-display text-2xl font-bold text-primary-foreground">
+                <h3 className="font-display text-2xl font-bold text-foreground">
                   {member.name}, {member.age}
                 </h3>
-                <p className="flex items-center gap-1 text-primary-foreground/80 text-sm mt-1">
-                  <MapPin className="w-4 h-4" />
+                <p className="flex items-center gap-1 text-muted-foreground text-sm mt-1">
+                  <MapPin className="w-4 h-4 text-primary" />
                   {member.city}
                 </p>
               </div>
-              <Sparkles className="w-6 h-6 text-secondary animate-pulse-soft" />
             </div>
           </div>
         </div>
       </Link>
 
       {/* Content */}
-      <div className="p-6">
+      <div className="p-5">
         <p className="text-muted-foreground text-sm line-clamp-2 mb-4">
           {member.bio}
         </p>
 
         {/* Interests */}
-        <div className="flex flex-wrap gap-2 mb-6">
+        <div className="flex flex-wrap gap-2 mb-5">
           {member.interests.slice(0, 3).map((interest) => (
-            <Badge key={interest} variant="secondary" className="bg-accent text-accent-foreground">
+            <Badge 
+              key={interest} 
+              variant="secondary" 
+              className="bg-accent/50 text-accent-foreground border border-purple-glow/20 text-xs"
+            >
               {interest}
             </Badge>
           ))}
@@ -72,7 +81,7 @@ const MemberCard = ({ member, onLike, onPass }: MemberCardProps) => {
             onClick={onPass}
             className="flex-1"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5" />
           </Button>
           <Button
             variant="like"
@@ -80,7 +89,7 @@ const MemberCard = ({ member, onLike, onPass }: MemberCardProps) => {
             onClick={onLike}
             className="flex-1"
           >
-            <Heart className="w-6 h-6" />
+            <Heart className="w-5 h-5" />
           </Button>
         </div>
       </div>
