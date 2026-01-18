@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Heart, Mail, Lock, User, Eye, EyeOff, MapPin, Loader2, Calendar } from "lucide-react";
+import { Heart, Mail, Lock, User, Eye, EyeOff, MapPin, Loader2, Calendar, Camera, Users } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -12,13 +13,33 @@ const Register = () => {
     email: "",
     city: "",
     age: "",
+    gender: "",
     password: "",
     confirmPassword: "",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const { signUp, user, loading } = useAuth();
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("גודל התמונה לא יכול לעלות על 5MB");
+        return;
+      }
+      if (!file.type.startsWith("image/")) {
+        toast.error("נא לבחור קובץ תמונה בלבד");
+        return;
+      }
+      setAvatarFile(file);
+      setAvatarPreview(URL.createObjectURL(file));
+    }
+  };
 
   // Redirect if already logged in
   useEffect(() => {
@@ -64,6 +85,14 @@ const Register = () => {
       toast.error("גיל חייב להיות מספר בין 18 ל-120");
       return;
     }
+    if (!formData.gender) {
+      toast.error("נא לבחור מגדר");
+      return;
+    }
+    if (!avatarFile) {
+      toast.error("נא להעלות תמונת פרופיל");
+      return;
+    }
     if (!formData.password.trim()) {
       toast.error("נא להזין סיסמה");
       return;
@@ -79,17 +108,17 @@ const Register = () => {
 
     setIsLoading(true);
     
-    const { error } = await signUp(
+    const { error, userId } = await signUp(
       formData.email, 
       formData.password, 
       formData.name, 
       formData.city,
-      age
+      age,
+      formData.gender
     );
     
-    setIsLoading(false);
-
     if (error) {
+      setIsLoading(false);
       if (error.message.includes("User already registered")) {
         toast.error("משתמש עם אימייל זה כבר רשום");
       } else {
@@ -97,7 +126,33 @@ const Register = () => {
       }
       return;
     }
+
+    // Upload avatar
+    if (userId && avatarFile) {
+      const fileExt = avatarFile.name.split('.').pop();
+      const fileName = `${userId}/avatar.${fileExt}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(fileName, avatarFile);
+      
+      if (uploadError) {
+        console.error('Error uploading avatar:', uploadError);
+        toast.error("ההרשמה הצליחה אך העלאת התמונה נכשלה");
+      } else {
+        // Get public URL and update profile
+        const { data: { publicUrl } } = supabase.storage
+          .from('avatars')
+          .getPublicUrl(fileName);
+        
+        await supabase
+          .from('profiles')
+          .update({ avatar_url: publicUrl })
+          .eq('user_id', userId);
+      }
+    }
     
+    setIsLoading(false);
     toast.success("נרשמת בהצלחה! ברוכים הבאים ל-Spark 💕");
     navigate("/members");
   };
@@ -129,6 +184,34 @@ const Register = () => {
           </h1>
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Avatar Upload */}
+            <div className="flex flex-col items-center mb-4">
+              <label className="text-sm font-medium text-foreground mb-2 block">
+                תמונת פרופיל *
+              </label>
+              <div 
+                onClick={() => fileInputRef.current?.click()}
+                className="w-28 h-28 rounded-full border-2 border-dashed border-primary/50 flex items-center justify-center cursor-pointer hover:border-primary transition-colors overflow-hidden bg-muted"
+              >
+                {avatarPreview ? (
+                  <img src={avatarPreview} alt="Preview" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="flex flex-col items-center gap-1 text-muted-foreground">
+                    <Camera className="w-8 h-8" />
+                    <span className="text-xs">הוסף תמונה</span>
+                  </div>
+                )}
+              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileSelect}
+                className="hidden"
+              />
+              <p className="text-xs text-muted-foreground mt-2">לחץ להעלאת תמונה (עד 5MB)</p>
+            </div>
+
             <div>
               <label className="text-sm font-medium text-foreground mb-2 block">
                 שם מלא
@@ -159,6 +242,39 @@ const Register = () => {
                   className="pr-10 h-12"
                   dir="ltr"
                 />
+              </div>
+            </div>
+
+            {/* Gender Selection */}
+            <div>
+              <label className="text-sm font-medium text-foreground mb-2 block">
+                מגדר
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setFormData({...formData, gender: "male"})}
+                  className={`h-12 rounded-lg border-2 transition-all flex items-center justify-center gap-2 ${
+                    formData.gender === "male" 
+                      ? "border-primary bg-primary/10 text-primary" 
+                      : "border-border hover:border-primary/50"
+                  }`}
+                >
+                  <Users className="w-5 h-5" />
+                  גבר
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFormData({...formData, gender: "female"})}
+                  className={`h-12 rounded-lg border-2 transition-all flex items-center justify-center gap-2 ${
+                    formData.gender === "female" 
+                      ? "border-primary bg-primary/10 text-primary" 
+                      : "border-border hover:border-primary/50"
+                  }`}
+                >
+                  <Users className="w-5 h-5" />
+                  אישה
+                </button>
               </div>
             </div>
 
