@@ -11,17 +11,37 @@ interface UseProfilesOptions {
   ageTo?: number;
   city?: string;
   excludeCurrentUser?: boolean;
+  filterByOppositeGender?: boolean;
 }
 
 export function useProfiles(options: UseProfilesOptions = {}) {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentUserGender, setCurrentUserGender] = useState<string | null>(null);
   const { user } = useAuth();
+
+  // Fetch current user's gender for filtering
+  useEffect(() => {
+    const fetchCurrentUserGender = async () => {
+      if (user && options.filterByOppositeGender !== false) {
+        const { data } = await supabase
+          .from('profiles')
+          .select('gender')
+          .eq('user_id', user.id)
+          .single();
+        
+        if (data?.gender) {
+          setCurrentUserGender(data.gender);
+        }
+      }
+    };
+    fetchCurrentUserGender();
+  }, [user, options.filterByOppositeGender]);
 
   useEffect(() => {
     fetchProfiles();
-  }, [options.search, options.ageFrom, options.ageTo, options.city, user]);
+  }, [options.search, options.ageFrom, options.ageTo, options.city, user, currentUserGender]);
 
   const fetchProfiles = async () => {
     try {
@@ -34,6 +54,12 @@ export function useProfiles(options: UseProfilesOptions = {}) {
       // Exclude current user's profile if logged in
       if (user && options.excludeCurrentUser !== false) {
         query = query.neq('user_id', user.id);
+      }
+
+      // Filter by opposite gender - men see women, women see men
+      if (currentUserGender && options.filterByOppositeGender !== false) {
+        const oppositeGender = currentUserGender === 'male' ? 'female' : 'male';
+        query = query.eq('gender', oppositeGender);
       }
 
       // Apply filters
