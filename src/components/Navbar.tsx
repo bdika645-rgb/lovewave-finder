@@ -1,12 +1,19 @@
 import { Link, useLocation } from "react-router-dom";
-import { Heart, Menu, X, User, MessageCircle, Search } from "lucide-react";
+import { Heart, Menu, X, User, MessageCircle, Search, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const isHome = location.pathname === "/";
+  const { user, signOut } = useAuth();
+
+  const handleLogout = async () => {
+    await signOut();
+    setIsOpen(false);
+  };
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -59,16 +66,25 @@ const Navbar = () => {
 
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center gap-3">
-            <Link to="/login">
-              <Button variant={isHome ? "hero-outline" : "ghost"}>
-                התחברות
+            {user ? (
+              <Button variant={isHome ? "hero-outline" : "ghost"} onClick={handleLogout}>
+                <LogOut className="w-4 h-4 ml-1" />
+                התנתק
               </Button>
-            </Link>
-            <Link to="/register">
-              <Button variant="hero">
-                הרשמה
-              </Button>
-            </Link>
+            ) : (
+              <>
+                <Link to="/login">
+                  <Button variant={isHome ? "hero-outline" : "ghost"}>
+                    התחברות
+                  </Button>
+                </Link>
+                <Link to="/register">
+                  <Button variant="hero">
+                    הרשמה
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -98,12 +114,21 @@ const Navbar = () => {
                 הפרופיל שלי
               </Link>
               <hr className="border-border" />
-              <Link to="/login" onClick={() => setIsOpen(false)}>
-                <Button variant="outline" className="w-full">התחברות</Button>
-              </Link>
-              <Link to="/register" onClick={() => setIsOpen(false)}>
-                <Button variant="hero" className="w-full">הרשמה</Button>
-              </Link>
+              {user ? (
+                <Button variant="outline" className="w-full" onClick={handleLogout}>
+                  <LogOut className="w-4 h-4 ml-1" />
+                  התנתק
+                </Button>
+              ) : (
+                <>
+                  <Link to="/login" onClick={() => setIsOpen(false)}>
+                    <Button variant="outline" className="w-full">התחברות</Button>
+                  </Link>
+                  <Link to="/register" onClick={() => setIsOpen(false)}>
+                    <Button variant="hero" className="w-full">הרשמה</Button>
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         )}
