@@ -31,10 +31,12 @@ import {
 } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
+type AppRole = "admin" | "moderator" | "user";
+
 interface RoleUser {
   id: string;
   user_id: string;
-  role: string;
+  role: AppRole;
   created_at: string;
   profile?: { name: string; avatar_url: string | null } | null;
 }
@@ -132,7 +134,7 @@ export default function AdminRoles() {
     }
   };
 
-  const updateRole = async (userId: string, newRole: string) => {
+  const updateRole = async (userId: string, newRole: AppRole) => {
     try {
       const { error } = await supabase
         .from("user_roles")
@@ -333,7 +335,7 @@ export default function AdminRoles() {
                   <TableCell>
                     <Select 
                       value={roleUser.role} 
-                      onValueChange={(v) => updateRole(roleUser.user_id, v as "admin" | "moderator" | "user")}
+                      onValueChange={(v) => updateRole(roleUser.user_id, v as AppRole)}
                     >
                       <SelectTrigger className="w-[130px]">
                         <SelectValue />

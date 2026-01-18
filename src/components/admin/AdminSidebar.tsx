@@ -8,7 +8,9 @@ import {
   BarChart3,
   Shield,
   LogOut,
-  Home
+  Home,
+  Flag,
+  Activity
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
@@ -18,6 +20,8 @@ const menuItems = [
   { icon: Users, label: "משתמשים", path: "/admin/users" },
   { icon: Heart, label: "מאצ'ים ולייקים", path: "/admin/matches" },
   { icon: MessageCircle, label: "הודעות", path: "/admin/messages" },
+  { icon: Flag, label: "דיווחים", path: "/admin/reports" },
+  { icon: Activity, label: "יומן פעילות", path: "/admin/activity" },
   { icon: BarChart3, label: "סטטיסטיקות", path: "/admin/analytics" },
   { icon: Shield, label: "תפקידים והרשאות", path: "/admin/roles" },
   { icon: Settings, label: "הגדרות", path: "/admin/settings" },
