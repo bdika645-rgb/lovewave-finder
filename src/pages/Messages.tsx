@@ -30,10 +30,13 @@ const Messages = () => {
 
   // Mark messages as read when conversation is selected
   useEffect(() => {
-    if (selectedConversationId) {
+    if (selectedConversationId && messages.length > 0) {
       markAsRead();
+      // Refetch conversations to update unread counts
+      const timer = setTimeout(() => refetchConversations(), 500);
+      return () => clearTimeout(timer);
     }
-  }, [selectedConversationId, messages.length]);
+  }, [selectedConversationId, messages.length, markAsRead, refetchConversations]);
 
   const [myProfileId, setMyProfileId] = useState<string | null>(null);
   
