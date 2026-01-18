@@ -1,4 +1,4 @@
-import { Heart, X, MapPin, Crown } from "lucide-react";
+import { Heart, X, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
@@ -23,12 +23,6 @@ const MemberCard = ({ member, onLike, onPass }: MemberCardProps) => {
           />
           <div className="absolute inset-0 gradient-overlay" />
           
-          {/* VIP Badge */}
-          <div className="absolute top-4 left-4 flex items-center gap-2 glass-gold px-3 py-1.5 rounded-full">
-            <Crown className="w-3 h-3 text-primary" />
-            <span className="text-xs font-medium text-primary">VIP</span>
-          </div>
-
           {/* Online Status */}
           {member.isOnline && (
             <div className="absolute top-4 right-4 flex items-center gap-2 glass-effect px-3 py-1.5 rounded-full">

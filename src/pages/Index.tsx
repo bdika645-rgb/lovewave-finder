@@ -5,7 +5,7 @@ import SuccessStoriesSection from "@/components/SuccessStoriesSection";
 import FAQSection from "@/components/FAQSection";
 import StatsSection from "@/components/StatsSection";
 import DatingTipsSection from "@/components/DatingTipsSection";
-import PremiumSection from "@/components/PremiumSection";
+
 import { useProfiles } from "@/hooks/useProfiles";
 import { Heart, Shield, Sparkles, Users, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -127,8 +127,6 @@ const Index = () => {
       {/* Dating Tips */}
       <DatingTipsSection />
 
-      {/* Premium Section */}
-      <PremiumSection />
 
       {/* FAQ Section */}
       <FAQSection />

@@ -12,7 +12,6 @@ export interface Member {
   education?: string;
   height?: number;
   lookingFor?: string;
-  isPremium?: boolean;
 }
 
 export const members: Member[] = [
@@ -29,7 +28,6 @@ export const members: Member[] = [
     education: "תואר ראשון בעיצוב",
     height: 165,
     lookingFor: "קשר רציני",
-    isPremium: true,
   },
   {
     id: "2",
@@ -59,7 +57,6 @@ export const members: Member[] = [
     education: "תואר במשפטים",
     height: 170,
     lookingFor: "קשר רציני",
-    isPremium: true,
   },
   {
     id: "4",
@@ -103,7 +100,6 @@ export const members: Member[] = [
     education: "בית ספר לבישול",
     height: 182,
     lookingFor: "קשר רציני",
-    isPremium: true,
   },
   {
     id: "7",
@@ -147,7 +143,6 @@ export const members: Member[] = [
     education: "לימודי מוזיקה",
     height: 160,
     lookingFor: "לראות לאן זה מוביל",
-    isPremium: true,
   },
   {
     id: "10",
@@ -162,7 +157,6 @@ export const members: Member[] = [
     education: "תואר שני במשפטים",
     height: 175,
     lookingFor: "קשר רציני",
-    isPremium: true,
   },
   {
     id: "11",
@@ -312,8 +306,8 @@ export interface FAQ {
 export const faqs: FAQ[] = [
   {
     id: "1",
-    question: "האם ההרשמה באמת חינם?",
-    answer: "כן! ההרשמה ל-Spark היא חינמית לחלוטין. תוכלו ליצור פרופיל, לגלוש בפרופילים ולקבל התאמות. למשתמשי פרימיום יש גישה לתכונות מתקדמות נוספות.",
+    question: "האם השירות באמת חינמי?",
+    answer: "כן! Spark הוא חינמי לחלוטין. כל התכונות פתוחות לכולם - לייקים ללא הגבלה, צ'אט, סינון מתקדם והכל. זה המודל שלנו!",
   },
   {
     id: "2",
@@ -337,57 +331,11 @@ export const faqs: FAQ[] = [
   },
   {
     id: "6",
-    question: "מה ההבדל בין חשבון רגיל לפרימיום?",
-    answer: "משתמשי פרימיום נהנים מתכונות מתקדמות כמו: לייקים ללא הגבלה, ראיית מי עשה לייק, סינון מתקדם, ביטול סוויפ, ובוסט לפרופיל.",
+    question: "למה הכל חינמי?",
+    answer: "אנחנו מאמינים שכולם צריכים גישה שווה לאהבה. המודל שלנו מבוסס על קהילה חזקה ולא על תשלומים.",
   },
 ];
 
-// Premium features
-export interface PremiumFeature {
-  id: string;
-  title: string;
-  description: string;
-  icon: string;
-}
-
-export const premiumFeatures: PremiumFeature[] = [
-  {
-    id: "1",
-    title: "לייקים ללא הגבלה",
-    description: "שלחו כמה לייקים שתרצו ביום, בלי הגבלות",
-    icon: "heart",
-  },
-  {
-    id: "2",
-    title: "ראו מי עשה לייק",
-    description: "גלו מי אוהב אתכם עוד לפני שאתם עושים סוויפ",
-    icon: "eye",
-  },
-  {
-    id: "3",
-    title: "סינון מתקדם",
-    description: "סננו לפי גובה, השכלה, מקצוע ועוד",
-    icon: "filter",
-  },
-  {
-    id: "4",
-    title: "ביטול סוויפ",
-    description: "טעיתם? חזרו אחורה וקבלו הזדמנות נוספת",
-    icon: "undo",
-  },
-  {
-    id: "5",
-    title: "בוסט לפרופיל",
-    description: "הפרופיל שלכם יופיע ליותר אנשים",
-    icon: "rocket",
-  },
-  {
-    id: "6",
-    title: "תגית פרימיום",
-    description: "בלטו עם תגית זהב בפרופיל שלכם",
-    icon: "crown",
-  },
-];
 
 // Dating tips
 export interface DatingTip {
