@@ -195,9 +195,9 @@ const Register = () => {
 
           <p className="mt-4 text-xs text-muted-foreground text-center">
             בלחיצה על "הירשם" אתם מסכימים ל
-            <Link to="/terms" className="text-primary hover:underline">תנאי השימוש</Link>
+            <button type="button" onClick={() => toast.info("תנאי השימוש יהיו זמינים בקרוב")} className="text-primary hover:underline">תנאי השימוש</button>
             {" "}ול
-            <Link to="/privacy" className="text-primary hover:underline">מדיניות הפרטיות</Link>
+            <button type="button" onClick={() => toast.info("מדיניות הפרטיות תהיה זמינה בקרוב")} className="text-primary hover:underline">מדיניות הפרטיות</button>
           </p>
 
           <div className="mt-6 text-center">
