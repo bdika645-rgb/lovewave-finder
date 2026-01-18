@@ -224,12 +224,13 @@ export type Database = {
           gender: string | null
           id: string
           interests: string[] | null
+          is_demo: boolean | null
           is_online: boolean | null
           last_seen: string | null
           looking_for: string | null
           name: string
           updated_at: string
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           age: number
@@ -240,12 +241,13 @@ export type Database = {
           gender?: string | null
           id?: string
           interests?: string[] | null
+          is_demo?: boolean | null
           is_online?: boolean | null
           last_seen?: string | null
           looking_for?: string | null
           name: string
           updated_at?: string
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           age?: number
@@ -256,12 +258,13 @@ export type Database = {
           gender?: string | null
           id?: string
           interests?: string[] | null
+          is_demo?: boolean | null
           is_online?: boolean | null
           last_seen?: string | null
           looking_for?: string | null
           name?: string
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: []
       }
