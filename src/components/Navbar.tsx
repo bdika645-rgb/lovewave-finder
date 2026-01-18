@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Heart, Menu, X, User, MessageCircle, Search, LogOut } from "lucide-react";
+import { Heart, Menu, X, User, MessageCircle, Search, LogOut, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
@@ -36,10 +36,19 @@ const Navbar = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
             <Link 
+              to="/discover" 
+              className={`font-body font-medium transition-colors hover:text-primary ${
+                isHome ? "text-primary-foreground/80 hover:text-primary-foreground" : "text-muted-foreground"
+              } ${location.pathname === '/discover' ? 'text-primary' : ''}`}
+            >
+              <Sparkles className="w-4 h-4 inline-block ml-1" />
+              Swipe
+            </Link>
+            <Link 
               to="/members" 
               className={`font-body font-medium transition-colors hover:text-primary ${
                 isHome ? "text-primary-foreground/80 hover:text-primary-foreground" : "text-muted-foreground"
-              }`}
+              } ${location.pathname === '/members' ? 'text-primary' : ''}`}
             >
               <Search className="w-4 h-4 inline-block ml-1" />
               גלה
@@ -48,7 +57,7 @@ const Navbar = () => {
               to="/messages" 
               className={`font-body font-medium transition-colors hover:text-primary ${
                 isHome ? "text-primary-foreground/80 hover:text-primary-foreground" : "text-muted-foreground"
-              }`}
+              } ${location.pathname === '/messages' ? 'text-primary' : ''}`}
             >
               <MessageCircle className="w-4 h-4 inline-block ml-1" />
               הודעות
@@ -57,7 +66,7 @@ const Navbar = () => {
               to="/profile" 
               className={`font-body font-medium transition-colors hover:text-primary ${
                 isHome ? "text-primary-foreground/80 hover:text-primary-foreground" : "text-muted-foreground"
-              }`}
+              } ${location.pathname === '/profile' ? 'text-primary' : ''}`}
             >
               <User className="w-4 h-4 inline-block ml-1" />
               פרופיל
@@ -104,6 +113,10 @@ const Navbar = () => {
         {isOpen && (
           <div className="md:hidden glass-effect rounded-2xl p-6 mb-4 animate-slide-up">
             <div className="flex flex-col gap-4">
+              <Link to="/discover" onClick={() => setIsOpen(false)} className="font-body text-foreground py-2">
+                <Sparkles className="w-4 h-4 inline-block ml-1" />
+                Swipe
+              </Link>
               <Link to="/members" onClick={() => setIsOpen(false)} className="font-body text-foreground py-2">
                 גלה פרופילים
               </Link>

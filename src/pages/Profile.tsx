@@ -3,12 +3,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Camera, Edit2, MapPin, Calendar, Heart, Settings, LogOut, X, Plus, Loader2 } from "lucide-react";
+import { Edit2, MapPin, Calendar, Heart, Settings, LogOut, X, Plus, Loader2, Users, Eye } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
+import { useProfileStats } from "@/hooks/useProfileStats";
+import PhotoUpload from "@/components/PhotoUpload";
 
 const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -17,7 +19,8 @@ const Profile = () => {
   const [showAddInterest, setShowAddInterest] = useState(false);
   const navigate = useNavigate();
   const { signOut } = useAuth();
-  const { profile, loading, updateProfile } = useProfile();
+  const { profile, loading, updateProfile, refetch } = useProfile();
+  const { stats, loading: statsLoading } = useProfileStats();
   
   // Local edit state
   const [editedProfile, setEditedProfile] = useState({
@@ -102,8 +105,8 @@ const Profile = () => {
     toast.info("דף ההגדרות בפיתוח");
   };
 
-  const handleUploadPhoto = () => {
-    toast.info("העלאת תמונות תתאפשר בגרסה הבאה");
+  const handlePhotoUploadComplete = (url: string) => {
+    refetch(); // Refresh profile data
   };
 
   if (loading) {
@@ -145,35 +148,25 @@ const Profile = () => {
         <div className="bg-card rounded-3xl shadow-card overflow-hidden mb-6">
           {/* Cover Image */}
           <div className="h-48 gradient-primary relative">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="absolute bottom-4 left-4 bg-primary-foreground/20 hover:bg-primary-foreground/30 text-primary-foreground"
-              onClick={handleUploadPhoto}
-            >
-              <Camera className="w-5 h-5" />
-            </Button>
           </div>
 
           {/* Profile Info */}
           <div className="relative px-8 pb-8">
-            {/* Avatar */}
+            {/* Avatar with PhotoUpload */}
             <div className="absolute -top-16 right-8">
-              <div className="relative">
+              {isEditing ? (
+                <PhotoUpload
+                  profileId={profile.id}
+                  currentAvatarUrl={profile.avatar_url}
+                  onUploadComplete={handlePhotoUploadComplete}
+                />
+              ) : (
                 <img 
                   src={imageUrl} 
                   alt={displayProfile.name}
                   className="w-32 h-32 rounded-full object-cover border-4 border-card shadow-elevated"
                 />
-                <Button 
-                  variant="hero" 
-                  size="icon" 
-                  className="absolute bottom-0 left-0"
-                  onClick={handleUploadPhoto}
-                >
-                  <Camera className="w-4 h-4" />
-                </Button>
-              </div>
+              )}
             </div>
 
             <div className="pt-20">
@@ -342,22 +335,32 @@ const Profile = () => {
               <h3 className="font-display text-lg font-bold text-foreground mb-4">
                 סטטיסטיקות
               </h3>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">לייקים שקיבלתי</span>
-                  <span className="font-bold text-primary flex items-center gap-1">
-                    <Heart className="w-4 h-4 fill-current" /> 0
-                  </span>
+              {statsLoading ? (
+                <div className="flex justify-center py-4">
+                  <Loader2 className="w-6 h-6 text-primary animate-spin" />
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">צפיות בפרופיל</span>
-                  <span className="font-bold text-foreground">0</span>
+              ) : (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">לייקים שקיבלתי</span>
+                    <span className="font-bold text-primary flex items-center gap-1">
+                      <Heart className="w-4 h-4 fill-current" /> {stats.likesReceived}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">לייקים ששלחתי</span>
+                    <span className="font-bold text-secondary flex items-center gap-1">
+                      <Heart className="w-4 h-4" /> {stats.likesSent}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">התאמות</span>
+                    <span className="font-bold text-foreground flex items-center gap-1">
+                      <Users className="w-4 h-4" /> {stats.matchesCount}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">התאמות</span>
-                  <span className="font-bold text-foreground">0</span>
-                </div>
-              </div>
+              )}
             </div>
 
             {/* Quick Actions */}
