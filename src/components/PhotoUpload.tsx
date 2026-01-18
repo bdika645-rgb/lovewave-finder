@@ -1,7 +1,8 @@
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { Camera, Upload, Loader2, X, Plus } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { Camera, Loader2, X, Plus } from "lucide-react";
 import { toast } from "sonner";
 
 interface PhotoUploadProps {
@@ -14,10 +15,16 @@ export function PhotoUpload({ profileId, currentAvatarUrl, onUploadComplete }: P
   const [uploading, setUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(currentAvatarUrl || null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { user } = useAuth();
 
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
+
+    if (!user) {
+      toast.error("נא להתחבר כדי להעלות תמונה");
+      return;
+    }
 
     // Validate file type
     if (!file.type.startsWith("image/")) {
@@ -41,12 +48,12 @@ export function PhotoUpload({ profileId, currentAvatarUrl, onUploadComplete }: P
       };
       reader.readAsDataURL(file);
 
-      // Generate unique file name
+      // Generate unique file name using user.id (matches storage policy)
       const fileExt = file.name.split(".").pop();
-      const fileName = `${profileId}/${Date.now()}.${fileExt}`;
+      const fileName = `${user.id}/${Date.now()}.${fileExt}`;
 
       // Upload to Supabase Storage
-      const { data, error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from("avatars")
         .upload(fileName, file, { 
           upsert: true,
@@ -80,7 +87,7 @@ export function PhotoUpload({ profileId, currentAvatarUrl, onUploadComplete }: P
   };
 
   const handleRemovePhoto = async () => {
-    if (!currentAvatarUrl) return;
+    if (!currentAvatarUrl || !user) return;
 
     setUploading(true);
     try {
