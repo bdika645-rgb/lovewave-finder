@@ -1,6 +1,11 @@
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import MemberCard from "@/components/MemberCard";
+import SuccessStoriesSection from "@/components/SuccessStoriesSection";
+import FAQSection from "@/components/FAQSection";
+import StatsSection from "@/components/StatsSection";
+import DatingTipsSection from "@/components/DatingTipsSection";
+import PremiumSection from "@/components/PremiumSection";
 import { members } from "@/data/members";
 import { Heart, Shield, Sparkles, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
