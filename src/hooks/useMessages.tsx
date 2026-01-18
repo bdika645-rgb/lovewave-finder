@@ -87,20 +87,27 @@ export function useMessages(conversationId: string | null) {
     }
   };
 
-  const markAsRead = async () => {
+  const markAsRead = useCallback(async () => {
     if (!conversationId) return;
 
     const myProfileId = await getMyProfileId();
     if (!myProfileId) return;
 
     // Mark all messages from other users as read
-    await supabase
+    const { error } = await supabase
       .from('messages')
       .update({ is_read: true })
       .eq('conversation_id', conversationId)
       .neq('sender_id', myProfileId)
       .eq('is_read', false);
-  };
+
+    if (!error) {
+      // Update local state to reflect read status
+      setMessages(prev => prev.map(msg => 
+        msg.sender_id !== myProfileId ? { ...msg, is_read: true } : msg
+      ));
+    }
+  }, [conversationId, getMyProfileId]);
 
   // Subscribe to realtime updates
   useEffect(() => {
