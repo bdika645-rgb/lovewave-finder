@@ -15,6 +15,17 @@ import Discover from "./pages/Discover";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 
+// Admin Pages
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminUsers from "./pages/admin/AdminUsers";
+import AdminMatches from "./pages/admin/AdminMatches";
+import AdminMessages from "./pages/admin/AdminMessages";
+import AdminAnalytics from "./pages/admin/AdminAnalytics";
+import AdminRoles from "./pages/admin/AdminRoles";
+import AdminSettings from "./pages/admin/AdminSettings";
+import AdminReports from "./pages/admin/AdminReports";
+import AdminActivityLog from "./pages/admin/AdminActivityLog";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -45,6 +56,18 @@ const App = () => (
             } />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            
+            {/* Admin Routes */}
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/users" element={<AdminUsers />} />
+            <Route path="/admin/matches" element={<AdminMatches />} />
+            <Route path="/admin/messages" element={<AdminMessages />} />
+            <Route path="/admin/analytics" element={<AdminAnalytics />} />
+            <Route path="/admin/roles" element={<AdminRoles />} />
+            <Route path="/admin/settings" element={<AdminSettings />} />
+            <Route path="/admin/reports" element={<AdminReports />} />
+            <Route path="/admin/activity" element={<AdminActivityLog />} />
+            
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
