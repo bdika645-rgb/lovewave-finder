@@ -118,6 +118,21 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Stats Section */}
+      <StatsSection />
+
+      {/* Success Stories */}
+      <SuccessStoriesSection />
+
+      {/* Dating Tips */}
+      <DatingTipsSection />
+
+      {/* Premium Section */}
+      <PremiumSection />
+
+      {/* FAQ Section */}
+      <FAQSection />
+
       {/* CTA Section */}
       <section className="py-24 gradient-primary">
         <div className="container mx-auto px-6 text-center">
