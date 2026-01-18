@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 
@@ -6,7 +6,7 @@ export function useLikes() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
 
-  const getMyProfileId = async (): Promise<string | null> => {
+  const getMyProfileId = useCallback(async (): Promise<string | null> => {
     if (!user) return null;
     
     const { data, error } = await supabase
@@ -21,14 +21,23 @@ export function useLikes() {
     }
     
     return data?.id || null;
-  };
+  }, [user]);
 
-  const sendLike = async (likedProfileId: string) => {
+  const sendLike = async (likedProfileId: string): Promise<{
+    error: Error | null;
+    isMatch?: boolean;
+    alreadyLiked?: boolean;
+  }> => {
     setLoading(true);
     try {
       const myProfileId = await getMyProfileId();
       if (!myProfileId) {
         throw new Error('Profile not found');
+      }
+
+      // Can't like yourself
+      if (myProfileId === likedProfileId) {
+        return { error: new Error("Can't like yourself"), alreadyLiked: false };
       }
 
       const { error } = await supabase
@@ -39,22 +48,23 @@ export function useLikes() {
         });
 
       if (error) {
-        // Check if it's a duplicate
+        // Check if it's a duplicate (unique constraint violation)
         if (error.code === '23505') {
           return { error: null, alreadyLiked: true };
         }
         throw error;
       }
 
-      // Check if it's a match (mutual like)
+      // Check if it's a match (mutual like) - the match is auto-created by trigger
+      // But we check here to notify the user
       const { data: mutualLike } = await supabase
         .from('likes')
         .select('id')
         .eq('liker_id', likedProfileId)
         .eq('liked_id', myProfileId)
-        .single();
+        .maybeSingle();
 
-      return { error: null, isMatch: !!mutualLike };
+      return { error: null, isMatch: !!mutualLike, alreadyLiked: false };
     } catch (err) {
       return { error: err as Error };
     } finally {
@@ -62,7 +72,7 @@ export function useLikes() {
     }
   };
 
-  const removeLike = async (likedProfileId: string) => {
+  const removeLike = async (likedProfileId: string): Promise<{ error: Error | null }> => {
     setLoading(true);
     try {
       const myProfileId = await getMyProfileId();
@@ -85,5 +95,19 @@ export function useLikes() {
     }
   };
 
-  return { sendLike, removeLike, loading };
+  const checkIfLiked = async (profileId: string): Promise<boolean> => {
+    const myProfileId = await getMyProfileId();
+    if (!myProfileId) return false;
+
+    const { data } = await supabase
+      .from('likes')
+      .select('id')
+      .eq('liker_id', myProfileId)
+      .eq('liked_id', profileId)
+      .maybeSingle();
+
+    return !!data;
+  };
+
+  return { sendLike, removeLike, checkIfLiked, loading, getMyProfileId };
 }
