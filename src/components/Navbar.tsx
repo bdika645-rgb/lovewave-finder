@@ -88,20 +88,20 @@ const Navbar = () => {
         {isOpen && (
           <div className="md:hidden glass-effect rounded-2xl p-6 mb-4 animate-slide-up">
             <div className="flex flex-col gap-4">
-              <Link to="/members" className="font-body text-foreground py-2">
+              <Link to="/members" onClick={() => setIsOpen(false)} className="font-body text-foreground py-2">
                 גלה פרופילים
               </Link>
-              <Link to="/messages" className="font-body text-foreground py-2">
+              <Link to="/messages" onClick={() => setIsOpen(false)} className="font-body text-foreground py-2">
                 הודעות
               </Link>
-              <Link to="/profile" className="font-body text-foreground py-2">
+              <Link to="/profile" onClick={() => setIsOpen(false)} className="font-body text-foreground py-2">
                 הפרופיל שלי
               </Link>
               <hr className="border-border" />
-              <Link to="/login">
+              <Link to="/login" onClick={() => setIsOpen(false)}>
                 <Button variant="outline" className="w-full">התחברות</Button>
               </Link>
-              <Link to="/register">
+              <Link to="/register" onClick={() => setIsOpen(false)}>
                 <Button variant="hero" className="w-full">הרשמה</Button>
               </Link>
             </div>
