@@ -49,6 +49,57 @@ export type Database = {
           },
         ]
       }
+      admin_notifications: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          message: string
+          read_by: string[] | null
+          target_all: boolean | null
+          target_user_id: string | null
+          title: string
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          message: string
+          read_by?: string[] | null
+          target_all?: boolean | null
+          target_user_id?: string | null
+          title: string
+          type?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          message?: string
+          read_by?: string[] | null
+          target_all?: boolean | null
+          target_user_id?: string | null
+          title?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_notifications_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "admin_notifications_target_user_id_fkey"
+            columns: ["target_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       app_settings: {
         Row: {
           id: string
@@ -75,6 +126,58 @@ export type Database = {
           {
             foreignKeyName: "app_settings_updated_by_fkey"
             columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      blocked_users: {
+        Row: {
+          admin_id: string | null
+          blocked_by_admin: boolean | null
+          blocked_id: string
+          blocker_id: string
+          created_at: string
+          id: string
+          reason: string | null
+        }
+        Insert: {
+          admin_id?: string | null
+          blocked_by_admin?: boolean | null
+          blocked_id: string
+          blocker_id: string
+          created_at?: string
+          id?: string
+          reason?: string | null
+        }
+        Update: {
+          admin_id?: string | null
+          blocked_by_admin?: boolean | null
+          blocked_id?: string
+          blocker_id?: string
+          created_at?: string
+          id?: string
+          reason?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blocked_users_admin_id_fkey"
+            columns: ["admin_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blocked_users_blocked_id_fkey"
+            columns: ["blocked_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blocked_users_blocker_id_fkey"
+            columns: ["blocker_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -286,11 +389,15 @@ export type Database = {
           age: number
           avatar_url: string | null
           bio: string | null
+          blocked_at: string | null
+          blocked_by: string | null
+          blocked_reason: string | null
           city: string
           created_at: string
           gender: string | null
           id: string
           interests: string[] | null
+          is_blocked: boolean | null
           is_demo: boolean | null
           is_online: boolean | null
           last_seen: string | null
@@ -303,11 +410,15 @@ export type Database = {
           age: number
           avatar_url?: string | null
           bio?: string | null
+          blocked_at?: string | null
+          blocked_by?: string | null
+          blocked_reason?: string | null
           city: string
           created_at?: string
           gender?: string | null
           id?: string
           interests?: string[] | null
+          is_blocked?: boolean | null
           is_demo?: boolean | null
           is_online?: boolean | null
           last_seen?: string | null
@@ -320,11 +431,15 @@ export type Database = {
           age?: number
           avatar_url?: string | null
           bio?: string | null
+          blocked_at?: string | null
+          blocked_by?: string | null
+          blocked_reason?: string | null
           city?: string
           created_at?: string
           gender?: string | null
           id?: string
           interests?: string[] | null
+          is_blocked?: boolean | null
           is_demo?: boolean | null
           is_online?: boolean | null
           last_seen?: string | null
@@ -333,7 +448,15 @@ export type Database = {
           updated_at?: string
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_blocked_by_fkey"
+            columns: ["blocked_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       reports: {
         Row: {
