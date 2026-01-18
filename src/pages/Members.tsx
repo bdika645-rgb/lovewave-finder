@@ -26,6 +26,7 @@ const Members = () => {
     ageFrom: activeFilters.ageFrom,
     ageTo: activeFilters.ageTo,
     city: activeFilters.city,
+    filterByOppositeGender: false, // Show all profiles in browse mode
   });
 
   const handleLike = async (memberId: string, memberName: string) => {
