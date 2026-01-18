@@ -1,18 +1,50 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Heart, Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { Heart, Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const validateEmail = (email: string) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validation
+    if (!email.trim()) {
+      toast.error("נא להזין כתובת אימייל");
+      return;
+    }
+    if (!validateEmail(email)) {
+      toast.error("כתובת האימייל אינה תקינה");
+      return;
+    }
+    if (!password.trim()) {
+      toast.error("נא להזין סיסמה");
+      return;
+    }
+    if (password.length < 6) {
+      toast.error("הסיסמה חייבת להכיל לפחות 6 תווים");
+      return;
+    }
+
+    setIsLoading(true);
+    
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    setIsLoading(false);
     toast.success("התחברת בהצלחה! 🎉");
+    navigate("/members");
   };
 
   return (
@@ -89,8 +121,15 @@ const Login = () => {
               </Link>
             </div>
 
-            <Button variant="hero" size="lg" className="w-full">
-              התחבר
+            <Button variant="hero" size="lg" className="w-full" disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  מתחבר...
+                </>
+              ) : (
+                "התחבר"
+              )}
             </Button>
           </form>
 

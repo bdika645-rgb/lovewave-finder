@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Heart, Mail, Lock, User, Eye, EyeOff, MapPin } from "lucide-react";
+import { Heart, Mail, Lock, User, Eye, EyeOff, MapPin, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 const Register = () => {
@@ -14,14 +14,58 @@ const Register = () => {
     confirmPassword: "",
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const validateEmail = (email: string) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validation
+    if (!formData.name.trim()) {
+      toast.error("נא להזין שם מלא");
+      return;
+    }
+    if (formData.name.trim().length < 2) {
+      toast.error("השם חייב להכיל לפחות 2 תווים");
+      return;
+    }
+    if (!formData.email.trim()) {
+      toast.error("נא להזין כתובת אימייל");
+      return;
+    }
+    if (!validateEmail(formData.email)) {
+      toast.error("כתובת האימייל אינה תקינה");
+      return;
+    }
+    if (!formData.city.trim()) {
+      toast.error("נא להזין עיר מגורים");
+      return;
+    }
+    if (!formData.password.trim()) {
+      toast.error("נא להזין סיסמה");
+      return;
+    }
+    if (formData.password.length < 6) {
+      toast.error("הסיסמה חייבת להכיל לפחות 6 תווים");
+      return;
+    }
     if (formData.password !== formData.confirmPassword) {
       toast.error("הסיסמאות לא תואמות");
       return;
     }
+
+    setIsLoading(true);
+    
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    setIsLoading(false);
     toast.success("נרשמת בהצלחה! ברוכים הבאים ל-Spark 💕");
+    navigate("/members");
   };
 
   return (
@@ -137,8 +181,15 @@ const Register = () => {
               </div>
             </div>
 
-            <Button variant="hero" size="lg" className="w-full">
-              הירשם
+            <Button variant="hero" size="lg" className="w-full" disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  נרשם...
+                </>
+              ) : (
+                "הירשם"
+              )}
             </Button>
           </form>
 
