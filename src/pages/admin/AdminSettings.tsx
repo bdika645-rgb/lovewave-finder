@@ -1,31 +1,43 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
+import { useAppSettings } from "@/hooks/useAppSettings";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { toast } from "sonner";
-import { Save, Bell, Shield, Palette, Globe } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Save, Bell, Shield, Palette, Globe, Loader2 } from "lucide-react";
 
 export default function AdminSettings() {
-  const [settings, setSettings] = useState({
-    siteName: "Spark",
-    siteDescription: "אפליקציית הכרויות מובילה בישראל",
-    maintenanceMode: false,
-    allowRegistration: true,
-    emailNotifications: true,
-    pushNotifications: true,
-    minAge: 18,
-    maxAge: 99,
-    maxPhotos: 6,
-    welcomeMessage: "ברוכים הבאים ל-Spark! מקווים שתמצאו את האהבה האמיתית."
-  });
+  const { settings, loading, saving, updateSettings } = useAppSettings();
+  const [localSettings, setLocalSettings] = useState(settings);
 
-  const handleSave = () => {
-    // In a real app, this would save to the database
-    toast.success("ההגדרות נשמרו בהצלחה");
+  useEffect(() => {
+    setLocalSettings(settings);
+  }, [settings]);
+
+  const handleSave = async () => {
+    await updateSettings(localSettings);
   };
+
+  if (loading) {
+    return (
+      <AdminLayout>
+        <div className="space-y-8 max-w-4xl">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">הגדרות</h1>
+            <p className="text-muted-foreground mt-1">הגדרות כלליות של האפליקציה</p>
+          </div>
+          <div className="space-y-6">
+            {[...Array(4)].map((_, i) => (
+              <Skeleton key={i} className="h-48 rounded-xl" />
+            ))}
+          </div>
+        </div>
+      </AdminLayout>
+    );
+  }
 
   return (
     <AdminLayout>
@@ -47,8 +59,8 @@ export default function AdminSettings() {
               <Label htmlFor="siteName">שם האתר</Label>
               <Input
                 id="siteName"
-                value={settings.siteName}
-                onChange={(e) => setSettings({ ...settings, siteName: e.target.value })}
+                value={localSettings.site_name}
+                onChange={(e) => setLocalSettings({ ...localSettings, site_name: e.target.value })}
               />
             </div>
 
@@ -56,8 +68,8 @@ export default function AdminSettings() {
               <Label htmlFor="siteDescription">תיאור האתר</Label>
               <Input
                 id="siteDescription"
-                value={settings.siteDescription}
-                onChange={(e) => setSettings({ ...settings, siteDescription: e.target.value })}
+                value={localSettings.site_description}
+                onChange={(e) => setLocalSettings({ ...localSettings, site_description: e.target.value })}
               />
             </div>
           </div>
@@ -66,8 +78,8 @@ export default function AdminSettings() {
             <Label htmlFor="welcomeMessage">הודעת פתיחה</Label>
             <Textarea
               id="welcomeMessage"
-              value={settings.welcomeMessage}
-              onChange={(e) => setSettings({ ...settings, welcomeMessage: e.target.value })}
+              value={localSettings.welcome_message}
+              onChange={(e) => setLocalSettings({ ...localSettings, welcome_message: e.target.value })}
               rows={3}
             />
           </div>
@@ -87,8 +99,8 @@ export default function AdminSettings() {
                 <p className="text-sm text-muted-foreground">חסום גישה לאתר למשתמשים רגילים</p>
               </div>
               <Switch
-                checked={settings.maintenanceMode}
-                onCheckedChange={(checked) => setSettings({ ...settings, maintenanceMode: checked })}
+                checked={localSettings.maintenance_mode}
+                onCheckedChange={(checked) => setLocalSettings({ ...localSettings, maintenance_mode: checked })}
               />
             </div>
 
@@ -98,8 +110,8 @@ export default function AdminSettings() {
                 <p className="text-sm text-muted-foreground">אפשר למשתמשים חדשים להירשם</p>
               </div>
               <Switch
-                checked={settings.allowRegistration}
-                onCheckedChange={(checked) => setSettings({ ...settings, allowRegistration: checked })}
+                checked={localSettings.allow_registration}
+                onCheckedChange={(checked) => setLocalSettings({ ...localSettings, allow_registration: checked })}
               />
             </div>
           </div>
@@ -119,8 +131,8 @@ export default function AdminSettings() {
                 <p className="text-sm text-muted-foreground">שלח התראות באימייל למשתמשים</p>
               </div>
               <Switch
-                checked={settings.emailNotifications}
-                onCheckedChange={(checked) => setSettings({ ...settings, emailNotifications: checked })}
+                checked={localSettings.email_notifications}
+                onCheckedChange={(checked) => setLocalSettings({ ...localSettings, email_notifications: checked })}
               />
             </div>
 
@@ -130,8 +142,8 @@ export default function AdminSettings() {
                 <p className="text-sm text-muted-foreground">שלח התראות push למכשירים</p>
               </div>
               <Switch
-                checked={settings.pushNotifications}
-                onCheckedChange={(checked) => setSettings({ ...settings, pushNotifications: checked })}
+                checked={localSettings.push_notifications}
+                onCheckedChange={(checked) => setLocalSettings({ ...localSettings, push_notifications: checked })}
               />
             </div>
           </div>
@@ -150,8 +162,8 @@ export default function AdminSettings() {
               <Input
                 id="minAge"
                 type="number"
-                value={settings.minAge}
-                onChange={(e) => setSettings({ ...settings, minAge: parseInt(e.target.value) })}
+                value={localSettings.min_age}
+                onChange={(e) => setLocalSettings({ ...localSettings, min_age: parseInt(e.target.value) || 18 })}
               />
             </div>
 
@@ -160,8 +172,8 @@ export default function AdminSettings() {
               <Input
                 id="maxAge"
                 type="number"
-                value={settings.maxAge}
-                onChange={(e) => setSettings({ ...settings, maxAge: parseInt(e.target.value) })}
+                value={localSettings.max_age}
+                onChange={(e) => setLocalSettings({ ...localSettings, max_age: parseInt(e.target.value) || 99 })}
               />
             </div>
 
@@ -170,8 +182,8 @@ export default function AdminSettings() {
               <Input
                 id="maxPhotos"
                 type="number"
-                value={settings.maxPhotos}
-                onChange={(e) => setSettings({ ...settings, maxPhotos: parseInt(e.target.value) })}
+                value={localSettings.max_photos}
+                onChange={(e) => setLocalSettings({ ...localSettings, max_photos: parseInt(e.target.value) || 6 })}
               />
             </div>
           </div>
@@ -179,8 +191,12 @@ export default function AdminSettings() {
 
         {/* Save Button */}
         <div className="flex justify-end">
-          <Button onClick={handleSave} size="lg">
-            <Save className="w-4 h-4 ml-2" />
+          <Button onClick={handleSave} size="lg" disabled={saving}>
+            {saving ? (
+              <Loader2 className="w-4 h-4 ml-2 animate-spin" />
+            ) : (
+              <Save className="w-4 h-4 ml-2" />
+            )}
             שמור הגדרות
           </Button>
         </div>

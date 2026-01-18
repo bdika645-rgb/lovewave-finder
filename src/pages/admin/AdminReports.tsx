@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { supabase } from "@/integrations/supabase/client";
+import { useReports, Report } from "@/hooks/useReports";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Flag, AlertTriangle, CheckCircle, XCircle, Eye } from "lucide-react";
+import { Flag, AlertTriangle, CheckCircle, XCircle, Eye, Trash2, RefreshCw } from "lucide-react";
 import StatsCard from "@/components/admin/StatsCard";
 import {
   Table,
@@ -29,73 +29,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { he } from "date-fns/locale";
 
-interface Report {
-  id: string;
-  reporter_id: string;
-  reported_id: string;
-  reason: string;
-  description: string;
-  status: "pending" | "reviewed" | "resolved" | "dismissed";
-  created_at: string;
-  reporter?: { name: string; avatar_url: string | null } | null;
-  reported?: { name: string; avatar_url: string | null } | null;
-}
-
-// Mock data for demonstration
-const mockReports: Report[] = [
-  {
-    id: "1",
-    reporter_id: "user1",
-    reported_id: "user2",
-    reason: "spam",
-    description: "המשתמש שולח הודעות ספאם חוזרות",
-    status: "pending",
-    created_at: new Date().toISOString(),
-    reporter: { name: "דנה כהן", avatar_url: null },
-    reported: { name: "יוסי לוי", avatar_url: null },
-  },
-  {
-    id: "2",
-    reporter_id: "user3",
-    reported_id: "user4",
-    reason: "inappropriate",
-    description: "תמונת פרופיל לא הולמת",
-    status: "reviewed",
-    created_at: new Date(Date.now() - 86400000).toISOString(),
-    reporter: { name: "מיכל אברהם", avatar_url: null },
-    reported: { name: "אבי ישראלי", avatar_url: null },
-  },
-  {
-    id: "3",
-    reporter_id: "user5",
-    reported_id: "user6",
-    reason: "harassment",
-    description: "הטרדה בהודעות פרטיות",
-    status: "resolved",
-    created_at: new Date(Date.now() - 172800000).toISOString(),
-    reporter: { name: "שרה דוד", avatar_url: null },
-    reported: { name: "רון מזרחי", avatar_url: null },
-  },
-];
-
 export default function AdminReports() {
-  const [reports, setReports] = useState<Report[]>(mockReports);
-  const [loading, setLoading] = useState(false);
+  const [filterStatus, setFilterStatus] = useState<string>("all");
+  const { reports, loading, stats, refetch, updateReportStatus, deleteReport } = useReports({ status: filterStatus });
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
-  const [filterStatus, setFilterStatus] = useState<string>("all");
   const [adminNote, setAdminNote] = useState("");
-
-  const stats = {
-    total: reports.length,
-    pending: reports.filter(r => r.status === "pending").length,
-    resolved: reports.filter(r => r.status === "resolved").length,
-    dismissed: reports.filter(r => r.status === "dismissed").length,
-  };
 
   const getReasonLabel = (reason: string) => {
     const labels: Record<string, string> = {
@@ -123,22 +65,19 @@ export default function AdminReports() {
     }
   };
 
-  const handleStatusUpdate = (reportId: string, newStatus: string) => {
-    setReports(reports.map(r => 
-      r.id === reportId ? { ...r, status: newStatus as Report["status"] } : r
-    ));
-    toast.success("סטטוס הדיווח עודכן");
-    setViewDialogOpen(false);
+  const handleStatusUpdate = async (newStatus: Report["status"]) => {
+    if (selectedReport) {
+      await updateReportStatus(selectedReport.id, newStatus, adminNote);
+      setViewDialogOpen(false);
+      setAdminNote("");
+    }
   };
 
   const handleViewReport = (report: Report) => {
     setSelectedReport(report);
+    setAdminNote(report.admin_note || "");
     setViewDialogOpen(true);
   };
-
-  const filteredReports = filterStatus === "all" 
-    ? reports 
-    : reports.filter(r => r.status === filterStatus);
 
   if (loading) {
     return (
@@ -158,9 +97,15 @@ export default function AdminReports() {
   return (
     <AdminLayout>
       <div className="space-y-8">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">דיווחים ותלונות</h1>
-          <p className="text-muted-foreground mt-1">ניהול דיווחים על משתמשים ותוכן</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">דיווחים ותלונות</h1>
+            <p className="text-muted-foreground mt-1">ניהול דיווחים על משתמשים ותוכן</p>
+          </div>
+          <Button variant="outline" onClick={() => refetch()}>
+            <RefreshCw className="w-4 h-4 ml-2" />
+            רענן
+          </Button>
         </div>
 
         {/* Stats */}
@@ -206,7 +151,7 @@ export default function AdminReports() {
         {/* Reports Table */}
         <div className="bg-card rounded-xl border border-border overflow-hidden">
           <div className="p-4 border-b border-border">
-            <h3 className="text-lg font-semibold">דיווחים אחרונים</h3>
+            <h3 className="text-lg font-semibold">דיווחים</h3>
           </div>
           <Table>
             <TableHeader>
@@ -220,7 +165,7 @@ export default function AdminReports() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredReports.map((report) => (
+              {reports.map((report) => (
                 <TableRow key={report.id}>
                   <TableCell>
                     <div className="flex items-center gap-2">
@@ -248,18 +193,28 @@ export default function AdminReports() {
                     {formatDistanceToNow(new Date(report.created_at), { addSuffix: true, locale: he })}
                   </TableCell>
                   <TableCell>
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      onClick={() => handleViewReport(report)}
-                    >
-                      <Eye className="w-4 h-4 ml-2" />
-                      צפה
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => handleViewReport(report)}
+                      >
+                        <Eye className="w-4 h-4 ml-1" />
+                        צפה
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-destructive hover:text-destructive"
+                        onClick={() => deleteReport(report.id)}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
-              {filteredReports.length === 0 && (
+              {reports.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
                     אין דיווחים
@@ -309,10 +264,12 @@ export default function AdminReports() {
                   </div>
                 </div>
 
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">תיאור</p>
-                  <p className="text-foreground bg-muted p-3 rounded-lg">{selectedReport.description}</p>
-                </div>
+                {selectedReport.description && (
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">תיאור</p>
+                    <p className="text-foreground bg-muted p-3 rounded-lg">{selectedReport.description}</p>
+                  </div>
+                )}
 
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">הערת מנהל</p>
@@ -328,7 +285,7 @@ export default function AdminReports() {
                   <Button 
                     variant="default" 
                     className="flex-1"
-                    onClick={() => handleStatusUpdate(selectedReport.id, "resolved")}
+                    onClick={() => handleStatusUpdate("resolved")}
                   >
                     <CheckCircle className="w-4 h-4 ml-2" />
                     טפל
@@ -336,7 +293,7 @@ export default function AdminReports() {
                   <Button 
                     variant="outline" 
                     className="flex-1"
-                    onClick={() => handleStatusUpdate(selectedReport.id, "dismissed")}
+                    onClick={() => handleStatusUpdate("dismissed")}
                   >
                     <XCircle className="w-4 h-4 ml-2" />
                     דחה
