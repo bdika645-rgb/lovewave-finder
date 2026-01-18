@@ -10,7 +10,10 @@ import {
   LogOut,
   Home,
   Flag,
-  Activity
+  Activity,
+  Image,
+  Bell,
+  UserX
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
@@ -21,6 +24,9 @@ const menuItems = [
   { icon: Heart, label: "מאצ'ים ולייקים", path: "/admin/matches" },
   { icon: MessageCircle, label: "הודעות", path: "/admin/messages" },
   { icon: Flag, label: "דיווחים", path: "/admin/reports" },
+  { icon: UserX, label: "משתמשים חסומים", path: "/admin/blocked" },
+  { icon: Image, label: "ניהול תוכן", path: "/admin/content" },
+  { icon: Bell, label: "התראות", path: "/admin/notifications" },
   { icon: Activity, label: "יומן פעילות", path: "/admin/activity" },
   { icon: BarChart3, label: "סטטיסטיקות", path: "/admin/analytics" },
   { icon: Shield, label: "תפקידים והרשאות", path: "/admin/roles" },

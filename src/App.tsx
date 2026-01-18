@@ -25,6 +25,9 @@ import AdminRoles from "./pages/admin/AdminRoles";
 import AdminSettings from "./pages/admin/AdminSettings";
 import AdminReports from "./pages/admin/AdminReports";
 import AdminActivityLog from "./pages/admin/AdminActivityLog";
+import AdminBlockedUsers from "./pages/admin/AdminBlockedUsers";
+import AdminContent from "./pages/admin/AdminContent";
+import AdminNotifications from "./pages/admin/AdminNotifications";
 
 const queryClient = new QueryClient();
 
@@ -67,6 +70,9 @@ const App = () => (
             <Route path="/admin/settings" element={<AdminSettings />} />
             <Route path="/admin/reports" element={<AdminReports />} />
             <Route path="/admin/activity" element={<AdminActivityLog />} />
+            <Route path="/admin/blocked" element={<AdminBlockedUsers />} />
+            <Route path="/admin/content" element={<AdminContent />} />
+            <Route path="/admin/notifications" element={<AdminNotifications />} />
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
