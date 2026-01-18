@@ -1,18 +1,23 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useProfileById } from "@/hooks/useProfiles";
 import { useLikes } from "@/hooks/useLikes";
+import { useConversations } from "@/hooks/useConversations";
 import { useAuth } from "@/hooks/useAuth";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Heart, MessageCircle, MapPin, Clock, ArrowRight, Star, Share2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useState } from "react";
 
 const MemberProfile = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { profile: member, loading, error } = useProfileById(id || "");
   const { sendLike, loading: likeLoading } = useLikes();
+  const { createOrGetConversation } = useConversations();
   const { user } = useAuth();
+  const [messageLoading, setMessageLoading] = useState(false);
 
   if (loading) {
     return (
@@ -60,12 +65,22 @@ const MemberProfile = () => {
     }
   };
 
-  const handleMessage = () => {
+  const handleMessage = async () => {
     if (!user) {
       toast.error("נא להתחבר כדי לשלוח הודעות");
       return;
     }
-    toast.success("נפתח צ'אט חדש!");
+    
+    setMessageLoading(true);
+    const conversationId = await createOrGetConversation(member!.id);
+    setMessageLoading(false);
+    
+    if (conversationId) {
+      navigate("/messages");
+      toast.success("נפתח צ'אט עם " + member!.name);
+    } else {
+      toast.error("שגיאה בפתיחת הצ'אט");
+    }
   };
 
   const handleShare = async () => {
@@ -208,9 +223,19 @@ const MemberProfile = () => {
                   )}
                   שלח לייק
                 </Button>
-                <Button variant="outline" size="lg" className="flex-1" onClick={handleMessage}>
-                  <MessageCircle className="w-5 h-5" />
-                  שלח הודעה
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="flex-1" 
+                  onClick={handleMessage}
+                  disabled={messageLoading}
+                >
+                  {messageLoading ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <MessageCircle className="w-5 h-5" />
+                  )}
+                  {messageLoading ? "פותח..." : "שלח הודעה"}
                 </Button>
               </div>
             </div>
