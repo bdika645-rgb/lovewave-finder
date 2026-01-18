@@ -6,7 +6,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signUp: (email: string, password: string, name: string, city: string, age: number) => Promise<{ error: Error | null }>;
+  signUp: (email: string, password: string, name: string, city: string, age: number, gender: string) => Promise<{ error: Error | null; userId?: string }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
@@ -38,7 +38,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = async (email: string, password: string, name: string, city: string, age: number) => {
+  const signUp = async (email: string, password: string, name: string, city: string, age: number, gender: string) => {
     try {
       const redirectUrl = `${window.location.origin}/`;
       
@@ -61,6 +61,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             name,
             city,
             age,
+            gender,
             bio: '',
             interests: [],
           });
@@ -68,6 +69,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (profileError) {
           console.error('Error creating profile:', profileError);
         }
+        
+        return { error: null, userId: data.user.id };
       }
 
       return { error: null };
