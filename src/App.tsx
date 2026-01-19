@@ -9,6 +9,7 @@ import Members from "./pages/Members";
 import MemberProfile from "./pages/MemberProfile";
 import Messages from "./pages/Messages";
 import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Discover from "./pages/Discover";
@@ -55,6 +56,11 @@ const App = () => (
             <Route path="/profile" element={
               <ProtectedRoute>
                 <Profile />
+              </ProtectedRoute>
+            } />
+            <Route path="/settings" element={
+              <ProtectedRoute>
+                <Settings />
               </ProtectedRoute>
             } />
             <Route path="/login" element={<Login />} />
