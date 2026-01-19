@@ -14,7 +14,7 @@ import { useProfile } from "@/hooks/useProfile";
 const Settings = () => {
   const navigate = useNavigate();
   const { signOut, user } = useAuth();
-  const { profile, updateProfile } = useProfile();
+  const { profile } = useProfile();
   
   const [isSaving, setIsSaving] = useState(false);
   const [settings, setSettings] = useState({
