@@ -153,27 +153,82 @@ const Index = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-foreground py-12">
+      <footer className="bg-foreground py-16">
         <div className="container mx-auto px-6">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-2">
-              <Heart className="w-6 h-6 text-primary fill-current" />
-              <span className="font-display text-xl font-bold text-primary-foreground">Spark</span>
+          <div className="grid md:grid-cols-4 gap-8 mb-12">
+            {/* Brand */}
+            <div className="md:col-span-1">
+              <div className="flex items-center gap-2 mb-4">
+                <Heart className="w-7 h-7 text-primary fill-current" />
+                <span className="font-display text-2xl font-bold text-primary-foreground">Spark</span>
+              </div>
+              <p className="text-primary-foreground/60 text-sm leading-relaxed">
+                הפלטפורמה המובילה להיכרויות בישראל. מצאו את האהבה שלכם היום.
+              </p>
             </div>
-            <nav className="flex flex-wrap items-center justify-center gap-4 md:gap-6 text-sm">
-              <Link to="/members" className="text-primary-foreground/60 hover:text-primary-foreground transition-colors">
-                גלה פרופילים
-              </Link>
-              <Link to="/login" className="text-primary-foreground/60 hover:text-primary-foreground transition-colors">
-                התחברות
-              </Link>
-              <Link to="/register" className="text-primary-foreground/60 hover:text-primary-foreground transition-colors">
-                הרשמה
-              </Link>
-            </nav>
-            <p className="text-primary-foreground/60 text-sm">
+
+            {/* Quick Links */}
+            <div>
+              <h4 className="font-display text-lg font-semibold text-primary-foreground mb-4">קישורים מהירים</h4>
+              <nav className="flex flex-col gap-3">
+                <Link to="/members" className="text-primary-foreground/60 hover:text-primary-foreground transition-colors text-sm">
+                  גלה פרופילים
+                </Link>
+                <Link to="/discover" className="text-primary-foreground/60 hover:text-primary-foreground transition-colors text-sm">
+                  Swipe
+                </Link>
+                <Link to="/messages" className="text-primary-foreground/60 hover:text-primary-foreground transition-colors text-sm">
+                  הודעות
+                </Link>
+              </nav>
+            </div>
+
+            {/* Account */}
+            <div>
+              <h4 className="font-display text-lg font-semibold text-primary-foreground mb-4">חשבון</h4>
+              <nav className="flex flex-col gap-3">
+                <Link to="/login" className="text-primary-foreground/60 hover:text-primary-foreground transition-colors text-sm">
+                  התחברות
+                </Link>
+                <Link to="/register" className="text-primary-foreground/60 hover:text-primary-foreground transition-colors text-sm">
+                  הרשמה
+                </Link>
+                <Link to="/profile" className="text-primary-foreground/60 hover:text-primary-foreground transition-colors text-sm">
+                  הפרופיל שלי
+                </Link>
+              </nav>
+            </div>
+
+            {/* Support */}
+            <div>
+              <h4 className="font-display text-lg font-semibold text-primary-foreground mb-4">תמיכה</h4>
+              <nav className="flex flex-col gap-3">
+                <button onClick={() => {}} className="text-right text-primary-foreground/60 hover:text-primary-foreground transition-colors text-sm">
+                  שאלות נפוצות
+                </button>
+                <button onClick={() => {}} className="text-right text-primary-foreground/60 hover:text-primary-foreground transition-colors text-sm">
+                  צור קשר
+                </button>
+                <button onClick={() => {}} className="text-right text-primary-foreground/60 hover:text-primary-foreground transition-colors text-sm">
+                  תנאי שימוש
+                </button>
+                <button onClick={() => {}} className="text-right text-primary-foreground/60 hover:text-primary-foreground transition-colors text-sm">
+                  מדיניות פרטיות
+                </button>
+              </nav>
+            </div>
+          </div>
+
+          {/* Bottom Bar */}
+          <div className="pt-8 border-t border-primary-foreground/10 flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-primary-foreground/50 text-sm">
               © {new Date().getFullYear()} Spark. כל הזכויות שמורות.
             </p>
+            <div className="flex items-center gap-4">
+              <span className="text-primary-foreground/40 text-xs">
+                עוצב עם ❤️ בישראל
+              </span>
+            </div>
           </div>
         </div>
       </footer>
