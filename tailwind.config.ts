@@ -88,6 +88,10 @@ export default {
           from: { transform: "translateX(0) rotate(0deg)", opacity: "1" },
           to: { transform: "translateX(-200px) rotate(-20deg)", opacity: "0" },
         },
+        "scale-in": {
+          from: { transform: "scale(0.9)", opacity: "0" },
+          to: { transform: "scale(1)", opacity: "1" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -95,6 +99,7 @@ export default {
         "heart-beat": "heart-beat 0.6s ease-in-out",
         "swipe-right": "swipe-right 0.4s ease-out forwards",
         "swipe-left": "swipe-left 0.4s ease-out forwards",
+        "scale-in": "scale-in 0.3s ease-out",
       },
     },
   },

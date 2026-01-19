@@ -6,17 +6,30 @@ import { useAdminUsers, AdminUser } from "@/hooks/useAdminUsers";
 import { useBlockedUsers } from "@/hooks/useBlockedUsers";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, RefreshCw, Download } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { ChevronLeft, ChevronRight, RefreshCw, Download, UserPlus, Loader2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { formatDistanceToNow } from "date-fns";
 import { he } from "date-fns/locale";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { israeliCities } from "@/data/members";
 
 export default function AdminUsers() {
   const [search, setSearch] = useState("");
@@ -25,7 +38,18 @@ export default function AdminUsers() {
   const [page, setPage] = useState(1);
   const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
   const pageSize = 20;
+
+  // New user form state
+  const [newUser, setNewUser] = useState({
+    name: "",
+    age: 25,
+    city: "תל אביב",
+    gender: "male",
+    bio: "",
+  });
 
   const sortConfig = useMemo(() => {
     const [field, order] = sortBy.split("_");
@@ -58,6 +82,43 @@ export default function AdminUsers() {
     refetch();
   };
 
+  const handleCreateUser = async () => {
+    if (!newUser.name.trim()) {
+      toast.error("נא להזין שם");
+      return;
+    }
+    if (newUser.age < 18 || newUser.age > 99) {
+      toast.error("גיל לא תקין (18-99)");
+      return;
+    }
+
+    setIsCreating(true);
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .insert({
+          name: newUser.name,
+          age: newUser.age,
+          city: newUser.city,
+          gender: newUser.gender,
+          bio: newUser.bio || null,
+          is_demo: true, // Mark as demo profile since it wasn't created via auth
+        });
+
+      if (error) throw error;
+
+      toast.success("המשתמש נוצר בהצלחה!");
+      setCreateDialogOpen(false);
+      setNewUser({ name: "", age: 25, city: "תל אביב", gender: "male", bio: "" });
+      refetch();
+    } catch (err) {
+      console.error("Error creating user:", err);
+      toast.error("שגיאה ביצירת המשתמש");
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
   const exportUsers = () => {
     const csv = [
       ["שם", "גיל", "מגדר", "עיר", "תאריך הרשמה"],
@@ -74,21 +135,25 @@ export default function AdminUsers() {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">ניהול משתמשים</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">ניהול משתמשים</h1>
             <p className="text-muted-foreground mt-1">
               {totalCount} משתמשים רשומים
             </p>
           </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={() => refetch()}>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button variant="outline" size="sm" onClick={() => refetch()}>
               <RefreshCw className="w-4 h-4 ml-2" />
               רענן
             </Button>
-            <Button variant="outline" onClick={exportUsers}>
+            <Button variant="outline" size="sm" onClick={exportUsers}>
               <Download className="w-4 h-4 ml-2" />
               ייצוא
+            </Button>
+            <Button size="sm" onClick={() => setCreateDialogOpen(true)}>
+              <UserPlus className="w-4 h-4 ml-2" />
+              צור משתמש
             </Button>
           </div>
         </div>
@@ -110,16 +175,20 @@ export default function AdminUsers() {
           </div>
         ) : (
           <>
-            <UsersTable
-              users={users}
-              onUpdateRole={updateUserRole}
-              onDelete={deleteUser}
-              onView={handleViewUser}
-              onBlock={handleBlockUser}
-            />
+            <div className="overflow-x-auto -mx-4 sm:mx-0">
+              <div className="min-w-[700px] px-4 sm:px-0">
+                <UsersTable
+                  users={users}
+                  onUpdateRole={updateUserRole}
+                  onDelete={deleteUser}
+                  onView={handleViewUser}
+                  onBlock={handleBlockUser}
+                />
+              </div>
+            </div>
 
             {/* Pagination */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <p className="text-sm text-muted-foreground">
                 מציג {((page - 1) * pageSize) + 1}-{Math.min(page * pageSize, totalCount)} מתוך {totalCount}
               </p>
@@ -132,8 +201,8 @@ export default function AdminUsers() {
                 >
                   <ChevronRight className="w-4 h-4" />
                 </Button>
-                <span className="text-sm text-muted-foreground">
-                  עמוד {page} מתוך {totalPages}
+                <span className="text-sm text-muted-foreground px-2">
+                  עמוד {page} מתוך {Math.max(totalPages, 1)}
                 </span>
                 <Button
                   variant="outline"
@@ -213,6 +282,104 @@ export default function AdminUsers() {
                 )}
               </div>
             )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Create User Dialog */}
+        <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>יצירת משתמש חדש</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 pt-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">שם</Label>
+                <Input
+                  id="name"
+                  placeholder="שם המשתמש"
+                  value={newUser.name}
+                  onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="age">גיל</Label>
+                  <Input
+                    id="age"
+                    type="number"
+                    min={18}
+                    max={99}
+                    value={newUser.age}
+                    onChange={(e) => setNewUser({ ...newUser, age: parseInt(e.target.value) || 18 })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>מגדר</Label>
+                  <Select
+                    value={newUser.gender}
+                    onValueChange={(v) => setNewUser({ ...newUser, gender: v })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="male">גבר</SelectItem>
+                      <SelectItem value="female">אישה</SelectItem>
+                      <SelectItem value="other">אחר</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>עיר</Label>
+                <Select
+                  value={newUser.city}
+                  onValueChange={(v) => setNewUser({ ...newUser, city: v })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {israeliCities.map((city) => (
+                      <SelectItem key={city} value={city}>
+                        {city}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="bio">תיאור (אופציונלי)</Label>
+                <Textarea
+                  id="bio"
+                  placeholder="קצת על המשתמש..."
+                  value={newUser.bio}
+                  onChange={(e) => setNewUser({ ...newUser, bio: e.target.value })}
+                  rows={3}
+                />
+              </div>
+
+              <Button
+                className="w-full"
+                onClick={handleCreateUser}
+                disabled={isCreating}
+              >
+                {isCreating ? (
+                  <>
+                    <Loader2 className="w-4 h-4 ml-2 animate-spin" />
+                    יוצר...
+                  </>
+                ) : (
+                  <>
+                    <UserPlus className="w-4 h-4 ml-2" />
+                    צור משתמש
+                  </>
+                )}
+              </Button>
+            </div>
           </DialogContent>
         </Dialog>
       </div>
