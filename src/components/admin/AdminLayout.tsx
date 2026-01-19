@@ -51,8 +51,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   return (
     <div className="min-h-screen bg-muted/30" dir="rtl">
       <AdminSidebar />
-      <main className="mr-64 min-h-screen">
-        <div className="p-8">
+      <main className="lg:mr-64 min-h-screen">
+        <div className="p-4 pt-20 lg:pt-8 lg:p-8">
           {children}
         </div>
       </main>

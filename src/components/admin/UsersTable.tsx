@@ -10,6 +10,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,7 +30,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { MoreHorizontal, Eye, Edit, Trash2, Shield, ShieldCheck, User } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { MoreHorizontal, Eye, Trash2, Shield, ShieldCheck, User, UserX } from "lucide-react";
 import { AdminUser } from "@/hooks/useAdminUsers";
 import { formatDistanceToNow } from "date-fns";
 import { he } from "date-fns/locale";
@@ -37,15 +46,24 @@ interface UsersTableProps {
   onUpdateRole: (userId: string, role: "admin" | "moderator" | "user") => void;
   onDelete: (profileId: string) => void;
   onView: (user: AdminUser) => void;
+  onBlock?: (profileId: string, reason: string) => Promise<void>;
 }
 
-export default function UsersTable({ users, onUpdateRole, onDelete, onView }: UsersTableProps) {
+export default function UsersTable({ users, onUpdateRole, onDelete, onView, onBlock }: UsersTableProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [blockDialogOpen, setBlockDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
+  const [blockReason, setBlockReason] = useState("");
 
   const handleDeleteClick = (user: AdminUser) => {
     setSelectedUser(user);
     setDeleteDialogOpen(true);
+  };
+
+  const handleBlockClick = (user: AdminUser) => {
+    setSelectedUser(user);
+    setBlockReason("");
+    setBlockDialogOpen(true);
   };
 
   const confirmDelete = () => {
@@ -54,6 +72,15 @@ export default function UsersTable({ users, onUpdateRole, onDelete, onView }: Us
     }
     setDeleteDialogOpen(false);
     setSelectedUser(null);
+  };
+
+  const confirmBlock = async () => {
+    if (selectedUser && onBlock) {
+      await onBlock(selectedUser.id, blockReason);
+    }
+    setBlockDialogOpen(false);
+    setSelectedUser(null);
+    setBlockReason("");
   };
 
   const getRoleBadge = (role?: string) => {
@@ -153,6 +180,15 @@ export default function UsersTable({ users, onUpdateRole, onDelete, onView }: Us
                           <DropdownMenuSeparator />
                         </>
                       )}
+                      {onBlock && (
+                        <DropdownMenuItem 
+                          onClick={() => handleBlockClick(user)}
+                          className="text-orange-600 focus:text-orange-600"
+                        >
+                          <UserX className="w-4 h-4 ml-2" />
+                          חסום משתמש
+                        </DropdownMenuItem>
+                      )}
                       <DropdownMenuItem 
                         onClick={() => handleDeleteClick(user)}
                         className="text-destructive focus:text-destructive"
@@ -185,6 +221,40 @@ export default function UsersTable({ users, onUpdateRole, onDelete, onView }: Us
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Block User Dialog */}
+      <Dialog open={blockDialogOpen} onOpenChange={setBlockDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>חסימת משתמש: {selectedUser?.name}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <div>
+              <Label htmlFor="blockReason">סיבת החסימה</Label>
+              <Textarea
+                id="blockReason"
+                placeholder="נא לציין את סיבת החסימה..."
+                value={blockReason}
+                onChange={(e) => setBlockReason(e.target.value)}
+                rows={3}
+              />
+            </div>
+            <div className="flex gap-2 justify-end">
+              <Button variant="outline" onClick={() => setBlockDialogOpen(false)}>
+                ביטול
+              </Button>
+              <Button 
+                variant="destructive" 
+                onClick={confirmBlock}
+                disabled={!blockReason.trim()}
+              >
+                <UserX className="w-4 h-4 ml-2" />
+                חסום משתמש
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

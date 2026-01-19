@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { formatDistanceToNow } from "date-fns";
 import { he } from "date-fns/locale";
-import { cn } from "@/lib/utils";
+
 
 export default function AdminContent() {
   const { photos, loading, stats, deletePhoto, refetch } = useAdminPhotos();
