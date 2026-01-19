@@ -3,6 +3,7 @@ import AdminLayout from "@/components/admin/AdminLayout";
 import UsersTable from "@/components/admin/UsersTable";
 import UserFilters from "@/components/admin/UserFilters";
 import { useAdminUsers, AdminUser } from "@/hooks/useAdminUsers";
+import { useBlockedUsers } from "@/hooks/useBlockedUsers";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, RefreshCw, Download } from "lucide-react";
@@ -43,11 +44,18 @@ export default function AdminUsers() {
     pageSize
   });
 
+  const { blockUser } = useBlockedUsers();
+
   const totalPages = Math.ceil(totalCount / pageSize);
 
   const handleViewUser = (user: AdminUser) => {
     setSelectedUser(user);
     setViewDialogOpen(true);
+  };
+
+  const handleBlockUser = async (profileId: string, reason: string) => {
+    await blockUser(profileId, reason);
+    refetch();
   };
 
   const exportUsers = () => {
@@ -107,6 +115,7 @@ export default function AdminUsers() {
               onUpdateRole={updateUserRole}
               onDelete={deleteUser}
               onView={handleViewUser}
+              onBlock={handleBlockUser}
             />
 
             {/* Pagination */}

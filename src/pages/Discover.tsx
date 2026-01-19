@@ -5,7 +5,7 @@ import { useProfiles } from "@/hooks/useProfiles";
 import { useLikes } from "@/hooks/useLikes";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { Heart, Loader2, RefreshCcw, Sparkles, Filter, X } from "lucide-react";
+import { Heart, Loader2, RefreshCcw, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
