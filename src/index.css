@@ -171,6 +171,10 @@
     background: hsla(0, 0%, 100%, 0.8);
   }
 
+  .dark .glass-effect {
+    background: hsla(240, 10%, 10%, 0.85);
+  }
+
   .card-hover {
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
