@@ -42,7 +42,6 @@ export function useProfiles(options: UseProfilesOptions = {}) {
   useEffect(() => {
     // If user is logged in and we need to filter by gender but haven't fetched it yet, wait
     if (user && options.filterByOppositeGender !== false && currentUserGender === null) {
-      console.log('Waiting for current user gender to be fetched...');
       return;
     }
     // If no user, or filterByOppositeGender is false, or we have the gender - proceed
@@ -84,12 +83,9 @@ export function useProfiles(options: UseProfilesOptions = {}) {
 
       const { data, error } = await query;
 
-      console.log('Fetched profiles:', data?.length, 'profiles', { user: user?.id, currentUserGender, filterByOppositeGender: options.filterByOppositeGender });
-
       if (error) throw error;
       setProfiles(data || []);
     } catch (err) {
-      console.error('Error fetching profiles:', err);
       setError((err as Error).message);
     } finally {
       setLoading(false);
@@ -122,7 +118,6 @@ export function useProfileById(id: string) {
       if (error) throw error;
       setProfile(data);
     } catch (err) {
-      console.error('Error fetching profile:', err);
       setError((err as Error).message);
     } finally {
       setLoading(false);

@@ -58,7 +58,6 @@ export function useActivityLogs(options: UseActivityLogsOptions = {}) {
       setActivities(enrichedActivities);
     } catch (err) {
       setError(err as Error);
-      console.error("Error fetching activities:", err);
     } finally {
       setLoading(false);
     }
@@ -92,7 +91,7 @@ export async function logActivity(
         user_id: userId,
         metadata: metadata ?? {}
       }]);
-  } catch (err) {
-    console.error("Error logging activity:", err);
+  } catch {
+    // Silently fail for activity logging
   }
 }

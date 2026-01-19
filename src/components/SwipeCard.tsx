@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Heart, X, Star, MessageCircle, MapPin, ChevronLeft, ChevronRight } from "lucide-react";
+import { Heart, X, Star, MapPin, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { Member } from "@/data/members";
