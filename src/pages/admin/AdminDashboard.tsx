@@ -69,25 +69,26 @@ export default function AdminDashboard() {
 
   return (
     <AdminLayout>
-      <div className="space-y-8">
+      <div className="space-y-6 sm:space-y-8">
         {/* Header with welcome message */}
-        <div className="flex items-start justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">לוח בקרה</h1>
-            <p className="text-muted-foreground mt-1">סקירה כללית של האפליקציה</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">לוח בקרה</h1>
+            <p className="text-muted-foreground mt-1 text-sm sm:text-base">סקירה כללית של האפליקציה</p>
           </div>
           <div className="flex items-center gap-2">
-            <Button asChild variant="outline">
+            <Button asChild variant="outline" size="sm" className="text-xs sm:text-sm">
               <Link to="/admin/analytics">
-                <BarChart3 className="w-4 h-4 ml-2" />
-                צפה בסטטיסטיקות מלאות
+                <BarChart3 className="w-4 h-4 ml-1 sm:ml-2" />
+                <span className="hidden sm:inline">צפה בסטטיסטיקות מלאות</span>
+                <span className="sm:hidden">סטטיסטיקות</span>
               </Link>
             </Button>
           </div>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
           <StatsCard
             title="סה״כ משתמשים"
             value={stats?.totalUsers || 0}
@@ -123,22 +124,22 @@ export default function AdminDashboard() {
         </div>
 
         {/* Quick Actions */}
-        <div className="bg-card rounded-xl p-6 border border-border">
-          <h3 className="text-lg font-semibold text-foreground mb-4">פעולות מהירות</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="bg-card rounded-xl p-4 sm:p-6 border border-border">
+          <h3 className="text-base sm:text-lg font-semibold text-foreground mb-4">פעולות מהירות</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4">
             {quickActions.map((action) => (
               <Link
                 key={action.path}
                 to={action.path}
-                className="flex items-center gap-3 p-4 rounded-lg border border-border hover:bg-muted/50 transition-all hover:scale-[1.02] group"
+                className="flex items-center gap-2 sm:gap-3 p-3 sm:p-4 rounded-lg border border-border hover:bg-muted/50 transition-all hover:scale-[1.02] group"
               >
-                <div className={`p-2 rounded-lg ${action.color}`}>
-                  <action.icon className="w-5 h-5 text-white" />
+                <div className={`p-1.5 sm:p-2 rounded-lg ${action.color}`}>
+                  <action.icon className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                 </div>
-                <span className="font-medium text-foreground group-hover:text-primary transition-colors">
+                <span className="font-medium text-foreground group-hover:text-primary transition-colors text-sm sm:text-base line-clamp-1">
                   {action.label}
                 </span>
-                <ArrowUpRight className="w-4 h-4 text-muted-foreground mr-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+                <ArrowUpRight className="w-4 h-4 text-muted-foreground mr-auto opacity-0 group-hover:opacity-100 transition-opacity hidden sm:block" />
               </Link>
             ))}
           </div>
