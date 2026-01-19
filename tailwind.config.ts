@@ -61,6 +61,13 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // Custom colors for premium theme
+        gold: {
+          DEFAULT: "hsl(40, 100%, 50%)",
+          light: "hsl(40, 100%, 70%)",
+        },
+        "purple-deep": "hsl(280, 80%, 20%)",
+        "purple-glow": "hsl(280, 70%, 60%)",
       },
       borderRadius: {
         lg: "var(--radius)",

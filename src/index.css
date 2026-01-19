@@ -169,10 +169,23 @@
   .glass-effect {
     backdrop-filter: blur(12px);
     background: hsla(0, 0%, 100%, 0.8);
+    border: 1px solid hsla(0, 0%, 100%, 0.2);
   }
 
   .dark .glass-effect {
     background: hsla(240, 10%, 10%, 0.85);
+    border: 1px solid hsla(0, 0%, 100%, 0.1);
+  }
+
+  .glass-gold {
+    backdrop-filter: blur(12px);
+    background: hsla(40, 100%, 50%, 0.1);
+    border: 1px solid hsla(40, 100%, 50%, 0.3);
+  }
+
+  .dark .glass-gold {
+    background: hsla(40, 100%, 50%, 0.15);
+    border: 1px solid hsla(40, 100%, 50%, 0.25);
   }
 
   .card-hover {

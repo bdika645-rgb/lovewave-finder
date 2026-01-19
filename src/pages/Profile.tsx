@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Edit2, MapPin, Calendar, Heart, Settings, LogOut, X, Plus, Loader2, Users, Eye } from "lucide-react";
+import { Edit2, MapPin, Calendar, Heart, Settings, LogOut, X, Plus, Loader2, Users } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
