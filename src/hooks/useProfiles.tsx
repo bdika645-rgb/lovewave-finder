@@ -84,6 +84,8 @@ export function useProfiles(options: UseProfilesOptions = {}) {
 
       const { data, error } = await query;
 
+      console.log('Fetched profiles:', data?.length, 'profiles', { user: user?.id, currentUserGender, filterByOppositeGender: options.filterByOppositeGender });
+
       if (error) throw error;
       setProfiles(data || []);
     } catch (err) {
