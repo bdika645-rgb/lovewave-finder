@@ -305,13 +305,13 @@ const Messages = () => {
                         return (
                           <div
                             key={message.id}
-                            className={`flex ${isMine ? "justify-start" : "justify-end"}`}
+                            className={`flex ${isMine ? "justify-end" : "justify-start"}`}
                           >
                             <div
                               className={`max-w-[70%] px-4 py-3 rounded-2xl ${
                                 isMine
-                                  ? "gradient-primary text-primary-foreground rounded-bl-sm"
-                                  : "bg-muted text-foreground rounded-br-sm"
+                                  ? "gradient-primary text-primary-foreground rounded-br-sm"
+                                  : "bg-muted text-foreground rounded-bl-sm"
                               }`}
                             >
                               <p>{message.content}</p>
