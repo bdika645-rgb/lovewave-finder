@@ -341,7 +341,7 @@ const Messages = () => {
                         placeholder="כתבו הודעה..."
                         value={messageText}
                         onChange={(e) => setMessageText(e.target.value)}
-                        onKeyPress={(e) => e.key === "Enter" && handleSend()}
+                        onKeyDown={(e) => e.key === "Enter" && handleSend()}
                         className="flex-1 h-12 rounded-full bg-muted/50 border-none"
                       />
                       <Button variant="ghost" size="icon" onClick={handleEmoji}>

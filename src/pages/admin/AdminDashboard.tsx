@@ -4,8 +4,7 @@ import StatsCard from "@/components/admin/StatsCard";
 import { useAdminStats } from "@/hooks/useAdminStats";
 import { 
   Users, Heart, MessageCircle, ThumbsUp, UserPlus, Activity,
-  Flag, Shield, Settings, BarChart3, TrendingUp, TrendingDown,
-  ArrowUpRight
+  Flag, Shield, Settings, BarChart3, TrendingUp, ArrowUpRight
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -20,9 +19,7 @@ import {
   PieChart,
   Pie,
   Cell,
-  Legend,
-  LineChart,
-  Line
+  Legend
 } from "recharts";
 
 const COLORS = ["#ec4899", "#8b5cf6", "#6366f1"];

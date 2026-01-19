@@ -105,7 +105,7 @@ const Profile = () => {
     navigate("/settings");
   };
 
-  const handlePhotoUploadComplete = (url: string) => {
+  const handlePhotoUploadComplete = () => {
     refetch(); // Refresh profile data
   };
 
@@ -264,7 +264,7 @@ const Profile = () => {
                     placeholder="תחום עניין חדש..."
                     value={newInterest}
                     onChange={(e) => setNewInterest(e.target.value)}
-                    onKeyPress={(e) => e.key === "Enter" && handleAddInterest()}
+                    onKeyDown={(e) => e.key === "Enter" && handleAddInterest()}
                     className="flex-1"
                   />
                   <Button variant="hero" size="sm" onClick={handleAddInterest}>
