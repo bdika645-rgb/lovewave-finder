@@ -102,7 +102,7 @@ const Profile = () => {
   };
 
   const handleSettings = () => {
-    toast.info("דף ההגדרות בפיתוח");
+    navigate("/settings");
   };
 
   const handlePhotoUploadComplete = (url: string) => {
