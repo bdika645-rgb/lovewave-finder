@@ -36,7 +36,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { MoreHorizontal, Eye, Trash2, Shield, ShieldCheck, User, UserX } from "lucide-react";
+import { MoreHorizontal, Eye, Trash2, Shield, ShieldCheck, User, UserX, Edit2 } from "lucide-react";
 import { AdminUser } from "@/hooks/useAdminUsers";
 import { formatDistanceToNow } from "date-fns";
 import { he } from "date-fns/locale";
@@ -47,9 +47,10 @@ interface UsersTableProps {
   onDelete: (profileId: string) => void;
   onView: (user: AdminUser) => void;
   onBlock?: (profileId: string, reason: string) => Promise<void>;
+  onEdit?: (user: AdminUser) => void;
 }
 
-export default function UsersTable({ users, onUpdateRole, onDelete, onView, onBlock }: UsersTableProps) {
+export default function UsersTable({ users, onUpdateRole, onDelete, onView, onBlock, onEdit }: UsersTableProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [blockDialogOpen, setBlockDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
@@ -162,6 +163,12 @@ export default function UsersTable({ users, onUpdateRole, onDelete, onView, onBl
                         <Eye className="w-4 h-4 ml-2" />
                         צפייה בפרופיל
                       </DropdownMenuItem>
+                      {onEdit && (
+                        <DropdownMenuItem onClick={() => onEdit(user)}>
+                          <Edit2 className="w-4 h-4 ml-2" />
+                          עריכת פרטים
+                        </DropdownMenuItem>
+                      )}
                       <DropdownMenuSeparator />
                       {user.user_id && (
                         <>

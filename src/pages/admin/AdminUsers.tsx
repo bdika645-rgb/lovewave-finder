@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ChevronLeft, ChevronRight, RefreshCw, Download, UserPlus, Loader2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, RefreshCw, Download, UserPlus, Loader2, Edit2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -39,11 +39,22 @@ export default function AdminUsers() {
   const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const pageSize = 20;
 
   // New user form state
   const [newUser, setNewUser] = useState({
+    name: "",
+    age: 25,
+    city: "תל אביב",
+    gender: "male",
+    bio: "",
+  });
+
+  // Edit user form state
+  const [editUser, setEditUser] = useState({
     name: "",
     age: 25,
     city: "תל אביב",
@@ -111,11 +122,57 @@ export default function AdminUsers() {
       setCreateDialogOpen(false);
       setNewUser({ name: "", age: 25, city: "תל אביב", gender: "male", bio: "" });
       refetch();
-    } catch (err) {
-      console.error("Error creating user:", err);
+    } catch {
       toast.error("שגיאה ביצירת המשתמש");
     } finally {
       setIsCreating(false);
+    }
+  };
+
+  const handleEditUser = (user: AdminUser) => {
+    setSelectedUser(user);
+    setEditUser({
+      name: user.name,
+      age: user.age,
+      city: user.city,
+      gender: user.gender || "male",
+      bio: user.bio || "",
+    });
+    setEditDialogOpen(true);
+  };
+
+  const handleSaveUser = async () => {
+    if (!selectedUser || !editUser.name.trim()) {
+      toast.error("נא להזין שם");
+      return;
+    }
+    if (editUser.age < 18 || editUser.age > 99) {
+      toast.error("גיל לא תקין (18-99)");
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          name: editUser.name,
+          age: editUser.age,
+          city: editUser.city,
+          gender: editUser.gender,
+          bio: editUser.bio || null,
+        })
+        .eq("id", selectedUser.id);
+
+      if (error) throw error;
+
+      toast.success("המשתמש עודכן בהצלחה!");
+      setEditDialogOpen(false);
+      refetch();
+    } catch {
+      toast.error("שגיאה בעדכון המשתמש");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -183,6 +240,7 @@ export default function AdminUsers() {
                   onDelete={deleteUser}
                   onView={handleViewUser}
                   onBlock={handleBlockUser}
+                  onEdit={handleEditUser}
                 />
               </div>
             </div>
@@ -376,6 +434,104 @@ export default function AdminUsers() {
                   <>
                     <UserPlus className="w-4 h-4 ml-2" />
                     צור משתמש
+                  </>
+                )}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Edit User Dialog */}
+        <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>עריכת משתמש: {selectedUser?.name}</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 pt-4">
+              <div className="space-y-2">
+                <Label htmlFor="editName">שם</Label>
+                <Input
+                  id="editName"
+                  placeholder="שם המשתמש"
+                  value={editUser.name}
+                  onChange={(e) => setEditUser({ ...editUser, name: e.target.value })}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="editAge">גיל</Label>
+                  <Input
+                    id="editAge"
+                    type="number"
+                    min={18}
+                    max={99}
+                    value={editUser.age}
+                    onChange={(e) => setEditUser({ ...editUser, age: parseInt(e.target.value) || 18 })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>מגדר</Label>
+                  <Select
+                    value={editUser.gender}
+                    onValueChange={(v) => setEditUser({ ...editUser, gender: v })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="male">גבר</SelectItem>
+                      <SelectItem value="female">אישה</SelectItem>
+                      <SelectItem value="other">אחר</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>עיר</Label>
+                <Select
+                  value={editUser.city}
+                  onValueChange={(v) => setEditUser({ ...editUser, city: v })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {israeliCities.map((city) => (
+                      <SelectItem key={city} value={city}>
+                        {city}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="editBio">תיאור (אופציונלי)</Label>
+                <Textarea
+                  id="editBio"
+                  placeholder="קצת על המשתמש..."
+                  value={editUser.bio}
+                  onChange={(e) => setEditUser({ ...editUser, bio: e.target.value })}
+                  rows={3}
+                />
+              </div>
+
+              <Button
+                className="w-full"
+                onClick={handleSaveUser}
+                disabled={isSaving}
+              >
+                {isSaving ? (
+                  <>
+                    <Loader2 className="w-4 h-4 ml-2 animate-spin" />
+                    שומר...
+                  </>
+                ) : (
+                  <>
+                    <Edit2 className="w-4 h-4 ml-2" />
+                    שמור שינויים
                   </>
                 )}
               </Button>
