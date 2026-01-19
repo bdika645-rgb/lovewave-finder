@@ -196,6 +196,36 @@
     transform: translateY(-8px) scale(1.02);
     box-shadow: var(--shadow-elevated);
   }
+
+  /* Improved focus states for accessibility */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2;
+  }
+
+  /* RTL support utilities */
+  [dir="rtl"] .rtl-flip {
+    transform: scaleX(-1);
+  }
+
+  /* Responsive table wrapper */
+  .table-responsive {
+    @apply overflow-x-auto -mx-4 sm:mx-0;
+  }
+
+  .table-responsive > table {
+    @apply min-w-[600px];
+  }
+
+  /* Dropdown solid background fix */
+  [data-radix-popper-content-wrapper] {
+    z-index: 50 !important;
+  }
+
+  /* Select content solid background */
+  [role="listbox"],
+  [data-radix-menu-content] {
+    @apply bg-popover;
+  }
 }
 
 @layer utilities {
