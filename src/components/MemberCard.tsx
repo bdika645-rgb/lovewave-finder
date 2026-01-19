@@ -12,7 +12,7 @@ interface MemberCardProps {
 
 const MemberCard = ({ member, onLike, onPass }: MemberCardProps) => {
   return (
-    <div className="group relative bg-card rounded-2xl overflow-hidden shadow-card card-hover border border-gold/10">
+    <div className="group relative bg-card rounded-2xl overflow-hidden shadow-card card-hover border border-border">
       {/* Image */}
       <Link to={`/member/${member.id}`}>
         <div className="relative aspect-[3/4] overflow-hidden">
@@ -60,7 +60,7 @@ const MemberCard = ({ member, onLike, onPass }: MemberCardProps) => {
             <Badge 
               key={interest} 
               variant="secondary" 
-              className="bg-accent/50 text-accent-foreground border border-purple-glow/20 text-xs"
+              className="bg-accent/50 text-accent-foreground text-xs"
             >
               {interest}
             </Badge>
