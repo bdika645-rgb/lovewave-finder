@@ -40,8 +40,13 @@ export function useProfiles(options: UseProfilesOptions = {}) {
   }, [user, options.filterByOppositeGender]);
 
   useEffect(() => {
+    // If we need to filter by gender but haven't fetched it yet, wait
+    if (user && options.filterByOppositeGender !== false && !currentUserGender) {
+      console.log('Waiting for current user gender to be fetched...');
+      return;
+    }
     fetchProfiles();
-  }, [options.search, options.ageFrom, options.ageTo, options.city, user, currentUserGender]);
+  }, [options.search, options.ageFrom, options.ageTo, options.city, user, currentUserGender, options.filterByOppositeGender]);
 
   const fetchProfiles = async () => {
     try {
