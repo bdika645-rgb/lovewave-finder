@@ -88,10 +88,10 @@ export default function AdminAnalytics() {
 
   return (
     <AdminLayout>
-      <div className="space-y-8">
+      <div className="space-y-6 sm:space-y-8">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">סטטיסטיקות</h1>
-          <p className="text-muted-foreground mt-1">נתונים מ-30 הימים האחרונים</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">סטטיסטיקות</h1>
+          <p className="text-muted-foreground mt-1 text-sm sm:text-base">נתונים מ-30 הימים האחרונים</p>
         </div>
 
         {/* New Users Chart */}
