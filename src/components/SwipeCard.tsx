@@ -55,15 +55,17 @@ const SwipeCard = ({ member, onLike, onPass, onSuperLike }: SwipeCardProps) => {
           </div>
 
           <button 
-            className="absolute left-2 top-1/2 -translate-y-1/2 p-2 glass-effect rounded-full opacity-0 hover:opacity-100 transition-opacity"
+            className="absolute left-2 top-1/2 -translate-y-1/2 p-2 glass-effect rounded-full opacity-50 md:opacity-0 md:hover:opacity-100 focus:opacity-100 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary"
             onClick={() => setImageIndex(Math.max(0, imageIndex - 1))}
+            aria-label="תמונה קודמת"
           >
             <ChevronRight className="w-6 h-6 text-foreground" />
           </button>
           
           <button 
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-2 glass-effect rounded-full opacity-0 hover:opacity-100 transition-opacity"
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-2 glass-effect rounded-full opacity-50 md:opacity-0 md:hover:opacity-100 focus:opacity-100 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary"
             onClick={() => setImageIndex(Math.min(2, imageIndex + 1))}
+            aria-label="תמונה הבאה"
           >
             <ChevronLeft className="w-6 h-6 text-foreground" />
           </button>

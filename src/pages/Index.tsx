@@ -160,8 +160,19 @@ const Index = () => {
               <Heart className="w-6 h-6 text-primary fill-current" />
               <span className="font-display text-xl font-bold text-primary-foreground">Spark</span>
             </div>
+            <nav className="flex flex-wrap items-center justify-center gap-4 md:gap-6 text-sm">
+              <Link to="/members" className="text-primary-foreground/60 hover:text-primary-foreground transition-colors">
+                גלה פרופילים
+              </Link>
+              <Link to="/login" className="text-primary-foreground/60 hover:text-primary-foreground transition-colors">
+                התחברות
+              </Link>
+              <Link to="/register" className="text-primary-foreground/60 hover:text-primary-foreground transition-colors">
+                הרשמה
+              </Link>
+            </nav>
             <p className="text-primary-foreground/60 text-sm">
-              © 2024 Spark. כל הזכויות שמורות.
+              © {new Date().getFullYear()} Spark. כל הזכויות שמורות.
             </p>
           </div>
         </div>
