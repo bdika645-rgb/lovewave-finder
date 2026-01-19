@@ -21,13 +21,13 @@ const Members = () => {
   const [locationFilter, setLocationFilter] = useState("");
   const [activeFilters, setActiveFilters] = useState<{ageFrom?: number; ageTo?: number; city?: string}>({});
 
-  // When user is logged in, show opposite gender by default
+  // Show all profiles - don't filter by gender
   const { profiles, loading, error } = useProfiles({
     search: searchQuery || undefined,
     ageFrom: activeFilters.ageFrom,
     ageTo: activeFilters.ageTo,
     city: activeFilters.city,
-    filterByOppositeGender: !!user, // If logged in, filter by opposite gender
+    filterByOppositeGender: false, // Show all profiles
   });
 
   const handleLike = async (memberId: string, memberName: string) => {
