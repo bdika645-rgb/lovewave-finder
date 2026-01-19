@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import Navbar from "@/components/Navbar";
 import SwipeCard from "@/components/SwipeCard";
 import { useProfiles } from "@/hooks/useProfiles";
@@ -8,12 +8,11 @@ import { Button } from "@/components/ui/button";
 import { Heart, Loader2, RefreshCcw, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 
 const Discover = () => {
   const { user } = useAuth();
   const { profiles, loading, refetch } = useProfiles({ filterByOppositeGender: true });
-  const { sendLike, checkIfLiked } = useLikes();
+  const { sendLike } = useLikes();
   
   const [currentIndex, setCurrentIndex] = useState(0);
   const [likedProfiles, setLikedProfiles] = useState<Set<string>>(new Set());
