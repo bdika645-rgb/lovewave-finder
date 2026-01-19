@@ -13,7 +13,8 @@ import {
   Activity,
   Image,
   Bell,
-  UserX
+  UserX,
+  Lightbulb
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
@@ -26,6 +27,7 @@ const menuItems = [
   { icon: Flag, label: "דיווחים", path: "/admin/reports" },
   { icon: UserX, label: "משתמשים חסומים", path: "/admin/blocked" },
   { icon: Image, label: "ניהול תוכן", path: "/admin/content" },
+  { icon: Lightbulb, label: "טיפים", path: "/admin/tips" },
   { icon: Bell, label: "התראות", path: "/admin/notifications" },
   { icon: Activity, label: "יומן פעילות", path: "/admin/activity" },
   { icon: BarChart3, label: "סטטיסטיקות", path: "/admin/analytics" },
