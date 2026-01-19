@@ -75,13 +75,13 @@ export default function AdminActivityLog() {
 
   return (
     <AdminLayout>
-      <div className="space-y-8">
-        <div className="flex items-center justify-between">
+      <div className="space-y-6 sm:space-y-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">יומן פעילות</h1>
-            <p className="text-muted-foreground mt-1">צפייה בפעילות אחרונה במערכת</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">יומן פעילות</h1>
+            <p className="text-muted-foreground mt-1 text-sm sm:text-base">צפייה בפעילות אחרונה במערכת</p>
           </div>
-          <Button variant="outline" onClick={() => refetch()}>
+          <Button variant="outline" size="sm" onClick={() => refetch()}>
             <RefreshCw className="w-4 h-4 ml-2" />
             רענן
           </Button>

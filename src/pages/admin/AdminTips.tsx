@@ -158,20 +158,20 @@ export default function AdminTips() {
 
   return (
     <AdminLayout>
-      <div className="space-y-8">
-        <div className="flex items-center justify-between">
+      <div className="space-y-6 sm:space-y-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">טיפים להיכרויות</h1>
-            <p className="text-muted-foreground mt-1">ניהול טיפים שמוצגים למשתמשים</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">טיפים להיכרויות</h1>
+            <p className="text-muted-foreground mt-1 text-sm sm:text-base">ניהול טיפים שמוצגים למשתמשים</p>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={() => refetch()}>
+            <Button variant="outline" size="sm" onClick={() => refetch()}>
               <RefreshCw className="w-4 h-4 ml-2" />
               רענן
             </Button>
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
-                <Button onClick={handleOpenCreate}>
+                <Button size="sm" onClick={handleOpenCreate}>
                   <Plus className="w-4 h-4 ml-2" />
                   הוסף טיפ
                 </Button>

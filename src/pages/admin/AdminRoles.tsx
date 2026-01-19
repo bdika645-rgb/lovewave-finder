@@ -207,16 +207,16 @@ export default function AdminRoles() {
 
   return (
     <AdminLayout>
-      <div className="space-y-8">
-        <div className="flex items-center justify-between">
+      <div className="space-y-6 sm:space-y-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">תפקידים והרשאות</h1>
-            <p className="text-muted-foreground mt-1">ניהול תפקידי משתמשים במערכת</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">תפקידים והרשאות</h1>
+            <p className="text-muted-foreground mt-1 text-sm sm:text-base">ניהול תפקידי משתמשים במערכת</p>
           </div>
           
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
-              <Button>
+              <Button size="sm">
                 <Plus className="w-4 h-4 ml-2" />
                 הוסף תפקיד
               </Button>
@@ -278,7 +278,7 @@ export default function AdminRoles() {
         </div>
 
         {/* Role Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6">
           <div className="bg-card rounded-xl p-6 border border-border flex items-center gap-4">
             <div className="p-3 bg-red-500/10 rounded-lg">
               <ShieldCheck className="w-6 h-6 text-red-500" />

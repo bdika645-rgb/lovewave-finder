@@ -96,20 +96,20 @@ export default function AdminReports() {
 
   return (
     <AdminLayout>
-      <div className="space-y-8">
-        <div className="flex items-center justify-between">
+      <div className="space-y-6 sm:space-y-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">דיווחים ותלונות</h1>
-            <p className="text-muted-foreground mt-1">ניהול דיווחים על משתמשים ותוכן</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">דיווחים ותלונות</h1>
+            <p className="text-muted-foreground mt-1 text-sm sm:text-base">ניהול דיווחים על משתמשים ותוכן</p>
           </div>
-          <Button variant="outline" onClick={() => refetch()}>
+          <Button variant="outline" size="sm" className="w-fit" onClick={() => refetch()}>
             <RefreshCw className="w-4 h-4 ml-2" />
             רענן
           </Button>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
           <StatsCard
             title="סה״כ דיווחים"
             value={stats.total}
@@ -153,6 +153,7 @@ export default function AdminReports() {
           <div className="p-4 border-b border-border">
             <h3 className="text-lg font-semibold">דיווחים</h3>
           </div>
+          <div className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
@@ -223,6 +224,7 @@ export default function AdminReports() {
               )}
             </TableBody>
           </Table>
+          </div>
         </div>
 
         {/* Report Details Dialog */}

@@ -122,14 +122,14 @@ export default function AdminNotifications() {
 
   return (
     <AdminLayout>
-      <div className="space-y-8">
-        <div className="flex items-center justify-between">
+      <div className="space-y-6 sm:space-y-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">התראות</h1>
-            <p className="text-muted-foreground mt-1">שלח התראות למשתמשים</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">התראות</h1>
+            <p className="text-muted-foreground mt-1 text-sm sm:text-base">שלח התראות למשתמשים</p>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={() => refetch()}>
+            <Button variant="outline" size="sm" onClick={() => refetch()}>
               <RefreshCw className="w-4 h-4 ml-2" />
               רענן
             </Button>
@@ -209,7 +209,7 @@ export default function AdminNotifications() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6">
           <StatsCard
             title="סה״כ התראות"
             value={notifications.length}
