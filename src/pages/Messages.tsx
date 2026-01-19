@@ -1,7 +1,7 @@
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Send, Search, Phone, Video, MoreVertical, Smile, Image, Paperclip, Loader2, MessageCircle, Heart } from "lucide-react";
+import { Send, Search, Phone, Video, MoreVertical, Smile, Image, Paperclip, Loader2, MessageCircle, Heart, ChevronRight } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { useConversations } from "@/hooks/useConversations";
@@ -151,11 +151,11 @@ const Messages = () => {
               </Link>
             </div>
           ) : (
-            <div className="grid md:grid-cols-[360px_1fr] h-full">
+            <div className="flex flex-col md:grid md:grid-cols-[320px_1fr] lg:grid-cols-[360px_1fr] h-full">
               {/* Conversations List */}
-              <div className="border-l border-border">
+              <div className={`border-l border-border ${selectedConversationId ? 'hidden md:block' : 'block'}`}>
                 <div className="p-4 border-b border-border">
-                  <h2 className="font-display text-xl font-bold text-foreground mb-4">הודעות</h2>
+                  <h2 className="font-display text-lg md:text-xl font-bold text-foreground mb-4">הודעות</h2>
                   <div className="relative">
                     <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <Input 
@@ -252,11 +252,20 @@ const Messages = () => {
 
               {/* Chat Area */}
               {selectedConversation ? (
-                <div className="flex flex-col h-full">
+                <div className={`flex flex-col h-full ${selectedConversationId ? 'block' : 'hidden md:block'}`}>
                   {/* Chat Header */}
-                  <div className="p-4 border-b border-border flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <Link to={`/member/${selectedConversation.otherProfile?.id}`}>
+                  <div className="p-3 md:p-4 border-b border-border flex items-center justify-between gap-2">
+                    {/* Back button for mobile */}
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="md:hidden shrink-0"
+                      onClick={() => setSelectedConversationId(null)}
+                    >
+                      <ChevronRight className="w-5 h-5" />
+                    </Button>
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                      <Link to={`/member/${selectedConversation.otherProfile?.id}`} className="shrink-0">
                         <img 
                           src={selectedConversation.otherProfile?.avatar_url || "/profiles/profile1.jpg"}
                           alt={selectedConversation.otherProfile?.name}
@@ -275,11 +284,11 @@ const Messages = () => {
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Button variant="ghost" size="icon" onClick={handleCall}>
+                    <div className="flex items-center gap-1 md:gap-2 shrink-0">
+                      <Button variant="ghost" size="icon" onClick={handleCall} className="hidden sm:inline-flex">
                         <Phone className="w-5 h-5" />
                       </Button>
-                      <Button variant="ghost" size="icon" onClick={handleVideoCall}>
+                      <Button variant="ghost" size="icon" onClick={handleVideoCall} className="hidden sm:inline-flex">
                         <Video className="w-5 h-5" />
                       </Button>
                       <Button variant="ghost" size="icon">
@@ -329,12 +338,12 @@ const Messages = () => {
                   </div>
 
                   {/* Message Input */}
-                  <div className="p-4 border-t border-border">
-                    <div className="flex items-center gap-2">
-                      <Button variant="ghost" size="icon" onClick={handleAttachment}>
+                  <div className="p-2 md:p-4 border-t border-border">
+                    <div className="flex items-center gap-1 md:gap-2">
+                      <Button variant="ghost" size="icon" onClick={handleAttachment} className="hidden sm:inline-flex">
                         <Paperclip className="w-5 h-5" />
                       </Button>
-                      <Button variant="ghost" size="icon" onClick={handleImage}>
+                      <Button variant="ghost" size="icon" onClick={handleImage} className="hidden sm:inline-flex">
                         <Image className="w-5 h-5" />
                       </Button>
                       <Input
@@ -342,9 +351,9 @@ const Messages = () => {
                         value={messageText}
                         onChange={(e) => setMessageText(e.target.value)}
                         onKeyDown={(e) => e.key === "Enter" && handleSend()}
-                        className="flex-1 h-12 rounded-full bg-muted/50 border-none"
+                        className="flex-1 h-10 md:h-12 rounded-full bg-muted/50 border-none text-sm md:text-base"
                       />
-                      <Button variant="ghost" size="icon" onClick={handleEmoji}>
+                      <Button variant="ghost" size="icon" onClick={handleEmoji} className="hidden sm:inline-flex">
                         <Smile className="w-5 h-5" />
                       </Button>
                       <Button 
