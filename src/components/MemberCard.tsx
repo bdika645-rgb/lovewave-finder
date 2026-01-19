@@ -73,7 +73,8 @@ const MemberCard = ({ member, onLike, onPass }: MemberCardProps) => {
             variant="pass"
             size="icon-lg"
             onClick={onPass}
-            className="flex-1"
+            className="flex-1 focus:ring-2 focus:ring-offset-2 focus:ring-destructive"
+            aria-label={`דלג על ${member.name}`}
           >
             <X className="w-5 h-5" />
           </Button>
@@ -81,7 +82,8 @@ const MemberCard = ({ member, onLike, onPass }: MemberCardProps) => {
             variant="like"
             size="icon-lg"
             onClick={onLike}
-            className="flex-1"
+            className="flex-1 focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+            aria-label={`שלח לייק ל${member.name}`}
           >
             <Heart className="w-5 h-5" />
           </Button>
