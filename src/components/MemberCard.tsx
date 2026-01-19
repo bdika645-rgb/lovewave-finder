@@ -32,14 +32,14 @@ const MemberCard = ({ member, onLike, onPass }: MemberCardProps) => {
           )}
 
           {/* Info Overlay */}
-          <div className="absolute bottom-0 left-0 right-0 p-6">
+          <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6">
             <div className="flex items-end justify-between">
               <div>
-                <h3 className="font-display text-2xl font-bold text-foreground">
+                <h3 className="font-display text-xl sm:text-2xl font-bold text-white drop-shadow-md">
                   {member.name}, {member.age}
                 </h3>
-                <p className="flex items-center gap-1 text-muted-foreground text-sm mt-1">
-                  <MapPin className="w-4 h-4 text-primary" />
+                <p className="flex items-center gap-1 text-white/80 text-sm mt-1 drop-shadow-md">
+                  <MapPin className="w-4 h-4 text-white" />
                   {member.city}
                 </p>
               </div>

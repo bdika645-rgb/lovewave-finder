@@ -32,12 +32,12 @@ const HeroSection = () => {
             </span>
           </div>
           
-          <h1 className="font-display text-5xl md:text-7xl lg:text-8xl font-bold text-foreground mb-6 leading-tight">
+          <h1 className="font-display text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold text-foreground mb-4 sm:mb-6 leading-tight">
             מפגשים<br />
             <span className="text-gradient">ברמה אחרת.</span>
           </h1>
           
-          <p className="font-body text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-12 leading-relaxed">
+          <p className="font-body text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 sm:mb-12 leading-relaxed px-4">
             הצטרפו לקהילה האקסקלוסיבית של רווקים ורווקות נבחרים. 
             כאן הקשרים נוצרים ברמה הכי גבוהה.
           </p>
@@ -58,21 +58,21 @@ const HeroSection = () => {
         </div>
 
         {/* Stats */}
-        <div className="mt-24 grid grid-cols-3 gap-6 max-w-3xl mx-auto animate-slide-up">
-          <div className="glass-effect rounded-2xl p-6 card-hover border border-gold/10">
-            <Users className="w-8 h-8 text-primary mx-auto mb-3" />
-            <p className="font-display text-4xl font-bold text-gradient">15K+</p>
-            <p className="text-muted-foreground text-sm mt-1">חברים נבחרים</p>
+        <div className="mt-16 sm:mt-24 grid grid-cols-3 gap-3 sm:gap-6 max-w-3xl mx-auto animate-slide-up">
+          <div className="glass-effect rounded-xl sm:rounded-2xl p-3 sm:p-6 card-hover border border-gold/10">
+            <Users className="w-5 h-5 sm:w-8 sm:h-8 text-primary mx-auto mb-2 sm:mb-3" />
+            <p className="font-display text-2xl sm:text-4xl font-bold text-gradient">15K+</p>
+            <p className="text-muted-foreground text-xs sm:text-sm mt-1">חברים נבחרים</p>
           </div>
-          <div className="glass-effect rounded-2xl p-6 card-hover border border-gold/10">
-            <Diamond className="w-8 h-8 text-primary mx-auto mb-3" />
-            <p className="font-display text-4xl font-bold text-gradient">8K+</p>
-            <p className="text-muted-foreground text-sm mt-1">זוגות מאושרים</p>
+          <div className="glass-effect rounded-xl sm:rounded-2xl p-3 sm:p-6 card-hover border border-gold/10">
+            <Diamond className="w-5 h-5 sm:w-8 sm:h-8 text-primary mx-auto mb-2 sm:mb-3" />
+            <p className="font-display text-2xl sm:text-4xl font-bold text-gradient">8K+</p>
+            <p className="text-muted-foreground text-xs sm:text-sm mt-1">זוגות מאושרים</p>
           </div>
-          <div className="glass-effect rounded-2xl p-6 card-hover border border-gold/10">
-            <Star className="w-8 h-8 text-primary mx-auto mb-3" />
-            <p className="font-display text-4xl font-bold text-gradient">98%</p>
-            <p className="text-muted-foreground text-sm mt-1">שביעות רצון</p>
+          <div className="glass-effect rounded-xl sm:rounded-2xl p-3 sm:p-6 card-hover border border-gold/10">
+            <Star className="w-5 h-5 sm:w-8 sm:h-8 text-primary mx-auto mb-2 sm:mb-3" />
+            <p className="font-display text-2xl sm:text-4xl font-bold text-gradient">98%</p>
+            <p className="text-muted-foreground text-xs sm:text-sm mt-1">שביעות רצון</p>
           </div>
         </div>
       </div>
