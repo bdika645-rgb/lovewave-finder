@@ -14,12 +14,12 @@ const HeroSection = () => {
           className="w-full h-full object-cover opacity-40"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background" />
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-deep/30 via-transparent to-purple-deep/30" />
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-transparent to-primary/20" />
       </div>
 
       {/* Decorative Elements */}
-      <div className="absolute top-1/4 left-10 w-32 h-32 bg-gold/5 rounded-full blur-3xl animate-pulse-soft" />
-      <div className="absolute bottom-1/4 right-10 w-40 h-40 bg-purple-glow/10 rounded-full blur-3xl animate-float" />
+      <div className="absolute top-1/4 left-10 w-32 h-32 bg-primary/5 rounded-full blur-3xl animate-pulse-soft" />
+      <div className="absolute bottom-1/4 right-10 w-40 h-40 bg-secondary/10 rounded-full blur-3xl animate-float" />
 
       {/* Content */}
       <div className="relative z-10 container mx-auto px-6 text-center">
@@ -59,17 +59,17 @@ const HeroSection = () => {
 
         {/* Stats */}
         <div className="mt-16 sm:mt-24 grid grid-cols-3 gap-3 sm:gap-6 max-w-3xl mx-auto animate-slide-up">
-          <div className="glass-effect rounded-xl sm:rounded-2xl p-3 sm:p-6 card-hover border border-gold/10">
+          <div className="glass-effect rounded-xl sm:rounded-2xl p-3 sm:p-6 card-hover border border-border">
             <Users className="w-5 h-5 sm:w-8 sm:h-8 text-primary mx-auto mb-2 sm:mb-3" />
             <p className="font-display text-2xl sm:text-4xl font-bold text-gradient">15K+</p>
             <p className="text-muted-foreground text-xs sm:text-sm mt-1">חברים נבחרים</p>
           </div>
-          <div className="glass-effect rounded-xl sm:rounded-2xl p-3 sm:p-6 card-hover border border-gold/10">
+          <div className="glass-effect rounded-xl sm:rounded-2xl p-3 sm:p-6 card-hover border border-border">
             <Diamond className="w-5 h-5 sm:w-8 sm:h-8 text-primary mx-auto mb-2 sm:mb-3" />
             <p className="font-display text-2xl sm:text-4xl font-bold text-gradient">8K+</p>
             <p className="text-muted-foreground text-xs sm:text-sm mt-1">זוגות מאושרים</p>
           </div>
-          <div className="glass-effect rounded-xl sm:rounded-2xl p-3 sm:p-6 card-hover border border-gold/10">
+          <div className="glass-effect rounded-xl sm:rounded-2xl p-3 sm:p-6 card-hover border border-border">
             <Star className="w-5 h-5 sm:w-8 sm:h-8 text-primary mx-auto mb-2 sm:mb-3" />
             <p className="font-display text-2xl sm:text-4xl font-bold text-gradient">98%</p>
             <p className="text-muted-foreground text-xs sm:text-sm mt-1">שביעות רצון</p>

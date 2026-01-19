@@ -22,8 +22,7 @@ export function useDatingTips() {
     try {
       setLoading(true);
       
-      // Use any type to bypass TS strict checking since table was just created
-      const { data, error: fetchError } = await (supabase as any)
+      const { data, error: fetchError } = await supabase
         .from("dating_tips")
         .select("*")
         .order("order_index", { ascending: true });
@@ -46,7 +45,7 @@ export function useDatingTips() {
 
   const createTip = async (tip: Omit<DatingTip, "id" | "created_at" | "updated_at">) => {
     try {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from("dating_tips")
         .insert(tip);
 
@@ -64,7 +63,7 @@ export function useDatingTips() {
 
   const updateTip = async (id: string, updates: Partial<DatingTip>) => {
     try {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from("dating_tips")
         .update({ ...updates, updated_at: new Date().toISOString() })
         .eq("id", id);
@@ -83,7 +82,7 @@ export function useDatingTips() {
 
   const deleteTip = async (id: string) => {
     try {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from("dating_tips")
         .delete()
         .eq("id", id);
@@ -102,7 +101,7 @@ export function useDatingTips() {
 
   const reorderTips = async (tipId: string, newIndex: number) => {
     try {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from("dating_tips")
         .update({ order_index: newIndex, updated_at: new Date().toISOString() })
         .eq("id", tipId);
