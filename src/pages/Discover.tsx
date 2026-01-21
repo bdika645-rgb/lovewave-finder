@@ -1,21 +1,36 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import Navbar from "@/components/Navbar";
 import SwipeCard from "@/components/SwipeCard";
 import ReportDialog from "@/components/ReportDialog";
+import DiscoverFilters, { DiscoverFiltersState } from "@/components/DiscoverFilters";
 import { useProfiles } from "@/hooks/useProfiles";
 import { useLikes } from "@/hooks/useLikes";
 import { useAuth } from "@/hooks/useAuth";
 import { useActionHistory } from "@/hooks/useActionHistory";
-import { usePhotos } from "@/hooks/usePhotos";
 import { Button } from "@/components/ui/button";
-import { Heart, Loader2, RefreshCcw, Sparkles, Filter, Undo2 } from "lucide-react";
+import { Heart, Loader2, RefreshCcw, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
 const Discover = () => {
   const { user } = useAuth();
-  const { profiles, loading, refetch } = useProfiles({ filterByOppositeGender: true });
+  
+  // Filters state
+  const [filters, setFilters] = useState<DiscoverFiltersState>({
+    ageFrom: null,
+    ageTo: null,
+    city: "",
+    interests: [],
+    relationshipGoal: ""
+  });
+
+  const { profiles, loading, refetch } = useProfiles({ 
+    filterByOppositeGender: true,
+    ageFrom: filters.ageFrom || undefined,
+    ageTo: filters.ageTo || undefined,
+    city: filters.city || undefined,
+  });
   const { sendLike, removeLike } = useLikes();
   const { recordAction, undoLastAction } = useActionHistory();
   
@@ -377,11 +392,24 @@ const Discover = () => {
       )}
 
       <div className="container mx-auto px-6 pt-28 pb-16">
-        {/* Header */}
+        {/* Header with Filters */}
         <div className="text-center mb-8">
-          <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-2">
-            <span className="text-gradient">גלו</span> את ההתאמה שלכם
-          </h1>
+          <div className="flex items-center justify-center gap-4 mb-4">
+            <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground">
+              <span className="text-gradient">גלו</span> את ההתאמה שלכם
+            </h1>
+            <DiscoverFilters 
+              filters={filters} 
+              onFiltersChange={setFilters}
+              activeFilterCount={
+                (filters.ageFrom ? 1 : 0) + 
+                (filters.ageTo ? 1 : 0) + 
+                (filters.city ? 1 : 0) + 
+                filters.interests.length +
+                (filters.relationshipGoal ? 1 : 0)
+              }
+            />
+          </div>
           <p className="text-muted-foreground">
             גררו ימינה ללייק, שמאלה לדלג, למעלה לסופר לייק
           </p>
