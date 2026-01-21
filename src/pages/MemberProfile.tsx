@@ -1,12 +1,14 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useProfileById } from "@/hooks/useProfiles";
+import { useProfile } from "@/hooks/useProfile";
 import { useLikes } from "@/hooks/useLikes";
 import { useConversations } from "@/hooks/useConversations";
 import { useAuth } from "@/hooks/useAuth";
+import { useCompatibility } from "@/hooks/useCompatibility";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Heart, MessageCircle, MapPin, Clock, ArrowRight, Star, Share2, Loader2 } from "lucide-react";
+import { Heart, MessageCircle, MapPin, Clock, ArrowRight, Star, Share2, Loader2, GraduationCap, Ruler, Cigarette, Target, Verified } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 
@@ -14,10 +16,14 @@ const MemberProfile = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { profile: member, loading, error } = useProfileById(id || "");
+  const { profile: currentUserProfile } = useProfile();
   const { sendLike, loading: likeLoading } = useLikes();
   const { createOrGetConversation } = useConversations();
   const { user } = useAuth();
   const [messageLoading, setMessageLoading] = useState(false);
+  
+  // Calculate compatibility score
+  const compatibility = useCompatibility(currentUserProfile, member);
 
   if (loading) {
     return (
@@ -208,6 +214,44 @@ const MemberProfile = () => {
                 </div>
               )}
 
+              {/* Additional Profile Details */}
+              {(member.education || member.height || member.smoking || member.relationship_goal) && (
+                <div className="mb-8">
+                  <h3 className="font-display text-lg font-semibold text-foreground mb-3">
+                    פרטים נוספים
+                  </h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    {member.education && (
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <GraduationCap className="w-4 h-4" />
+                        <span>{member.education}</span>
+                      </div>
+                    )}
+                    {member.height && (
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Ruler className="w-4 h-4" />
+                        <span>{member.height} ס"מ</span>
+                      </div>
+                    )}
+                    {member.smoking && (
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Cigarette className="w-4 h-4" />
+                        <span>{member.smoking === 'no' ? 'לא מעשן/ת' : member.smoking === 'yes' ? 'מעשן/ת' : 'לפעמים'}</span>
+                      </div>
+                    )}
+                    {member.relationship_goal && (
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Target className="w-4 h-4" />
+                        <span>
+                          {member.relationship_goal === 'serious' ? 'קשר רציני' : 
+                           member.relationship_goal === 'casual' ? 'הכרויות' : 'חברות'}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
               <div className="flex gap-4">
                 <Button 
                   variant="hero" 
@@ -240,17 +284,95 @@ const MemberProfile = () => {
               </div>
             </div>
 
-            {/* Additional Info Cards */}
-            <div className="grid grid-cols-2 gap-4 mt-6">
-              <div className="bg-card rounded-2xl p-6 shadow-card text-center">
-                <p className="font-display text-2xl font-bold text-primary">98%</p>
-                <p className="text-muted-foreground text-sm">התאמה</p>
+            {/* Compatibility Card - Real Data */}
+            {user && currentUserProfile && compatibility.score > 0 && (
+              <div className="bg-card rounded-2xl p-6 shadow-card mt-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-display text-lg font-semibold text-foreground">
+                    התאמה
+                  </h3>
+                  <div className="text-3xl font-bold text-primary">
+                    {compatibility.score}%
+                  </div>
+                </div>
+                
+                {/* Compatibility Breakdown */}
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">תחומי עניין</span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-24 h-2 bg-muted rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-primary rounded-full" 
+                          style={{ width: `${(compatibility.breakdown.interests / 40) * 100}%` }}
+                        />
+                      </div>
+                      <span className="text-xs text-muted-foreground w-8">{compatibility.breakdown.interests}/40</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">מיקום</span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-24 h-2 bg-muted rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-primary rounded-full" 
+                          style={{ width: `${(compatibility.breakdown.location / 25) * 100}%` }}
+                        />
+                      </div>
+                      <span className="text-xs text-muted-foreground w-8">{compatibility.breakdown.location}/25</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">מטרות</span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-24 h-2 bg-muted rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-primary rounded-full" 
+                          style={{ width: `${(compatibility.breakdown.relationshipGoal / 20) * 100}%` }}
+                        />
+                      </div>
+                      <span className="text-xs text-muted-foreground w-8">{compatibility.breakdown.relationshipGoal}/20</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">גיל</span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-24 h-2 bg-muted rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-primary rounded-full" 
+                          style={{ width: `${(compatibility.breakdown.ageRange / 15) * 100}%` }}
+                        />
+                      </div>
+                      <span className="text-xs text-muted-foreground w-8">{compatibility.breakdown.ageRange}/15</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Match Reasons */}
+                {compatibility.matchReasons.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {compatibility.matchReasons.map((reason, i) => (
+                      <Badge key={i} variant="secondary" className="text-xs">
+                        ✓ {reason}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
               </div>
-              <div className="bg-card rounded-2xl p-6 shadow-card text-center">
-                <p className="font-display text-2xl font-bold text-primary">4.9★</p>
-                <p className="text-muted-foreground text-sm">דירוג</p>
+            )}
+
+            {/* Verified Badge Card */}
+            {(member as any).is_verified && (
+              <div className="bg-gradient-to-r from-secondary/20 to-primary/20 rounded-2xl p-4 mt-6 flex items-center gap-3">
+                <div className="p-2 bg-secondary/20 rounded-full">
+                  <Verified className="w-6 h-6 text-secondary" />
+                </div>
+                <div>
+                  <p className="font-semibold text-foreground">פרופיל מאומת</p>
+                  <p className="text-sm text-muted-foreground">הזהות של {member.name} אומתה</p>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>

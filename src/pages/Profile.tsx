@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Edit2, MapPin, Calendar, Heart, Settings, LogOut, X, Plus, Loader2, Users } from "lucide-react";
+import { Edit2, MapPin, Calendar, Heart, Settings, LogOut, X, Plus, Loader2, Users, GraduationCap, Ruler, Cigarette, Target } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -11,6 +11,14 @@ import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
 import { useProfileStats } from "@/hooks/useProfileStats";
 import PhotoUpload from "@/components/PhotoUpload";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { israeliCities } from "@/data/members";
 
 const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -29,6 +37,10 @@ const Profile = () => {
     city: "",
     bio: "",
     interests: [] as string[],
+    education: "",
+    height: null as number | null,
+    smoking: "",
+    relationship_goal: "",
   });
 
   // Initialize edit state when entering edit mode
@@ -40,6 +52,10 @@ const Profile = () => {
         city: profile.city,
         bio: profile.bio || "",
         interests: profile.interests || [],
+        education: profile.education || "",
+        height: profile.height,
+        smoking: profile.smoking || "",
+        relationship_goal: profile.relationship_goal || "",
       });
     }
     setIsEditing(true);
@@ -63,6 +79,10 @@ const Profile = () => {
       city: editedProfile.city,
       bio: editedProfile.bio,
       interests: editedProfile.interests,
+      education: editedProfile.education || null,
+      height: editedProfile.height,
+      smoking: editedProfile.smoking || null,
+      relationship_goal: editedProfile.relationship_goal || null,
     });
 
     setIsSaving(false);
@@ -134,6 +154,10 @@ const Profile = () => {
     city: profile.city,
     bio: profile.bio || "",
     interests: profile.interests || [],
+    education: profile.education || "",
+    height: profile.height,
+    smoking: profile.smoking || "",
+    relationship_goal: profile.relationship_goal || "",
   };
 
   const imageUrl = profile.avatar_url || "/profiles/profile1.jpg";
@@ -309,10 +333,19 @@ const Profile = () => {
                 <div>
                   <label className="text-sm text-muted-foreground">עיר</label>
                   {isEditing ? (
-                    <Input 
+                    <Select
                       value={editedProfile.city}
-                      onChange={(e) => setEditedProfile({...editedProfile, city: e.target.value})}
-                    />
+                      onValueChange={(value) => setEditedProfile({...editedProfile, city: value})}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="בחר עיר" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {israeliCities.map(city => (
+                          <SelectItem key={city} value={city}>{city}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   ) : (
                     <p className="font-medium text-foreground">{displayProfile.city}</p>
                   )}
@@ -323,6 +356,116 @@ const Profile = () => {
                     <Calendar className="w-4 h-4" />
                     {joinedDate}
                   </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Extended Profile Details */}
+            <div className="bg-card rounded-2xl p-6 shadow-card">
+              <h3 className="font-display text-lg font-bold text-foreground mb-4">
+                פרטים נוספים
+              </h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm text-muted-foreground flex items-center gap-1">
+                    <GraduationCap className="w-4 h-4" /> השכלה
+                  </label>
+                  {isEditing ? (
+                    <Select
+                      value={editedProfile.education}
+                      onValueChange={(value) => setEditedProfile({...editedProfile, education: value})}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="בחר השכלה" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="high_school">תיכונית</SelectItem>
+                        <SelectItem value="bachelor">תואר ראשון</SelectItem>
+                        <SelectItem value="master">תואר שני</SelectItem>
+                        <SelectItem value="phd">דוקטורט</SelectItem>
+                        <SelectItem value="other">אחר</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <p className="font-medium text-foreground">
+                      {displayProfile.education === 'high_school' ? 'תיכונית' :
+                       displayProfile.education === 'bachelor' ? 'תואר ראשון' :
+                       displayProfile.education === 'master' ? 'תואר שני' :
+                       displayProfile.education === 'phd' ? 'דוקטורט' :
+                       displayProfile.education === 'other' ? 'אחר' : 'לא צוין'}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <label className="text-sm text-muted-foreground flex items-center gap-1">
+                    <Ruler className="w-4 h-4" /> גובה
+                  </label>
+                  {isEditing ? (
+                    <Input 
+                      type="number"
+                      value={editedProfile.height || ""}
+                      onChange={(e) => setEditedProfile({...editedProfile, height: e.target.value ? parseInt(e.target.value) : null})}
+                      placeholder='ס"מ'
+                      min={120}
+                      max={250}
+                    />
+                  ) : (
+                    <p className="font-medium text-foreground">
+                      {displayProfile.height ? `${displayProfile.height} ס"מ` : 'לא צוין'}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <label className="text-sm text-muted-foreground flex items-center gap-1">
+                    <Cigarette className="w-4 h-4" /> יחס לעישון
+                  </label>
+                  {isEditing ? (
+                    <Select
+                      value={editedProfile.smoking}
+                      onValueChange={(value) => setEditedProfile({...editedProfile, smoking: value})}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="בחר" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="no">לא מעשן/ת</SelectItem>
+                        <SelectItem value="sometimes">לפעמים</SelectItem>
+                        <SelectItem value="yes">מעשן/ת</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <p className="font-medium text-foreground">
+                      {displayProfile.smoking === 'no' ? 'לא מעשן/ת' :
+                       displayProfile.smoking === 'sometimes' ? 'לפעמים' :
+                       displayProfile.smoking === 'yes' ? 'מעשן/ת' : 'לא צוין'}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <label className="text-sm text-muted-foreground flex items-center gap-1">
+                    <Target className="w-4 h-4" /> מטרת הקשר
+                  </label>
+                  {isEditing ? (
+                    <Select
+                      value={editedProfile.relationship_goal}
+                      onValueChange={(value) => setEditedProfile({...editedProfile, relationship_goal: value})}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="בחר מטרה" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="serious">קשר רציני</SelectItem>
+                        <SelectItem value="casual">הכרויות</SelectItem>
+                        <SelectItem value="friendship">חברות</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <p className="font-medium text-foreground">
+                      {displayProfile.relationship_goal === 'serious' ? 'קשר רציני' :
+                       displayProfile.relationship_goal === 'casual' ? 'הכרויות' :
+                       displayProfile.relationship_goal === 'friendship' ? 'חברות' : 'לא צוין'}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>

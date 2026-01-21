@@ -2,10 +2,18 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Heart, Mail, Lock, User, Eye, EyeOff, MapPin, Loader2, Calendar, Camera, Users } from "lucide-react";
+import { Heart, Mail, Lock, User, Eye, EyeOff, MapPin, Loader2, Calendar, Camera, Users, GraduationCap, Ruler, Cigarette, Target } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { israeliCities } from "@/data/members";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -16,6 +24,11 @@ const Register = () => {
     gender: "",
     password: "",
     confirmPassword: "",
+    // New fields
+    education: "",
+    height: "",
+    smoking: "",
+    relationshipGoal: "",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -127,27 +140,44 @@ const Register = () => {
       return;
     }
 
-    // Upload avatar
-    if (userId && avatarFile) {
-      const fileExt = avatarFile.name.split('.').pop();
-      const fileName = `${userId}/avatar.${fileExt}`;
-      
-      const { error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(fileName, avatarFile);
-      
-      if (uploadError) {
-        console.error('Error uploading avatar:', uploadError);
-        toast.error("ההרשמה הצליחה אך העלאת התמונה נכשלה");
-      } else {
-        // Get public URL and update profile
-        const { data: { publicUrl } } = supabase.storage
-          .from('avatars')
-          .getPublicUrl(fileName);
+    // Upload avatar and update profile with extra fields
+    if (userId) {
+      // Upload avatar
+      if (avatarFile) {
+        const fileExt = avatarFile.name.split('.').pop();
+        const fileName = `${userId}/avatar.${fileExt}`;
         
+        const { error: uploadError } = await supabase.storage
+          .from('avatars')
+          .upload(fileName, avatarFile);
+        
+        if (uploadError) {
+          console.error('Error uploading avatar:', uploadError);
+          toast.error("ההרשמה הצליחה אך העלאת התמונה נכשלה");
+        } else {
+          // Get public URL and update profile
+          const { data: { publicUrl } } = supabase.storage
+            .from('avatars')
+            .getPublicUrl(fileName);
+          
+          await supabase
+            .from('profiles')
+            .update({ avatar_url: publicUrl })
+            .eq('user_id', userId);
+        }
+      }
+
+      // Update profile with additional fields
+      const updateData: Record<string, any> = {};
+      if (formData.education) updateData.education = formData.education;
+      if (formData.height) updateData.height = parseInt(formData.height);
+      if (formData.smoking) updateData.smoking = formData.smoking;
+      if (formData.relationshipGoal) updateData.relationship_goal = formData.relationshipGoal;
+
+      if (Object.keys(updateData).length > 0) {
         await supabase
           .from('profiles')
-          .update({ avatar_url: publicUrl })
+          .update(updateData)
           .eq('user_id', userId);
       }
     }
@@ -283,16 +313,20 @@ const Register = () => {
                 <label className="text-sm font-medium text-foreground mb-2 block">
                   עיר
                 </label>
-                <div className="relative">
-                  <MapPin className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                  <Input
-                    type="text"
-                    placeholder="עיר מגורים"
-                    value={formData.city}
-                    onChange={(e) => setFormData({...formData, city: e.target.value})}
-                    className="pr-10 h-12"
-                  />
-                </div>
+                <Select
+                  value={formData.city}
+                  onValueChange={(value) => setFormData({...formData, city: value})}
+                >
+                  <SelectTrigger className="h-12">
+                    <MapPin className="w-5 h-5 text-muted-foreground ml-2" />
+                    <SelectValue placeholder="בחר עיר" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {israeliCities.map(city => (
+                      <SelectItem key={city} value={city}>{city}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div>
                 <label className="text-sm font-medium text-foreground mb-2 block">
@@ -309,6 +343,93 @@ const Register = () => {
                     min="18"
                     max="120"
                   />
+                </div>
+              </div>
+            </div>
+
+            {/* Additional Fields Section */}
+            <div className="border-t border-border pt-4 mt-4">
+              <p className="text-sm font-medium text-foreground mb-3">פרטים נוספים (אופציונלי)</p>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-2 block">
+                    השכלה
+                  </label>
+                  <Select
+                    value={formData.education}
+                    onValueChange={(value) => setFormData({...formData, education: value})}
+                  >
+                    <SelectTrigger className="h-12">
+                      <GraduationCap className="w-5 h-5 text-muted-foreground ml-2" />
+                      <SelectValue placeholder="בחר השכלה" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="high_school">תיכונית</SelectItem>
+                      <SelectItem value="bachelor">תואר ראשון</SelectItem>
+                      <SelectItem value="master">תואר שני</SelectItem>
+                      <SelectItem value="phd">דוקטורט</SelectItem>
+                      <SelectItem value="other">אחר</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-2 block">
+                    גובה (ס"מ)
+                  </label>
+                  <div className="relative">
+                    <Ruler className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                    <Input
+                      type="number"
+                      placeholder="גובה"
+                      value={formData.height}
+                      onChange={(e) => setFormData({...formData, height: e.target.value})}
+                      className="pr-10 h-12"
+                      min="120"
+                      max="250"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 mt-4">
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-2 block">
+                    יחס לעישון
+                  </label>
+                  <Select
+                    value={formData.smoking}
+                    onValueChange={(value) => setFormData({...formData, smoking: value})}
+                  >
+                    <SelectTrigger className="h-12">
+                      <Cigarette className="w-5 h-5 text-muted-foreground ml-2" />
+                      <SelectValue placeholder="בחר" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="no">לא מעשן/ת</SelectItem>
+                      <SelectItem value="sometimes">לפעמים</SelectItem>
+                      <SelectItem value="yes">מעשן/ת</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-2 block">
+                    מטרת הקשר
+                  </label>
+                  <Select
+                    value={formData.relationshipGoal}
+                    onValueChange={(value) => setFormData({...formData, relationshipGoal: value})}
+                  >
+                    <SelectTrigger className="h-12">
+                      <Target className="w-5 h-5 text-muted-foreground ml-2" />
+                      <SelectValue placeholder="בחר מטרה" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="serious">קשר רציני</SelectItem>
+                      <SelectItem value="casual">הכרויות</SelectItem>
+                      <SelectItem value="friendship">חברות</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             </div>

@@ -2,12 +2,16 @@ import { Link } from "react-router-dom";
 import AdminLayout from "@/components/admin/AdminLayout";
 import StatsCard from "@/components/admin/StatsCard";
 import { useAdminStats } from "@/hooks/useAdminStats";
+import { useActivityLogs } from "@/hooks/useActivityLogs";
 import { 
   Users, Heart, MessageCircle, ThumbsUp, UserPlus, Activity,
   Flag, Shield, Settings, BarChart3, TrendingUp, ArrowUpRight
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { formatDistanceToNow } from "date-fns";
+import { he } from "date-fns/locale";
 import {
   BarChart,
   Bar,
@@ -22,7 +26,7 @@ import {
   Legend
 } from "recharts";
 
-const COLORS = ["#ec4899", "#8b5cf6", "#6366f1"];
+const COLORS = ["hsl(var(--primary))", "hsl(var(--secondary))", "hsl(var(--accent))"];
 
 // Quick actions for the dashboard
 const quickActions = [
@@ -32,16 +36,20 @@ const quickActions = [
   { icon: Settings, label: "הגדרות", path: "/admin/settings", color: "bg-gray-500" },
 ];
 
-// Mock recent activity
-const recentActivity = [
-  { id: 1, type: "signup", text: "משתמש חדש נרשם: דני כהן", time: "לפני 5 דקות", icon: UserPlus },
-  { id: 2, type: "match", text: "מאץ' חדש: מיכל ויוסי", time: "לפני 12 דקות", icon: Heart },
-  { id: 3, type: "report", text: "דיווח חדש על תוכן לא הולם", time: "לפני 25 דקות", icon: Flag },
-  { id: 4, type: "message", text: "1,234 הודעות נשלחו היום", time: "לפני שעה", icon: MessageCircle },
-];
+// Activity type icons and colors
+const activityConfig: Record<string, { icon: React.ElementType; color: string }> = {
+  signup: { icon: UserPlus, color: "text-green-500" },
+  match: { icon: Heart, color: "text-pink-500" },
+  like: { icon: ThumbsUp, color: "text-red-500" },
+  message: { icon: MessageCircle, color: "text-blue-500" },
+  report: { icon: Flag, color: "text-orange-500" },
+  login: { icon: Users, color: "text-purple-500" },
+  default: { icon: Activity, color: "text-muted-foreground" }
+};
 
 export default function AdminDashboard() {
   const { stats, loading } = useAdminStats();
+  const { activities, loading: activitiesLoading } = useActivityLogs({ limit: 5 });
 
   if (loading) {
     return (
@@ -195,7 +203,7 @@ export default function AdminDashboard() {
 
         {/* Bottom Row: Recent Activity + Quick Stats */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Recent Activity */}
+          {/* Recent Activity - Real Data */}
           <div className="lg:col-span-2 bg-card rounded-xl border border-border overflow-hidden">
             <div className="p-4 border-b border-border flex items-center justify-between">
               <h3 className="text-lg font-semibold">פעילות אחרונה</h3>
@@ -207,17 +215,52 @@ export default function AdminDashboard() {
               </Button>
             </div>
             <div className="divide-y divide-border">
-              {recentActivity.map((item) => (
-                <div key={item.id} className="p-4 flex items-center gap-4 hover:bg-muted/50 transition-colors">
-                  <div className="p-2 bg-muted rounded-lg">
-                    <item.icon className="w-4 h-4 text-primary" />
+              {activitiesLoading ? (
+                [...Array(4)].map((_, i) => (
+                  <div key={i} className="p-4 flex items-center gap-4">
+                    <Skeleton className="w-10 h-10 rounded-lg" />
+                    <div className="flex-1">
+                      <Skeleton className="h-4 w-3/4 mb-2" />
+                      <Skeleton className="h-3 w-1/4" />
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-foreground text-sm">{item.text}</p>
-                    <p className="text-xs text-muted-foreground">{item.time}</p>
-                  </div>
+                ))
+              ) : activities.length === 0 ? (
+                <div className="p-8 text-center text-muted-foreground">
+                  <Activity className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                  <p>אין פעילות אחרונה</p>
                 </div>
-              ))}
+              ) : (
+                activities.map((activity) => {
+                  const config = activityConfig[activity.action_type] || activityConfig.default;
+                  const IconComponent = config.icon;
+                  
+                  return (
+                    <div key={activity.id} className="p-4 flex items-center gap-4 hover:bg-muted/50 transition-colors">
+                      <div className="p-2 bg-muted rounded-lg">
+                        <IconComponent className={`w-4 h-4 ${config.color}`} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          {activity.user && (
+                            <Avatar className="w-5 h-5">
+                              <AvatarImage src={activity.user.avatar_url || undefined} />
+                              <AvatarFallback className="text-xs">{activity.user.name?.[0]}</AvatarFallback>
+                            </Avatar>
+                          )}
+                          <p className="text-foreground text-sm truncate">{activity.description}</p>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          {formatDistanceToNow(new Date(activity.created_at), { 
+                            addSuffix: true, 
+                            locale: he 
+                          })}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
             </div>
           </div>
 
