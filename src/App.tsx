@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
+import { ThemeProvider } from "next-themes";
 import Index from "./pages/Index";
 import Members from "./pages/Members";
 import MemberProfile from "./pages/MemberProfile";
@@ -13,6 +14,11 @@ import Settings from "./pages/Settings";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Discover from "./pages/Discover";
+import Matches from "./pages/Matches";
+import WhoLikedMe from "./pages/WhoLikedMe";
+import Support from "./pages/Support";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -35,59 +41,74 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/discover" element={
-              <ProtectedRoute>
-                <Discover />
-              </ProtectedRoute>
-            } />
-            <Route path="/members" element={<Members />} />
-            <Route path="/member/:id" element={<MemberProfile />} />
-            <Route path="/messages" element={
-              <ProtectedRoute>
-                <Messages />
-              </ProtectedRoute>
-            } />
-            <Route path="/profile" element={
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
-            } />
-            <Route path="/settings" element={
-              <ProtectedRoute>
-                <Settings />
-              </ProtectedRoute>
-            } />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            
-            {/* Admin Routes */}
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/admin/users" element={<AdminUsers />} />
-            <Route path="/admin/matches" element={<AdminMatches />} />
-            <Route path="/admin/messages" element={<AdminMessages />} />
-            <Route path="/admin/analytics" element={<AdminAnalytics />} />
-            <Route path="/admin/roles" element={<AdminRoles />} />
-            <Route path="/admin/settings" element={<AdminSettings />} />
-            <Route path="/admin/reports" element={<AdminReports />} />
-            <Route path="/admin/activity" element={<AdminActivityLog />} />
-            <Route path="/admin/blocked" element={<AdminBlockedUsers />} />
-            <Route path="/admin/content" element={<AdminContent />} />
-            <Route path="/admin/notifications" element={<AdminNotifications />} />
-            <Route path="/admin/tips" element={<AdminTips />} />
-            
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </AuthProvider>
+    <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/discover" element={
+                <ProtectedRoute>
+                  <Discover />
+                </ProtectedRoute>
+              } />
+              <Route path="/members" element={<Members />} />
+              <Route path="/member/:id" element={<MemberProfile />} />
+              <Route path="/messages" element={
+                <ProtectedRoute>
+                  <Messages />
+                </ProtectedRoute>
+              } />
+              <Route path="/matches" element={
+                <ProtectedRoute>
+                  <Matches />
+                </ProtectedRoute>
+              } />
+              <Route path="/who-liked-me" element={
+                <ProtectedRoute>
+                  <WhoLikedMe />
+                </ProtectedRoute>
+              } />
+              <Route path="/profile" element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              } />
+              <Route path="/settings" element={
+                <ProtectedRoute>
+                  <Settings />
+                </ProtectedRoute>
+              } />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/support" element={<Support />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/privacy" element={<Privacy />} />
+              
+              {/* Admin Routes */}
+              <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin/users" element={<AdminUsers />} />
+              <Route path="/admin/matches" element={<AdminMatches />} />
+              <Route path="/admin/messages" element={<AdminMessages />} />
+              <Route path="/admin/analytics" element={<AdminAnalytics />} />
+              <Route path="/admin/roles" element={<AdminRoles />} />
+              <Route path="/admin/settings" element={<AdminSettings />} />
+              <Route path="/admin/reports" element={<AdminReports />} />
+              <Route path="/admin/activity" element={<AdminActivityLog />} />
+              <Route path="/admin/blocked" element={<AdminBlockedUsers />} />
+              <Route path="/admin/content" element={<AdminContent />} />
+              <Route path="/admin/notifications" element={<AdminNotifications />} />
+              <Route path="/admin/tips" element={<AdminTips />} />
+              
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 

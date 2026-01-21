@@ -1,8 +1,11 @@
 import { Link, useLocation } from "react-router-dom";
-import { Heart, Menu, X, User, MessageCircle, Search, LogOut, Sparkles } from "lucide-react";
+import { Heart, Menu, X, User, MessageCircle, Search, LogOut, Sparkles, Bell, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useUnreadMessages } from "@/hooks/useUnreadMessages";
+import { Badge } from "@/components/ui/badge";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -10,6 +13,7 @@ const Navbar = () => {
   const location = useLocation();
   const isHome = location.pathname === "/";
   const { user, signOut } = useAuth();
+  const { unreadCount } = useUnreadMessages();
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -71,13 +75,30 @@ const Navbar = () => {
               גלה
             </Link>
             <Link 
-              to="/messages" 
+              to="/matches" 
               className={`font-body font-medium transition-colors hover:text-primary flex items-center gap-1 ${
+                isHome && !isScrolled ? "text-primary-foreground/80 hover:text-primary-foreground" : "text-muted-foreground"
+              } ${location.pathname === '/matches' ? 'text-primary' : ''}`}
+            >
+              <Heart className="w-4 h-4" />
+              התאמות
+            </Link>
+            <Link 
+              to="/messages" 
+              className={`font-body font-medium transition-colors hover:text-primary flex items-center gap-1 relative ${
                 isHome && !isScrolled ? "text-primary-foreground/80 hover:text-primary-foreground" : "text-muted-foreground"
               } ${location.pathname === '/messages' ? 'text-primary' : ''}`}
             >
               <MessageCircle className="w-4 h-4" />
               הודעות
+              {unreadCount > 0 && (
+                <Badge 
+                  variant="destructive" 
+                  className="absolute -top-2 -right-2 h-5 min-w-5 px-1 flex items-center justify-center text-xs"
+                >
+                  {unreadCount > 99 ? "99+" : unreadCount}
+                </Badge>
+              )}
             </Link>
             <Link 
               to="/profile" 
@@ -92,11 +113,23 @@ const Navbar = () => {
 
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center gap-3">
+            <ThemeToggle />
             {user ? (
-              <Button variant={isHome && !isScrolled ? "hero-outline" : "ghost"} onClick={handleLogout}>
-                <LogOut className="w-4 h-4 ml-1" />
-                התנתק
-              </Button>
+              <>
+                <Link to="/who-liked-me">
+                  <Button 
+                    variant={isHome && !isScrolled ? "hero-outline" : "ghost"} 
+                    size="icon"
+                    className="relative"
+                  >
+                    <Bell className="w-5 h-5" />
+                  </Button>
+                </Link>
+                <Button variant={isHome && !isScrolled ? "hero-outline" : "ghost"} onClick={handleLogout}>
+                  <LogOut className="w-4 h-4 ml-1" />
+                  התנתק
+                </Button>
+              </>
             ) : (
               <>
                 <Link to="/login">
@@ -114,17 +147,20 @@ const Navbar = () => {
           </div>
 
           {/* Mobile Menu Button */}
-          <button 
-            onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden p-2 -mr-2"
-            aria-label="תפריט"
-          >
-            {isOpen ? (
-              <X className={`w-6 h-6 ${isHome && !isScrolled && !isOpen ? "text-primary-foreground" : "text-foreground"}`} />
-            ) : (
-              <Menu className={`w-6 h-6 ${isHome && !isScrolled ? "text-primary-foreground" : "text-foreground"}`} />
-            )}
-          </button>
+          <div className="flex items-center gap-2 md:hidden">
+            <ThemeToggle />
+            <button 
+              onClick={() => setIsOpen(!isOpen)}
+              className="p-2 -mr-2"
+              aria-label="תפריט"
+            >
+              {isOpen ? (
+                <X className={`w-6 h-6 ${isHome && !isScrolled && !isOpen ? "text-primary-foreground" : "text-foreground"}`} />
+              ) : (
+                <Menu className={`w-6 h-6 ${isHome && !isScrolled ? "text-primary-foreground" : "text-foreground"}`} />
+              )}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Menu */}
@@ -146,11 +182,30 @@ const Navbar = () => {
                 גלה פרופילים
               </Link>
               <Link 
+                to="/matches" 
+                className="font-body text-foreground py-3 px-4 rounded-lg hover:bg-accent transition-colors flex items-center gap-3"
+              >
+                <Heart className="w-5 h-5 text-primary" />
+                התאמות
+              </Link>
+              <Link 
                 to="/messages" 
                 className="font-body text-foreground py-3 px-4 rounded-lg hover:bg-accent transition-colors flex items-center gap-3"
               >
                 <MessageCircle className="w-5 h-5 text-primary" />
                 הודעות
+                {unreadCount > 0 && (
+                  <Badge variant="destructive" className="mr-auto">
+                    {unreadCount}
+                  </Badge>
+                )}
+              </Link>
+              <Link 
+                to="/who-liked-me" 
+                className="font-body text-foreground py-3 px-4 rounded-lg hover:bg-accent transition-colors flex items-center gap-3"
+              >
+                <Bell className="w-5 h-5 text-primary" />
+                מי עשה לי לייק
               </Link>
               <Link 
                 to="/profile" 
