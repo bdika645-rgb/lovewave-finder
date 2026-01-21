@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import SEOHead from "@/components/SEOHead";
 import { Heart, Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
@@ -79,7 +80,13 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen gradient-hero flex items-center justify-center p-6" dir="rtl">
+    <>
+      <SEOHead 
+        title="התחברות"
+        description="התחברו לחשבון Spark שלכם והתחילו לפגוש אנשים חדשים"
+        keywords="התחברות, לוגין, כניסה"
+      />
+      <div className="min-h-screen gradient-hero flex items-center justify-center p-6" dir="rtl">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
@@ -177,7 +184,8 @@ const Login = () => {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 

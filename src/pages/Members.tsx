@@ -1,7 +1,8 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo } from "react";
 import Navbar from "@/components/Navbar";
 import MemberCard from "@/components/MemberCard";
 import SEOHead from "@/components/SEOHead";
+import LazyImage from "@/components/LazyImage";
 import EmptyState from "@/components/EmptyState";
 import { SkeletonGrid } from "@/components/ui/skeleton-card";
 import { useProfiles } from "@/hooks/useProfiles";
@@ -320,10 +321,11 @@ const Members = () => {
                         to={`/member/${profile.id}`}
                         className="flex items-center gap-4 p-4 bg-card rounded-xl border border-border hover:shadow-card transition-shadow"
                       >
-                        <img 
+                        <LazyImage 
                           src={profile.avatar_url || "/profiles/profile1.jpg"} 
                           alt={profile.name}
-                          className="w-16 h-16 rounded-full object-cover"
+                          className="w-16 h-16 rounded-full"
+                          aspectRatio="square"
                         />
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
