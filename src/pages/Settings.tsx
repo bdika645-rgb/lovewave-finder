@@ -4,47 +4,94 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { 
+  AlertDialog, 
+  AlertDialogAction, 
+  AlertDialogCancel, 
+  AlertDialogContent, 
+  AlertDialogDescription, 
+  AlertDialogFooter, 
+  AlertDialogHeader, 
+  AlertDialogTitle, 
+  AlertDialogTrigger 
+} from "@/components/ui/alert-dialog";
 import { ArrowRight, Bell, Eye, Lock, Shield, Trash2, Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
+import { useUserSettings } from "@/hooks/useUserSettings";
+import { usePasswordReset } from "@/hooks/usePasswordReset";
+import { useDeleteAccount } from "@/hooks/useDeleteAccount";
 
 const Settings = () => {
   const navigate = useNavigate();
   const { signOut, user } = useAuth();
   const { profile } = useProfile();
-  
-  const [isSaving, setIsSaving] = useState(false);
-  const [settings, setSettings] = useState({
-    emailNotifications: true,
-    pushNotifications: true,
-    matchNotifications: true,
-    messageNotifications: true,
-    showOnlineStatus: true,
-    showLastSeen: true,
-    showDistance: true,
-    profileVisible: true,
-  });
+  const { settings, loading: settingsLoading, saving, updateSettings } = useUserSettings();
+  const { sendResetEmail, loading: resetLoading } = usePasswordReset();
+  const { deleteAccount, loading: deleteLoading } = useDeleteAccount();
+
+  const [localSettings, setLocalSettings] = useState(settings);
+
+  useEffect(() => {
+    setLocalSettings(settings);
+  }, [settings]);
 
   const handleSaveNotifications = async () => {
-    setIsSaving(true);
-    // Simulate saving
-    await new Promise(resolve => setTimeout(resolve, 500));
-    setIsSaving(false);
-    toast.success("הגדרות ההתראות נשמרו!");
+    const { error } = await updateSettings({
+      email_notifications: localSettings.email_notifications,
+      push_notifications: localSettings.push_notifications,
+      match_notifications: localSettings.match_notifications,
+      message_notifications: localSettings.message_notifications,
+    });
+
+    if (error) {
+      toast.error("שגיאה בשמירת ההגדרות");
+    } else {
+      toast.success("הגדרות ההתראות נשמרו!");
+    }
   };
 
   const handleSavePrivacy = async () => {
-    setIsSaving(true);
-    await new Promise(resolve => setTimeout(resolve, 500));
-    setIsSaving(false);
-    toast.success("הגדרות הפרטיות נשמרו!");
+    const { error } = await updateSettings({
+      show_online_status: localSettings.show_online_status,
+      show_last_seen: localSettings.show_last_seen,
+      profile_visible: localSettings.profile_visible,
+    });
+
+    if (error) {
+      toast.error("שגיאה בשמירת ההגדרות");
+    } else {
+      toast.success("הגדרות הפרטיות נשמרו!");
+    }
   };
 
-  const handleDeleteAccount = () => {
-    toast.error("לא ניתן למחוק חשבון כרגע. פנה לתמיכה.");
+  const handleResetPassword = async () => {
+    if (!user?.email) {
+      toast.error("לא נמצא אימייל לחשבון");
+      return;
+    }
+
+    const { error } = await sendResetEmail(user.email);
+
+    if (error) {
+      toast.error("שגיאה בשליחת המייל");
+    } else {
+      toast.success("שלחנו קישור לאיפוס סיסמה למייל שלך");
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    const { error } = await deleteAccount();
+
+    if (error) {
+      toast.error("שגיאה במחיקת החשבון");
+    } else {
+      toast.success("החשבון נמחק בהצלחה");
+      navigate("/");
+    }
   };
 
   const handleLogout = async () => {
@@ -52,6 +99,14 @@ const Settings = () => {
     toast.success("התנתקת בהצלחה!");
     navigate("/");
   };
+
+  if (settingsLoading) {
+    return (
+      <div className="min-h-screen bg-muted/20 flex items-center justify-center" dir="rtl">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-muted/20" dir="rtl">
@@ -112,8 +167,8 @@ const Settings = () => {
                   <p className="text-sm text-muted-foreground">קבל עדכונים למייל</p>
                 </div>
                 <Switch 
-                  checked={settings.emailNotifications}
-                  onCheckedChange={(checked) => setSettings({...settings, emailNotifications: checked})}
+                  checked={localSettings.email_notifications}
+                  onCheckedChange={(checked) => setLocalSettings({...localSettings, email_notifications: checked})}
                 />
               </div>
               
@@ -125,8 +180,8 @@ const Settings = () => {
                   <p className="text-sm text-muted-foreground">קבל התראות לטלפון</p>
                 </div>
                 <Switch 
-                  checked={settings.pushNotifications}
-                  onCheckedChange={(checked) => setSettings({...settings, pushNotifications: checked})}
+                  checked={localSettings.push_notifications}
+                  onCheckedChange={(checked) => setLocalSettings({...localSettings, push_notifications: checked})}
                 />
               </div>
               
@@ -138,8 +193,8 @@ const Settings = () => {
                   <p className="text-sm text-muted-foreground">התראה כשיש התאמה חדשה</p>
                 </div>
                 <Switch 
-                  checked={settings.matchNotifications}
-                  onCheckedChange={(checked) => setSettings({...settings, matchNotifications: checked})}
+                  checked={localSettings.match_notifications}
+                  onCheckedChange={(checked) => setLocalSettings({...localSettings, match_notifications: checked})}
                 />
               </div>
               
@@ -151,8 +206,8 @@ const Settings = () => {
                   <p className="text-sm text-muted-foreground">התראה על הודעות חדשות</p>
                 </div>
                 <Switch 
-                  checked={settings.messageNotifications}
-                  onCheckedChange={(checked) => setSettings({...settings, messageNotifications: checked})}
+                  checked={localSettings.message_notifications}
+                  onCheckedChange={(checked) => setLocalSettings({...localSettings, message_notifications: checked})}
                 />
               </div>
 
@@ -160,9 +215,9 @@ const Settings = () => {
                 variant="hero" 
                 className="w-full mt-4"
                 onClick={handleSaveNotifications}
-                disabled={isSaving}
+                disabled={saving}
               >
-                {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : "שמור הגדרות התראות"}
+                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : "שמור הגדרות התראות"}
               </Button>
             </CardContent>
           </Card>
@@ -183,8 +238,8 @@ const Settings = () => {
                   <p className="text-sm text-muted-foreground">אחרים יראו כשאתה מחובר</p>
                 </div>
                 <Switch 
-                  checked={settings.showOnlineStatus}
-                  onCheckedChange={(checked) => setSettings({...settings, showOnlineStatus: checked})}
+                  checked={localSettings.show_online_status}
+                  onCheckedChange={(checked) => setLocalSettings({...localSettings, show_online_status: checked})}
                 />
               </div>
               
@@ -196,8 +251,8 @@ const Settings = () => {
                   <p className="text-sm text-muted-foreground">הצג מתי היית מחובר לאחרונה</p>
                 </div>
                 <Switch 
-                  checked={settings.showLastSeen}
-                  onCheckedChange={(checked) => setSettings({...settings, showLastSeen: checked})}
+                  checked={localSettings.show_last_seen}
+                  onCheckedChange={(checked) => setLocalSettings({...localSettings, show_last_seen: checked})}
                 />
               </div>
               
@@ -209,8 +264,8 @@ const Settings = () => {
                   <p className="text-sm text-muted-foreground">אחרים יכולים לראות את הפרופיל שלך</p>
                 </div>
                 <Switch 
-                  checked={settings.profileVisible}
-                  onCheckedChange={(checked) => setSettings({...settings, profileVisible: checked})}
+                  checked={localSettings.profile_visible}
+                  onCheckedChange={(checked) => setLocalSettings({...localSettings, profile_visible: checked})}
                 />
               </div>
 
@@ -218,9 +273,9 @@ const Settings = () => {
                 variant="hero" 
                 className="w-full mt-4"
                 onClick={handleSavePrivacy}
-                disabled={isSaving}
+                disabled={saving}
               >
-                {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : "שמור הגדרות פרטיות"}
+                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : "שמור הגדרות פרטיות"}
               </Button>
             </CardContent>
           </Card>
@@ -238,9 +293,17 @@ const Settings = () => {
               <Button 
                 variant="outline" 
                 className="w-full"
-                onClick={() => toast.info("שלחנו קישור לאיפוס סיסמה למייל שלך")}
+                onClick={handleResetPassword}
+                disabled={resetLoading}
               >
-                שנה סיסמה
+                {resetLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin ml-2" />
+                    שולח...
+                  </>
+                ) : (
+                  "שנה סיסמה"
+                )}
               </Button>
               <Button 
                 variant="outline" 
@@ -262,13 +325,46 @@ const Settings = () => {
               <CardDescription>פעולות בלתי הפיכות</CardDescription>
             </CardHeader>
             <CardContent>
-              <Button 
-                variant="destructive" 
-                className="w-full"
-                onClick={handleDeleteAccount}
-              >
-                מחק את החשבון שלי
-              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive" className="w-full">
+                    מחק את החשבון שלי
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent dir="rtl">
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>האם אתה בטוח?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      פעולה זו תמחק את כל הנתונים שלך לצמיתות, כולל:
+                      <ul className="list-disc list-inside mt-2 space-y-1">
+                        <li>הפרופיל שלך</li>
+                        <li>כל התמונות שלך</li>
+                        <li>כל ההתאמות וההודעות</li>
+                        <li>כל הלייקים והפעילות</li>
+                      </ul>
+                      <br />
+                      לא ניתן לשחזר את הנתונים לאחר מחיקה.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter className="flex gap-2">
+                    <AlertDialogCancel>ביטול</AlertDialogCancel>
+                    <AlertDialogAction 
+                      onClick={handleDeleteAccount}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      disabled={deleteLoading}
+                    >
+                      {deleteLoading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin ml-2" />
+                          מוחק...
+                        </>
+                      ) : (
+                        "מחק לצמיתות"
+                      )}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
               <p className="text-xs text-muted-foreground text-center mt-2">
                 פעולה זו תמחק את כל הנתונים שלך לצמיתות
               </p>

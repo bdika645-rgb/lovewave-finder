@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      action_history: {
+        Row: {
+          action_type: string
+          created_at: string | null
+          id: string
+          profile_id: string
+          target_profile_id: string
+        }
+        Insert: {
+          action_type: string
+          created_at?: string | null
+          id?: string
+          profile_id: string
+          target_profile_id: string
+        }
+        Update: {
+          action_type?: string
+          created_at?: string | null
+          id?: string
+          profile_id?: string
+          target_profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "action_history_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "action_history_target_profile_id_fkey"
+            columns: ["target_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       activity_logs: {
         Row: {
           action_type: string
@@ -275,18 +314,21 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          is_super: boolean | null
           liked_id: string
           liker_id: string
         }
         Insert: {
           created_at?: string
           id?: string
+          is_super?: boolean | null
           liked_id: string
           liker_id: string
         }
         Update: {
           created_at?: string
           id?: string
+          is_super?: boolean | null
           liked_id?: string
           liker_id?: string
         }
@@ -427,15 +469,21 @@ export type Database = {
           blocked_reason: string | null
           city: string
           created_at: string
+          education: string | null
           gender: string | null
+          height: number | null
           id: string
           interests: string[] | null
           is_blocked: boolean | null
           is_demo: boolean | null
           is_online: boolean | null
+          is_verified: boolean | null
+          is_visible: boolean | null
           last_seen: string | null
           looking_for: string | null
           name: string
+          relationship_goal: string | null
+          smoking: string | null
           updated_at: string
           user_id: string | null
         }
@@ -448,15 +496,21 @@ export type Database = {
           blocked_reason?: string | null
           city: string
           created_at?: string
+          education?: string | null
           gender?: string | null
+          height?: number | null
           id?: string
           interests?: string[] | null
           is_blocked?: boolean | null
           is_demo?: boolean | null
           is_online?: boolean | null
+          is_verified?: boolean | null
+          is_visible?: boolean | null
           last_seen?: string | null
           looking_for?: string | null
           name: string
+          relationship_goal?: string | null
+          smoking?: string | null
           updated_at?: string
           user_id?: string | null
         }
@@ -469,15 +523,21 @@ export type Database = {
           blocked_reason?: string | null
           city?: string
           created_at?: string
+          education?: string | null
           gender?: string | null
+          height?: number | null
           id?: string
           interests?: string[] | null
           is_blocked?: boolean | null
           is_demo?: boolean | null
           is_online?: boolean | null
+          is_verified?: boolean | null
+          is_visible?: boolean | null
           last_seen?: string | null
           looking_for?: string | null
           name?: string
+          relationship_goal?: string | null
+          smoking?: string | null
           updated_at?: string
           user_id?: string | null
         }
@@ -569,6 +629,48 @@ export type Database = {
           created_at?: string
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_settings: {
+        Row: {
+          created_at: string | null
+          email_notifications: boolean | null
+          id: string
+          match_notifications: boolean | null
+          message_notifications: boolean | null
+          profile_visible: boolean | null
+          push_notifications: boolean | null
+          show_last_seen: boolean | null
+          show_online_status: boolean | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          email_notifications?: boolean | null
+          id?: string
+          match_notifications?: boolean | null
+          message_notifications?: boolean | null
+          profile_visible?: boolean | null
+          push_notifications?: boolean | null
+          show_last_seen?: boolean | null
+          show_online_status?: boolean | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          email_notifications?: boolean | null
+          id?: string
+          match_notifications?: boolean | null
+          message_notifications?: boolean | null
+          profile_visible?: boolean | null
+          push_notifications?: boolean | null
+          show_last_seen?: boolean | null
+          show_online_status?: boolean | null
+          updated_at?: string | null
           user_id?: string
         }
         Relationships: []
