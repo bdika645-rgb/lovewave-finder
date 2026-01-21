@@ -1,7 +1,7 @@
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Send, Search, Phone, Video, MoreVertical, Smile, Image, Paperclip, Loader2, MessageCircle, Heart, ChevronRight } from "lucide-react";
+import { Send, Search, MoreVertical, Loader2, MessageCircle, Heart, ChevronRight } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { useConversations } from "@/hooks/useConversations";
@@ -83,26 +83,6 @@ const Messages = () => {
   const matchesWithoutConversation = matches.filter(match => 
     !conversations.some(conv => conv.otherProfile?.id === match.matchedProfile?.id)
   );
-
-  const handleCall = () => {
-    toast.info("שיחות קוליות יהיו זמינות בגרסה הבאה");
-  };
-
-  const handleVideoCall = () => {
-    toast.info("שיחות וידאו יהיו זמינות בגרסה הבאה");
-  };
-
-  const handleAttachment = () => {
-    toast.info("שליחת קבצים תהיה זמינה בגרסה הבאה");
-  };
-
-  const handleImage = () => {
-    toast.info("שליחת תמונות תהיה זמינה בגרסה הבאה");
-  };
-
-  const handleEmoji = () => {
-    toast.info("בחירת אימוג'ים תהיה זמינה בגרסה הבאה");
-  };
 
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
@@ -223,7 +203,7 @@ const Messages = () => {
                             className="w-14 h-14 rounded-full object-cover"
                           />
                           {conv.otherProfile?.is_online && (
-                            <span className="absolute bottom-0 right-0 w-4 h-4 bg-green-500 rounded-full border-2 border-card" />
+                            <span className="absolute bottom-0 right-0 w-4 h-4 bg-success rounded-full border-2 border-card" />
                           )}
                         </div>
                         <div className="flex-1 text-right">
@@ -285,12 +265,6 @@ const Messages = () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-1 md:gap-2 shrink-0">
-                      <Button variant="ghost" size="icon" onClick={handleCall} className="hidden sm:inline-flex">
-                        <Phone className="w-5 h-5" />
-                      </Button>
-                      <Button variant="ghost" size="icon" onClick={handleVideoCall} className="hidden sm:inline-flex">
-                        <Video className="w-5 h-5" />
-                      </Button>
                       <Button variant="ghost" size="icon">
                         <MoreVertical className="w-5 h-5" />
                       </Button>
@@ -340,12 +314,6 @@ const Messages = () => {
                   {/* Message Input */}
                   <div className="p-2 md:p-4 border-t border-border">
                     <div className="flex items-center gap-1 md:gap-2">
-                      <Button variant="ghost" size="icon" onClick={handleAttachment} className="hidden sm:inline-flex">
-                        <Paperclip className="w-5 h-5" />
-                      </Button>
-                      <Button variant="ghost" size="icon" onClick={handleImage} className="hidden sm:inline-flex">
-                        <Image className="w-5 h-5" />
-                      </Button>
                       <Input
                         placeholder="כתבו הודעה..."
                         value={messageText}
@@ -353,9 +321,6 @@ const Messages = () => {
                         onKeyDown={(e) => e.key === "Enter" && handleSend()}
                         className="flex-1 h-10 md:h-12 rounded-full bg-muted/50 border-none text-sm md:text-base"
                       />
-                      <Button variant="ghost" size="icon" onClick={handleEmoji} className="hidden sm:inline-flex">
-                        <Smile className="w-5 h-5" />
-                      </Button>
                       <Button 
                         variant="hero" 
                         size="icon"
