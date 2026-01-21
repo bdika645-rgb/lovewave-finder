@@ -1,38 +1,59 @@
 import { useSiteStatistics } from "@/hooks/useSiteStatistics";
 import { Users, Heart, MessageCircle, MapPin, TrendingUp, Clock, Loader2 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+
+// נתוני דמו למשתמשים לא מחוברים
+const demoStats = {
+  totalMembers: "15,000+",
+  successfulMatches: "8,000+",
+  messagesPerDay: "50,000+",
+  dailyActiveUsers: "3,500+",
+  mostActiveCity: "תל אביב",
+  averageMatchTime: "3 ימים",
+};
 
 const StatsSection = () => {
   const { stats, loading } = useSiteStatistics();
+  const { user } = useAuth();
+
+  // Use demo stats for non-authenticated users or when stats are all zeros
+  const isStatsEmpty = !user || (
+    stats.totalMembers === "0" && 
+    stats.successfulMatches === "0" && 
+    stats.dailyActiveUsers === "0"
+  );
+  
+  const displayStats = isStatsEmpty ? demoStats : stats;
 
   const statItems = [
     {
       icon: Users,
-      value: stats.totalMembers,
+      value: displayStats.totalMembers,
       label: "חברים רשומים",
     },
     {
       icon: Heart,
-      value: stats.successfulMatches,
+      value: displayStats.successfulMatches,
       label: "זוגות מאושרים",
     },
     {
       icon: MessageCircle,
-      value: stats.messagesPerDay,
+      value: displayStats.messagesPerDay,
       label: "הודעות ביום",
     },
     {
       icon: TrendingUp,
-      value: stats.dailyActiveUsers,
+      value: displayStats.dailyActiveUsers,
       label: "משתמשים פעילים",
     },
     {
       icon: MapPin,
-      value: stats.mostActiveCity,
+      value: displayStats.mostActiveCity,
       label: "העיר הפעילה ביותר",
     },
     {
       icon: Clock,
-      value: stats.averageMatchTime,
+      value: displayStats.averageMatchTime,
       label: "זמן ממוצע למאצ'",
     },
   ];
@@ -44,7 +65,7 @@ const StatsSection = () => {
           {statItems.map((stat, index) => (
             <div key={index} className="text-center">
               <stat.icon className="w-8 h-8 text-primary-foreground/80 mx-auto mb-3" />
-              {loading ? (
+              {loading && !isStatsEmpty ? (
                 <div className="flex justify-center">
                   <Loader2 className="w-6 h-6 text-primary-foreground/60 animate-spin" />
                 </div>

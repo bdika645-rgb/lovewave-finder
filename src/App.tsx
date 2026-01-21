@@ -4,10 +4,12 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
+import { CurrentProfileProvider } from "@/hooks/useCurrentProfile";
 import { ThemeProvider } from "next-themes";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import AdminProtectedRoute from "@/components/AdminProtectedRoute";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import OnboardingTour from "@/components/OnboardingTour";
 
 // Pages
 import Index from "./pages/Index";
@@ -60,10 +62,12 @@ const App = () => (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
         <AuthProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
+          <CurrentProfileProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <OnboardingTour />
+              <BrowserRouter>
               <Routes>
                 {/* Public Routes */}
                 <Route path="/" element={<Index />} />
@@ -186,10 +190,11 @@ const App = () => (
               </Routes>
             </BrowserRouter>
           </TooltipProvider>
-        </AuthProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
-  </ErrorBoundary>
+        </CurrentProfileProvider>
+      </AuthProvider>
+    </ThemeProvider>
+  </QueryClientProvider>
+</ErrorBoundary>
 );
 
 export default App;
