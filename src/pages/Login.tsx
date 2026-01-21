@@ -66,7 +66,7 @@ const Login = () => {
       return;
     }
     
-    toast.success("התחברת בהצלחה! 🎉");
+    toast.success("התחברת בהצלחה!");
     const from = (location.state as any)?.from?.pathname || "/members";
     navigate(from, { replace: true });
   };
@@ -116,6 +116,7 @@ const Login = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="pr-10 h-12"
+                  autoComplete="email"
                   dir="ltr"
                 />
               </div>
@@ -133,12 +134,14 @@ const Login = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="pr-10 pl-10 h-12"
+                  autoComplete="current-password"
                   dir="ltr"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute left-3 top-1/2 -translate-y-1/2"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 rounded-md p-1 focus-ring"
+                  aria-label={showPassword ? "הסתר סיסמה" : "הצג סיסמה"}
                 >
                   {showPassword ? (
                     <EyeOff className="w-5 h-5 text-muted-foreground" />
@@ -151,7 +154,7 @@ const Login = () => {
 
             <div className="flex items-center justify-between text-sm">
               <label className="flex items-center gap-2">
-                <input type="checkbox" className="rounded border-border" />
+                <input id="remember-me" type="checkbox" className="rounded border-border" />
                 <span className="text-muted-foreground">זכור אותי</span>
               </label>
               <Link 

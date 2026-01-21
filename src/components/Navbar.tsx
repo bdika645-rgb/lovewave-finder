@@ -213,7 +213,7 @@ const Navbar = () => {
             <ThemeToggle />
             <button 
               onClick={() => setIsOpen(!isOpen)}
-              className="p-2 -mr-2"
+               className="p-2 -mr-2 rounded-md focus-ring"
               aria-label={isOpen ? "סגור תפריט" : "פתח תפריט"}
               aria-expanded={isOpen}
               aria-controls="mobile-menu"
@@ -229,12 +229,13 @@ const Navbar = () => {
 
         {/* Mobile Menu */}
         {isOpen && (
-          <div 
+           <nav 
             id="mobile-menu" 
             className="md:hidden bg-card rounded-2xl p-6 mb-4 animate-slide-up shadow-elevated border border-border"
-            role="menu"
+             aria-label="ניווט במובייל"
           >
-            <div className="flex flex-col gap-3">
+             <ul className="flex flex-col gap-3">
+               <li>
               <Link 
                 to="/discover" 
                 className="font-body text-foreground py-3 px-4 rounded-lg hover:bg-accent transition-colors flex items-center gap-3"
@@ -242,6 +243,8 @@ const Navbar = () => {
                 <Sparkles className="w-5 h-5 text-primary" />
                 Swipe
               </Link>
+               </li>
+               <li>
               <Link 
                 to="/members" 
                 className="font-body text-foreground py-3 px-4 rounded-lg hover:bg-accent transition-colors flex items-center gap-3"
@@ -249,6 +252,8 @@ const Navbar = () => {
                 <Search className="w-5 h-5 text-primary" />
                 חפש פרופילים
               </Link>
+               </li>
+               <li>
               <Link 
                 to="/matches" 
                 className="font-body text-foreground py-3 px-4 rounded-lg hover:bg-accent transition-colors flex items-center gap-3"
@@ -256,6 +261,8 @@ const Navbar = () => {
                 <Heart className="w-5 h-5 text-primary" />
                 התאמות
               </Link>
+               </li>
+               <li>
               <Link 
                 to="/messages" 
                 className="font-body text-foreground py-3 px-4 rounded-lg hover:bg-accent transition-colors flex items-center gap-3"
@@ -268,6 +275,8 @@ const Navbar = () => {
                   </Badge>
                 )}
               </Link>
+               </li>
+               <li>
               <Link 
                 to="/who-liked-me" 
                 className="font-body text-foreground py-3 px-4 rounded-lg hover:bg-accent transition-colors flex items-center gap-3"
@@ -275,6 +284,8 @@ const Navbar = () => {
                 <Heart className="w-5 h-5 text-primary fill-primary" />
                 מי לייק אותי
               </Link>
+               </li>
+               <li>
               <Link 
                 to="/who-viewed-me" 
                 className="font-body text-foreground py-3 px-4 rounded-lg hover:bg-accent transition-colors flex items-center gap-3"
@@ -282,6 +293,8 @@ const Navbar = () => {
                 <Eye className="w-5 h-5 text-primary" />
                 מי צפה בי
               </Link>
+               </li>
+               <li>
               <Link 
                 to="/profile" 
                 className="font-body text-foreground py-3 px-4 rounded-lg hover:bg-accent transition-colors flex items-center gap-3"
@@ -289,26 +302,31 @@ const Navbar = () => {
                 <User className="w-5 h-5 text-primary" />
                 הפרופיל שלי
               </Link>
+               </li>
               
               <hr className="border-border my-2" />
               
               {user ? (
-                <Button variant="outline" className="w-full justify-center" onClick={handleLogout}>
-                  <LogOut className="w-4 h-4 ml-2" />
-                  התנתק
-                </Button>
+                 <li>
+                   <Button variant="outline" className="w-full justify-center" onClick={handleLogout}>
+                     <LogOut className="w-4 h-4 ml-2" />
+                     התנתק
+                   </Button>
+                 </li>
               ) : (
-                <div className="flex flex-col gap-3">
-                  <Link to="/login">
-                    <Button variant="outline" className="w-full">התחברות</Button>
-                  </Link>
-                  <Link to="/register">
-                    <Button variant="hero" className="w-full">הרשמה</Button>
-                  </Link>
-                </div>
+                 <li>
+                   <div className="flex flex-col gap-3">
+                     <Link to="/login">
+                       <Button variant="outline" className="w-full">התחברות</Button>
+                     </Link>
+                     <Link to="/register">
+                       <Button variant="hero" className="w-full">הרשמה</Button>
+                     </Link>
+                   </div>
+                 </li>
               )}
-            </div>
-          </div>
+             </ul>
+           </nav>
         )}
       </div>
     </nav>

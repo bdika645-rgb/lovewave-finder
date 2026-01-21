@@ -255,9 +255,11 @@ const Register = () => {
                   >
                     {/* Avatar Upload */}
                     <div className="flex flex-col items-center mb-2">
-                      <div 
+                      <button
+                        type="button"
                         onClick={() => fileInputRef.current?.click()}
-                        className="w-24 h-24 rounded-full border-2 border-dashed border-primary/50 flex items-center justify-center cursor-pointer hover:border-primary transition-colors overflow-hidden bg-muted"
+                        className="w-24 h-24 rounded-full border-2 border-dashed border-primary/50 flex items-center justify-center cursor-pointer hover:border-primary transition-colors overflow-hidden bg-muted focus-ring"
+                        aria-label="העלה תמונת פרופיל (אופציונלי)"
                       >
                         {avatarPreview ? (
                           <img src={avatarPreview} alt="Preview" className="w-full h-full object-cover" />
@@ -267,8 +269,9 @@ const Register = () => {
                             <span className="text-xs">תמונה</span>
                           </div>
                         )}
-                      </div>
+                      </button>
                       <input
+                        id="avatar-upload"
                         ref={fileInputRef}
                         type="file"
                         accept="image/*"
@@ -290,6 +293,7 @@ const Register = () => {
                           value={formData.name}
                           onChange={(e) => setFormData({...formData, name: e.target.value})}
                           className="pr-10 h-12"
+                          autoComplete="name"
                         />
                       </div>
                     </div>
@@ -306,6 +310,7 @@ const Register = () => {
                           value={formData.email}
                           onChange={(e) => setFormData({...formData, email: e.target.value})}
                           className="pr-10 h-12"
+                          autoComplete="email"
                           dir="ltr"
                         />
                       </div>
@@ -316,10 +321,13 @@ const Register = () => {
                       <label className="text-sm font-medium text-foreground mb-2 block">
                         מגדר *
                       </label>
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-2 gap-3" role="radiogroup" aria-label="בחירת מגדר">
                         <button
                           type="button"
                           onClick={() => setFormData({...formData, gender: "male"})}
+                          role="radio"
+                          aria-checked={formData.gender === "male"}
+                          aria-pressed={formData.gender === "male"}
                           className={`h-12 rounded-lg border-2 transition-all flex items-center justify-center gap-2 ${
                             formData.gender === "male" 
                               ? "border-primary bg-primary/10 text-primary" 
@@ -332,6 +340,9 @@ const Register = () => {
                         <button
                           type="button"
                           onClick={() => setFormData({...formData, gender: "female"})}
+                          role="radio"
+                          aria-checked={formData.gender === "female"}
+                          aria-pressed={formData.gender === "female"}
                           className={`h-12 rounded-lg border-2 transition-all flex items-center justify-center gap-2 ${
                             formData.gender === "female" 
                               ? "border-primary bg-primary/10 text-primary" 
@@ -395,12 +406,14 @@ const Register = () => {
                           value={formData.password}
                           onChange={(e) => setFormData({...formData, password: e.target.value})}
                           className="pr-10 pl-10 h-12"
+                          autoComplete="new-password"
                           dir="ltr"
                         />
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
-                          className="absolute left-3 top-1/2 -translate-y-1/2"
+                          className="absolute left-3 top-1/2 -translate-y-1/2 rounded-md p-1 focus-ring"
+                          aria-label={showPassword ? "הסתר סיסמה" : "הצג סיסמה"}
                         >
                           {showPassword ? (
                             <EyeOff className="w-5 h-5 text-muted-foreground" />
@@ -424,6 +437,7 @@ const Register = () => {
                           value={formData.confirmPassword}
                           onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
                           className="pr-10 h-12"
+                          autoComplete="new-password"
                           dir="ltr"
                         />
                       </div>
@@ -558,6 +572,7 @@ const Register = () => {
                       type="submit"
                       className="w-full text-sm text-muted-foreground hover:text-foreground transition-colors pt-2"
                       disabled={isLoading}
+                      aria-label="דלג על הפרטים הנוספים והמשך לסיום הרשמה"
                     >
                       דלג והשלם אחר כך →
                     </button>
