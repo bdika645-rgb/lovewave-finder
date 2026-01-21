@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
-import { useProfile } from './useProfile';
+import { useCurrentProfile } from './useCurrentProfile';
 
 interface Notification {
   id: string;
@@ -17,7 +17,7 @@ interface Notification {
 
 export function useNotifications() {
   const { user } = useAuth();
-  const { profile } = useProfile();
+  const { profile } = useCurrentProfile();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);

@@ -20,7 +20,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
-import { useProfile } from "@/hooks/useProfile";
+import { useCurrentProfile } from "@/hooks/useCurrentProfile";
 import { useUserSettings } from "@/hooks/useUserSettings";
 import { usePasswordReset } from "@/hooks/usePasswordReset";
 import { useDeleteAccount } from "@/hooks/useDeleteAccount";
@@ -28,7 +28,7 @@ import { useDeleteAccount } from "@/hooks/useDeleteAccount";
 const Settings = () => {
   const navigate = useNavigate();
   const { signOut, user } = useAuth();
-  const { profile } = useProfile();
+  const { profile } = useCurrentProfile();
   const { settings, loading: settingsLoading, saving, updateSettings } = useUserSettings();
   const { sendResetEmail, loading: resetLoading } = usePasswordReset();
   const { deleteAccount, loading: deleteLoading } = useDeleteAccount();

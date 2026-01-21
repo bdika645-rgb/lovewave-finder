@@ -40,14 +40,18 @@ const Navbar = () => {
     : "glass-effect shadow-soft";
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${navBgClass}`}>
+    <nav 
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${navBgClass}`}
+      role="navigation"
+      aria-label="ניווט ראשי"
+    >
       <div className="container mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16 sm:h-20">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group">
+          <Link to="/" className="flex items-center gap-2 group" aria-label="Spark - דף הבית">
             <Heart className={`w-7 h-7 sm:w-8 sm:h-8 transition-colors ${
               isHome && !isScrolled ? "text-primary-foreground" : "text-primary"
-            } fill-current group-hover:scale-110 transition-transform`} />
+            } fill-current group-hover:scale-110 transition-transform`} aria-hidden="true" />
             <span className={`font-display text-xl sm:text-2xl font-bold ${
               isHome && !isScrolled ? "text-primary-foreground" : "text-foreground"
             }`}>
@@ -113,21 +117,26 @@ const Navbar = () => {
           </div>
 
           {/* CTA Buttons */}
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-3" role="group" aria-label="פעולות משתמש">
             <ThemeToggle />
             {user ? (
               <>
-                <Link to="/who-liked-me">
+                <Link to="/who-liked-me" aria-label="מי עשה לי לייק">
                   <Button 
                     variant={isHome && !isScrolled ? "hero-outline" : "ghost"} 
                     size="icon"
                     className="relative"
+                    aria-label="מי עשה לי לייק"
                   >
-                    <Bell className="w-5 h-5" />
+                    <Bell className="w-5 h-5" aria-hidden="true" />
                   </Button>
                 </Link>
-                <Button variant={isHome && !isScrolled ? "hero-outline" : "ghost"} onClick={handleLogout}>
-                  <LogOut className="w-4 h-4 ml-1" />
+                <Button 
+                  variant={isHome && !isScrolled ? "hero-outline" : "ghost"} 
+                  onClick={handleLogout}
+                  aria-label="התנתק מהחשבון"
+                >
+                  <LogOut className="w-4 h-4 ml-1" aria-hidden="true" />
                   התנתק
                 </Button>
               </>
@@ -153,12 +162,14 @@ const Navbar = () => {
             <button 
               onClick={() => setIsOpen(!isOpen)}
               className="p-2 -mr-2"
-              aria-label="תפריט"
+              aria-label={isOpen ? "סגור תפריט" : "פתח תפריט"}
+              aria-expanded={isOpen}
+              aria-controls="mobile-menu"
             >
               {isOpen ? (
-                <X className={`w-6 h-6 ${isHome && !isScrolled && !isOpen ? "text-primary-foreground" : "text-foreground"}`} />
+                <X className={`w-6 h-6 ${isHome && !isScrolled && !isOpen ? "text-primary-foreground" : "text-foreground"}`} aria-hidden="true" />
               ) : (
-                <Menu className={`w-6 h-6 ${isHome && !isScrolled ? "text-primary-foreground" : "text-foreground"}`} />
+                <Menu className={`w-6 h-6 ${isHome && !isScrolled ? "text-primary-foreground" : "text-foreground"}`} aria-hidden="true" />
               )}
             </button>
           </div>
@@ -166,7 +177,11 @@ const Navbar = () => {
 
         {/* Mobile Menu */}
         {isOpen && (
-          <div className="md:hidden bg-card rounded-2xl p-6 mb-4 animate-slide-up shadow-elevated border border-border">
+          <div 
+            id="mobile-menu" 
+            className="md:hidden bg-card rounded-2xl p-6 mb-4 animate-slide-up shadow-elevated border border-border"
+            role="menu"
+          >
             <div className="flex flex-col gap-3">
               <Link 
                 to="/discover" 

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
+import { useMyProfileId } from './useMyProfileId';
 
 interface ProfileStats {
   likesReceived: number;
@@ -10,16 +11,16 @@ interface ProfileStats {
 
 export function useProfileStats() {
   const { user } = useAuth();
+  const { profileId } = useMyProfileId();
   const [stats, setStats] = useState<ProfileStats>({
     likesReceived: 0,
     likesSent: 0,
     matchesCount: 0,
   });
   const [loading, setLoading] = useState(true);
-  const [profileId, setProfileId] = useState<string | null>(null);
 
   const fetchStats = useCallback(async () => {
-    if (!user) {
+    if (!user || !profileId) {
       setStats({ likesReceived: 0, likesSent: 0, matchesCount: 0 });
       setLoading(false);
       return;
@@ -28,39 +29,25 @@ export function useProfileStats() {
     try {
       setLoading(true);
 
-      // Get user's profile ID
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('user_id', user.id)
-        .single();
-
-      if (!profile) {
-        setLoading(false);
-        return;
-      }
-
-      setProfileId(profile.id);
-
       // Fetch all stats in parallel
       const [likesReceivedRes, likesSentRes, matchesRes] = await Promise.all([
         // Likes received
         supabase
           .from('likes')
           .select('id', { count: 'exact', head: true })
-          .eq('liked_id', profile.id),
+          .eq('liked_id', profileId),
         
         // Likes sent
         supabase
           .from('likes')
           .select('id', { count: 'exact', head: true })
-          .eq('liker_id', profile.id),
+          .eq('liker_id', profileId),
         
         // Matches count
         supabase
           .from('matches')
           .select('id', { count: 'exact', head: true })
-          .or(`profile1_id.eq.${profile.id},profile2_id.eq.${profile.id}`),
+          .or(`profile1_id.eq.${profileId},profile2_id.eq.${profileId}`),
       ]);
 
       setStats({
@@ -73,7 +60,7 @@ export function useProfileStats() {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, profileId]);
 
   useEffect(() => {
     fetchStats();

@@ -8,7 +8,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
-import { useProfile } from "@/hooks/useProfile";
+import { useCurrentProfile } from "@/hooks/useCurrentProfile";
 import { useProfileStats } from "@/hooks/useProfileStats";
 import PhotoUpload from "@/components/PhotoUpload";
 import PhotoGallery from "@/components/PhotoGallery";
@@ -28,7 +28,7 @@ const Profile = () => {
   const [showAddInterest, setShowAddInterest] = useState(false);
   const navigate = useNavigate();
   const { signOut } = useAuth();
-  const { profile, loading, updateProfile, refetch } = useProfile();
+  const { profile, loading, updateProfile, refetch } = useCurrentProfile();
   const { stats, loading: statsLoading } = useProfileStats();
   
   // Local edit state

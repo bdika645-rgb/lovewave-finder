@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from './useAuth';
+import { useMyProfileId } from './useMyProfileId';
 import type { Tables } from '@/integrations/supabase/types';
 
 type Message = Tables<'messages'>;
@@ -9,25 +9,8 @@ export function useMessages(conversationId: string | null) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { user } = useAuth();
+  const { getMyProfileId, profileId } = useMyProfileId();
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
-
-  const getMyProfileId = useCallback(async (): Promise<string | null> => {
-    if (!user) return null;
-    
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('id')
-      .eq('user_id', user.id)
-      .single();
-
-    if (error) {
-      console.error('Error getting profile:', error);
-      return null;
-    }
-    
-    return data?.id || null;
-  }, [user]);
 
   const fetchMessages = useCallback(async () => {
     if (!conversationId) {
@@ -88,26 +71,23 @@ export function useMessages(conversationId: string | null) {
   };
 
   const markAsRead = useCallback(async () => {
-    if (!conversationId) return;
-
-    const myProfileId = await getMyProfileId();
-    if (!myProfileId) return;
+    if (!conversationId || !profileId) return;
 
     // Mark all messages from other users as read
     const { error } = await supabase
       .from('messages')
       .update({ is_read: true })
       .eq('conversation_id', conversationId)
-      .neq('sender_id', myProfileId)
+      .neq('sender_id', profileId)
       .eq('is_read', false);
 
     if (!error) {
       // Update local state to reflect read status
       setMessages(prev => prev.map(msg => 
-        msg.sender_id !== myProfileId ? { ...msg, is_read: true } : msg
+        msg.sender_id !== profileId ? { ...msg, is_read: true } : msg
       ));
     }
-  }, [conversationId, getMyProfileId]);
+  }, [conversationId, profileId]);
 
   // Subscribe to realtime updates
   useEffect(() => {
