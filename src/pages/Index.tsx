@@ -27,11 +27,56 @@ const SectionLoader = () => (
   </div>
 );
 
+// Demo profiles for unauthenticated users on homepage
+const demoProfiles = [
+  {
+    id: "demo-1",
+    name: "מיכל",
+    age: 28,
+    city: "תל אביב",
+    bio: "אוהבת טיולים, קפה טוב ושיחות עמוקות 🌸",
+    image: "/profiles/profile1.jpg",
+    interests: ["טיולים", "קפה", "מוזיקה"],
+    isOnline: true,
+  },
+  {
+    id: "demo-2",
+    name: "דניאל",
+    age: 32,
+    city: "הרצליה",
+    bio: "יזם, ספורטאי חובב, מחפש את זו שתצחיק אותי 😊",
+    image: "/profiles/profile2.jpg",
+    interests: ["ספורט", "יזמות", "בישול"],
+    isOnline: false,
+  },
+  {
+    id: "demo-3",
+    name: "נועה",
+    age: 26,
+    city: "ירושלים",
+    bio: "סטודנטית לפסיכולוגיה, אוהבת תיאטרון ואמנות",
+    image: "/profiles/profile3.jpg",
+    interests: ["תיאטרון", "אמנות", "יוגה"],
+    isOnline: true,
+  },
+  {
+    id: "demo-4",
+    name: "אורי",
+    age: 30,
+    city: "חיפה",
+    bio: "מהנדס תוכנה, מטייל בזמני הפנוי, אוהב ים 🌊",
+    image: "/profiles/profile4.jpg",
+    interests: ["טכנולוגיה", "טיולים", "שחייה"],
+    isOnline: false,
+  },
+];
+
 const Index = () => {
   // Fetch featured profiles from database (limit to 4)
   const { profiles, loading } = useProfiles({});
-  const featuredProfiles = profiles.slice(0, 4);
-  const hasFeaturedProfiles = featuredProfiles.length > 0;
+  const featuredProfiles = profiles.length > 0 ? profiles.slice(0, 4) : [];
+  // Use demo profiles as fallback when not logged in or no profiles available
+  const displayProfiles = featuredProfiles.length > 0 ? featuredProfiles : demoProfiles;
   
   return (
     <div className="min-h-screen" dir="rtl">
@@ -98,52 +143,50 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Featured Members - Only show if there are profiles */}
-        {(loading || hasFeaturedProfiles) && (
-          <section className="py-24" aria-labelledby="featured-title">
-            <div className="container mx-auto px-6">
-              <AnimatedSection className="text-center mb-16">
-                <h2 id="featured-title" className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
-                  פרופילים <span className="text-gradient">מובחרים</span>
-                </h2>
-                <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                  הכירו כמה מהמשתמשים הפעילים שלנו
-                </p>
-              </AnimatedSection>
+        {/* Featured Members - Always show with demo or real profiles */}
+        <section className="py-24" aria-labelledby="featured-title">
+          <div className="container mx-auto px-6">
+            <AnimatedSection className="text-center mb-16">
+              <h2 id="featured-title" className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
+                פרופילים <span className="text-gradient">מובחרים</span>
+              </h2>
+              <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+                הכירו כמה מהמשתמשים הפעילים שלנו
+              </p>
+            </AnimatedSection>
 
-              {loading ? (
-                <SkeletonGrid count={4} />
-              ) : (
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {featuredProfiles.map((profile, index) => (
-                    <AnimatedCard key={profile.id} index={index}>
-                      <MemberCard 
-                        member={{
-                          id: profile.id,
-                          name: profile.name,
-                          age: profile.age,
-                          city: profile.city,
-                          bio: profile.bio || "",
-                          image: profile.avatar_url || "/profiles/profile1.jpg",
-                          interests: profile.interests || [],
-                          isOnline: profile.is_online || false,
-                        }}
-                      />
-                    </AnimatedCard>
-                  ))}
-                </div>
-              )}
+            {loading ? (
+              <SkeletonGrid count={4} />
+            ) : (
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {displayProfiles.map((profile, index) => (
+                  <AnimatedCard key={profile.id} index={index}>
+                    <MemberCard 
+                      member={{
+                        id: profile.id,
+                        name: profile.name,
+                        age: profile.age,
+                        city: profile.city,
+                        bio: 'bio' in profile ? profile.bio || "" : (profile as any).bio,
+                        image: 'avatar_url' in profile ? profile.avatar_url || "/profiles/profile1.jpg" : (profile as any).image,
+                        interests: profile.interests || [],
+                        isOnline: 'is_online' in profile ? profile.is_online || false : (profile as any).isOnline,
+                      }}
+                    />
+                  </AnimatedCard>
+                ))}
+              </div>
+            )}
 
-              <AnimatedSection delay={0.3} className="text-center mt-12">
-                <Link to="/members">
-                  <Button variant="hero" size="lg">
-                    ראו עוד פרופילים
-                  </Button>
-                </Link>
-              </AnimatedSection>
-            </div>
-          </section>
-        )}
+            <AnimatedSection delay={0.3} className="text-center mt-12">
+              <Link to="/members">
+                <Button variant="hero" size="lg">
+                  ראו עוד פרופילים
+                </Button>
+              </Link>
+            </AnimatedSection>
+          </div>
+        </section>
 
         {/* Lazy loaded sections */}
         <Suspense fallback={<SectionLoader />}>

@@ -123,6 +123,77 @@ const Members = () => {
     return labels;
   }, [activeFilters]);
 
+  // Show login prompt for unauthenticated users
+  if (!user && !loading) {
+    return (
+      <div className="min-h-screen bg-muted/20" dir="rtl">
+        <SEOHead 
+          title="גלו פרופילים"
+          description="דפדפו בפרופילים של משתמשים ומצאו את ההתאמה המושלמת שלכם. אלפי פרופילים מאומתים מחכים לכם."
+          keywords="חיפוש פרופילים, היכרויות, דייטינג, פרופילים"
+        />
+        <Navbar />
+        
+        <main className="container mx-auto px-6 pt-28 pb-16">
+          {/* Header */}
+          <header className="text-center mb-12">
+            <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
+              גלו את <span className="text-gradient">ההתאמה</span> שלכם
+            </h1>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              דפדפו בפרופילים ומצאו אנשים שמתאימים לכם
+            </p>
+          </header>
+
+          {/* Login Prompt */}
+          <div className="max-w-lg mx-auto">
+            <div className="bg-card rounded-3xl p-8 shadow-card text-center">
+              <div className="w-20 h-20 gradient-primary rounded-full flex items-center justify-center mx-auto mb-6">
+                <Users className="w-10 h-10 text-primary-foreground" />
+              </div>
+              <h2 className="font-display text-2xl font-bold text-foreground mb-4">
+                הצטרפו כדי לגלות פרופילים
+              </h2>
+              <p className="text-muted-foreground mb-6">
+                יש לנו אלפי פרופילים מאומתים של אנשים אמיתיים שמחכים להכיר אתכם. 
+                הירשמו בחינם כדי לצפות בפרופילים, לשלוח לייקים ולמצוא את ההתאמה המושלמת.
+              </p>
+              
+              {/* Preview Stats */}
+              <div className="grid grid-cols-3 gap-4 mb-8 p-4 bg-muted/50 rounded-2xl">
+                <div className="text-center">
+                  <div className="font-display text-2xl font-bold text-gradient">160+</div>
+                  <div className="text-xs text-muted-foreground">פרופילים</div>
+                </div>
+                <div className="text-center">
+                  <div className="font-display text-2xl font-bold text-gradient">100%</div>
+                  <div className="text-xs text-muted-foreground">מאומתים</div>
+                </div>
+                <div className="text-center">
+                  <div className="font-display text-2xl font-bold text-gradient">חינם</div>
+                  <div className="text-xs text-muted-foreground">לגמרי</div>
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Link to="/register">
+                  <Button variant="hero" size="lg" className="w-full sm:w-auto">
+                    הרשמה חינם
+                  </Button>
+                </Link>
+                <Link to="/login">
+                  <Button variant="outline" size="lg" className="w-full sm:w-auto">
+                    יש לי חשבון
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-muted/20" dir="rtl">
       <SEOHead 
