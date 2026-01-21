@@ -5,7 +5,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { 
   Mail, 
   MessageCircle, 
-  Phone, 
   Clock, 
   HelpCircle,
   Send,
@@ -13,14 +12,15 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useSupportTickets } from "@/hooks/useSupportTickets";
 
 const Support = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
-  const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
+  const { submitTicket, sending } = useSupportTickets();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,12 +29,26 @@ const Support = () => {
       return;
     }
     
-    setSending(true);
-    // Simulate sending
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setSending(false);
-    setSent(true);
-    toast.success("ההודעה נשלחה בהצלחה! נחזור אליכם בהקדם");
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast.error("אנא הזינו כתובת אימייל תקינה");
+      return;
+    }
+    
+    const { success, error } = await submitTicket({ name, email, subject, message });
+    
+    if (success) {
+      setSent(true);
+      setName("");
+      setEmail("");
+      setSubject("");
+      setMessage("");
+      toast.success("ההודעה נשלחה בהצלחה! נחזור אליכם בהקדם");
+    } else {
+      toast.error("אירעה שגיאה בשליחת ההודעה. אנא נסו שוב.");
+      console.error("Support ticket error:", error);
+    }
   };
 
   return (

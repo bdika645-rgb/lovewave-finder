@@ -675,6 +675,77 @@ export type Database = {
           },
         ]
       }
+      site_statistics: {
+        Row: {
+          id: string
+          stat_key: string
+          stat_value: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          stat_key: string
+          stat_value: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          stat_key?: string
+          stat_value?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      support_tickets: {
+        Row: {
+          admin_note: string | null
+          created_at: string
+          email: string
+          id: string
+          message: string
+          name: string
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string
+          subject: string | null
+          updated_at: string
+        }
+        Insert: {
+          admin_note?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          message: string
+          name: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          subject?: string | null
+          updated_at?: string
+        }
+        Update: {
+          admin_note?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string
+          name?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          subject?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_tickets_resolved_by_fkey"
+            columns: ["resolved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -756,6 +827,7 @@ export type Database = {
         Args: { conv_id: string }
         Returns: boolean
       }
+      update_site_statistics: { Args: never; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
