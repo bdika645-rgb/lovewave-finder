@@ -10,6 +10,7 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 import AdminProtectedRoute from "@/components/AdminProtectedRoute";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import OnboardingTour from "@/components/OnboardingTour";
+import SkipToContent from "@/components/SkipToContent";
 
 // Pages
 import Index from "./pages/Index";
@@ -64,10 +65,12 @@ const App = () => (
         <AuthProvider>
           <CurrentProfileProvider>
             <TooltipProvider>
+              <SkipToContent />
               <Toaster />
               <Sonner />
               <OnboardingTour />
               <BrowserRouter>
+              <main id="main-content">
               <Routes>
                 {/* Public Routes */}
                 <Route path="/" element={<Index />} />
@@ -188,6 +191,7 @@ const App = () => (
                 {/* 404 */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
+              </main>
             </BrowserRouter>
           </TooltipProvider>
         </CurrentProfileProvider>

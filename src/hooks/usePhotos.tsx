@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
+import { useMyProfileId } from './useMyProfileId';
 
 interface Photo {
   id: string;
@@ -12,6 +13,7 @@ interface Photo {
 
 export function usePhotos(profileId?: string) {
   const { user } = useAuth();
+  const { profileId: myProfileId } = useMyProfileId();
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -46,21 +48,12 @@ export function usePhotos(profileId?: string) {
   }, [fetchPhotos]);
 
   const uploadPhoto = async (file: File): Promise<{ url: string | null; error: Error | null }> => {
-    if (!user) return { url: null, error: new Error('Not authenticated') };
+    if (!user || !myProfileId) return { url: null, error: new Error('Not authenticated') };
 
     try {
-      // Get user's profile
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('user_id', user.id)
-        .single();
-
-      if (!profile) throw new Error('Profile not found');
-
       // Upload to storage
       const fileExt = file.name.split('.').pop();
-      const fileName = `${profile.id}/${Date.now()}.${fileExt}`;
+      const fileName = `${myProfileId}/${Date.now()}.${fileExt}`;
       
       const { error: uploadError } = await supabase.storage
         .from('avatars')
@@ -81,7 +74,7 @@ export function usePhotos(profileId?: string) {
       const { error: insertError } = await supabase
         .from('photos')
         .insert({
-          profile_id: profile.id,
+          profile_id: myProfileId,
           url,
           display_order: maxOrder + 1,
         });

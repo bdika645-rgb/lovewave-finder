@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
+import { useMyProfileId } from './useMyProfileId';
 import type { Tables } from '@/integrations/supabase/types';
 
 type Conversation = Tables<'conversations'>;
@@ -18,23 +19,7 @@ export function useConversations() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
-
-  const getMyProfileId = useCallback(async (): Promise<string | null> => {
-    if (!user) return null;
-    
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('id')
-      .eq('user_id', user.id)
-      .single();
-
-    if (error) {
-      console.error('Error getting profile:', error);
-      return null;
-    }
-    
-    return data?.id || null;
-  }, [user]);
+  const { getMyProfileId, profileId: cachedProfileId } = useMyProfileId();
 
   const fetchConversations = useCallback(async () => {
     if (!user) {
@@ -45,7 +30,7 @@ export function useConversations() {
 
     try {
       setLoading(true);
-      const myProfileId = await getMyProfileId();
+      const myProfileId = cachedProfileId || await getMyProfileId();
       
       if (!myProfileId) {
         setConversations([]);
@@ -69,13 +54,34 @@ export function useConversations() {
 
       const conversationIds = participations.map(p => p.conversation_id);
 
-      // Get all participants for these conversations
-      const { data: allParticipants, error: allParticipantsError } = await supabase
-        .from('conversation_participants')
-        .select('conversation_id, profile_id')
-        .in('conversation_id', conversationIds);
+      // Fetch all data in parallel for better performance
+      const [allParticipantsRes, conversationsRes, messagesRes] = await Promise.all([
+        // Get all participants for these conversations
+        supabase
+          .from('conversation_participants')
+          .select('conversation_id, profile_id')
+          .in('conversation_id', conversationIds),
+        // Get conversations with updated_at
+        supabase
+          .from('conversations')
+          .select('*')
+          .in('id', conversationIds)
+          .order('updated_at', { ascending: false }),
+        // Get last messages for each conversation
+        supabase
+          .from('messages')
+          .select('*')
+          .in('conversation_id', conversationIds)
+          .order('created_at', { ascending: false }),
+      ]);
 
-      if (allParticipantsError) throw allParticipantsError;
+      if (allParticipantsRes.error) throw allParticipantsRes.error;
+      if (conversationsRes.error) throw conversationsRes.error;
+      if (messagesRes.error) throw messagesRes.error;
+
+      const allParticipants = allParticipantsRes.data;
+      const conversationsData = conversationsRes.data;
+      const messages = messagesRes.data;
 
       // Get the other profile IDs (not the current user)
       const otherProfileIds = allParticipants
@@ -89,24 +95,6 @@ export function useConversations() {
         .in('id', otherProfileIds);
 
       if (profilesError) throw profilesError;
-
-      // Get conversations with updated_at
-      const { data: conversationsData, error: conversationsError } = await supabase
-        .from('conversations')
-        .select('*')
-        .in('id', conversationIds)
-        .order('updated_at', { ascending: false });
-
-      if (conversationsError) throw conversationsError;
-
-      // Get last messages for each conversation
-      const { data: messages, error: messagesError } = await supabase
-        .from('messages')
-        .select('*')
-        .in('conversation_id', conversationIds)
-        .order('created_at', { ascending: false });
-
-      if (messagesError) throw messagesError;
 
       // Build conversation details
       const conversationsWithDetails: ConversationWithDetails[] = conversationsData?.map(conv => {
@@ -136,11 +124,11 @@ export function useConversations() {
     } finally {
       setLoading(false);
     }
-  }, [user, getMyProfileId]);
+  }, [user, getMyProfileId, cachedProfileId]);
 
   const createOrGetConversation = async (otherProfileId: string): Promise<string | null> => {
     try {
-      const myProfileId = await getMyProfileId();
+      const myProfileId = cachedProfileId || await getMyProfileId();
       if (!myProfileId) return null;
 
       // Check if conversation already exists

@@ -1,6 +1,6 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useProfileById } from "@/hooks/useProfiles";
-import { useProfile } from "@/hooks/useProfile";
+import { useCurrentProfile } from "@/hooks/useCurrentProfile";
 import { useLikes } from "@/hooks/useLikes";
 import { useConversations } from "@/hooks/useConversations";
 import { useAuth } from "@/hooks/useAuth";
@@ -16,7 +16,7 @@ const MemberProfile = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { profile: member, loading, error } = useProfileById(id || "");
-  const { profile: currentUserProfile } = useProfile();
+  const { profile: currentUserProfile } = useCurrentProfile();
   const { sendLike, loading: likeLoading } = useLikes();
   const { createOrGetConversation } = useConversations();
   const { user } = useAuth();
