@@ -1,16 +1,21 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import { useMatches } from "@/hooks/useMatches";
 import { useAuth } from "@/hooks/useAuth";
+import { useConversations } from "@/hooks/useConversations";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Heart, MessageCircle, Loader2, Users, Sparkles } from "lucide-react";
+import { toast } from "sonner";
 
 const Matches = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { matches, loading } = useMatches();
+  const { createOrGetConversation } = useConversations();
   const [filter, setFilter] = useState<"all" | "new">("all");
+  const [loadingMessage, setLoadingMessage] = useState<string | null>(null);
 
   // Filter matches from the last 7 days as "new"
   const newMatches = matches.filter((match) => {
@@ -137,12 +142,33 @@ const Matches = () => {
                     <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
                       {profile.bio || "אין תיאור"}
                     </p>
-                    <Link to="/messages">
-                      <Button variant="hero" className="w-full gap-2">
+                    <Button
+                      variant="hero"
+                      className="w-full gap-2"
+                      disabled={loadingMessage === profile.id}
+                      onClick={async () => {
+                        setLoadingMessage(profile.id);
+                        try {
+                          const conversationId = await createOrGetConversation(profile.id);
+                          if (conversationId) {
+                            navigate("/messages");
+                          } else {
+                            toast.error("לא ניתן ליצור שיחה כרגע");
+                          }
+                        } catch (error) {
+                          toast.error("שגיאה בפתיחת השיחה");
+                        } finally {
+                          setLoadingMessage(null);
+                        }
+                      }}
+                    >
+                      {loadingMessage === profile.id ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
                         <MessageCircle className="w-4 h-4" />
-                        שלחו הודעה
-                      </Button>
-                    </Link>
+                      )}
+                      שלחו הודעה
+                    </Button>
                   </div>
                 </div>
               );

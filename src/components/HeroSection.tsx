@@ -49,7 +49,7 @@ const HeroSection = () => {
                 הצטרפו עכשיו - חינם
               </Button>
             </Link>
-            <Link to="/discover">
+            <Link to="/members">
               <Button variant="hero-outline" size="xl">
                 גלו פרופילים
               </Button>
