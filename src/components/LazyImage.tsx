@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { User } from 'lucide-react';
 
@@ -11,10 +11,24 @@ interface LazyImageProps {
   fallbackSrc?: string;
   onLoad?: () => void;
   onError?: () => void;
+  sizes?: string;
+  priority?: boolean;
 }
 
 // Default fallback - a nice gradient placeholder
 const DEFAULT_FALLBACK = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23f3f4f6'/%3E%3Cstop offset='100%25' style='stop-color:%23e5e7eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23grad)' width='400' height='400'/%3E%3C/svg%3E";
+
+// Generate srcset for responsive images (Unsplash-specific)
+const generateSrcSet = (src: string): string | undefined => {
+  if (!src || !src.includes('unsplash.com')) return undefined;
+  
+  const baseUrl = src.split('?')[0];
+  const widths = [320, 480, 640, 768, 1024, 1280];
+  
+  return widths
+    .map(w => `${baseUrl}?w=${w}&q=80&auto=format ${w}w`)
+    .join(', ');
+};
 
 const LazyImage = ({
   src,
@@ -25,12 +39,16 @@ const LazyImage = ({
   fallbackSrc = DEFAULT_FALLBACK,
   onLoad,
   onError,
+  sizes = '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw',
+  priority = false,
 }: LazyImageProps) => {
   const [isLoaded, setIsLoaded] = useState(false);
-  const [isInView, setIsInView] = useState(false);
+  const [isInView, setIsInView] = useState(priority);
   const [error, setError] = useState(false);
   const [currentSrc, setCurrentSrc] = useState(src);
   const imgRef = useRef<HTMLDivElement>(null);
+
+  const srcSet = useMemo(() => generateSrcSet(src), [src]);
 
   useEffect(() => {
     // Reset states when src changes
@@ -40,6 +58,11 @@ const LazyImage = ({
   }, [src]);
 
   useEffect(() => {
+    if (priority) {
+      setIsInView(true);
+      return;
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -47,7 +70,7 @@ const LazyImage = ({
           observer.disconnect();
         }
       },
-      { rootMargin: '100px' }
+      { rootMargin: '200px' } // Increased for earlier loading
     );
 
     if (imgRef.current) {
@@ -55,7 +78,7 @@ const LazyImage = ({
     }
 
     return () => observer.disconnect();
-  }, []);
+  }, [priority]);
 
   const handleLoad = () => {
     setIsLoaded(true);
@@ -111,6 +134,8 @@ const LazyImage = ({
       {isInView && !error && (
         <img
           src={currentSrc}
+          srcSet={srcSet}
+          sizes={sizes}
           alt={alt}
           className={cn(
             "w-full h-full object-cover transition-opacity duration-300",
@@ -118,8 +143,9 @@ const LazyImage = ({
           )}
           onLoad={handleLoad}
           onError={handleError}
-          loading="lazy"
+          loading={priority ? "eager" : "lazy"}
           decoding="async"
+          fetchPriority={priority ? "high" : "auto"}
         />
       )}
     </div>

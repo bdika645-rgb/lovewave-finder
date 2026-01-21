@@ -330,11 +330,12 @@ const Discover = () => {
         <Navbar />
         <main id="main-content" className="container mx-auto px-6 pt-28 pb-16 flex items-center justify-center min-h-[calc(100vh-80px)]">
           <EmptyState
-            icon={<Sparkles className="w-10 h-10" />}
-            title="אין עוד פרופילים"
-            description="סיימתם לעבור על כל הפרופילים הזמינים. נסו שוב מאוחר יותר או אפסו את הרשימה."
-            actionLabel="אפס פרופילים"
+            icon={<Sparkles className="w-12 h-12" />}
+            title="עברתם על כל הפרופילים! 🎉"
+            description="וואו, אתם ממש פעילים! סיימתם לעבור על כל הפרופילים הזמינים כרגע. נסו שוב מאוחר יותר או אפסו את הרשימה כדי להתחיל מחדש."
+            actionLabel="התחל מחדש"
             onAction={resetProfiles}
+            showInvite
           />
         </main>
       </div>

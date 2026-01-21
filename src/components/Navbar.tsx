@@ -68,7 +68,7 @@ const Navbar = () => {
               } ${location.pathname === '/discover' ? 'text-primary' : ''}`}
             >
               <Sparkles className="w-4 h-4" />
-              גלישה
+              Swipe
             </Link>
             <Link 
               to="/members" 
@@ -77,7 +77,7 @@ const Navbar = () => {
               } ${location.pathname === '/members' ? 'text-primary' : ''}`}
             >
               <Search className="w-4 h-4" />
-              גלה
+              חפש
             </Link>
             <Link 
               to="/matches" 
@@ -188,14 +188,14 @@ const Navbar = () => {
                 className="font-body text-foreground py-3 px-4 rounded-lg hover:bg-accent transition-colors flex items-center gap-3"
               >
                 <Sparkles className="w-5 h-5 text-primary" />
-                גלישה
+                Swipe
               </Link>
               <Link 
                 to="/members" 
                 className="font-body text-foreground py-3 px-4 rounded-lg hover:bg-accent transition-colors flex items-center gap-3"
               >
                 <Search className="w-5 h-5 text-primary" />
-                גלה פרופילים
+                חפש פרופילים
               </Link>
               <Link 
                 to="/matches" 

@@ -40,11 +40,11 @@ export function useProfiles(options: UseProfilesOptions = {}) {
   }, [user, options.filterByOppositeGender]);
 
   useEffect(() => {
-    // If user is logged in and we need to filter by gender but haven't fetched it yet, wait
-    if (user && options.filterByOppositeGender !== false && currentUserGender === null) {
+    // If we need to filter by opposite gender AND user is logged in AND we haven't fetched gender yet - wait
+    if (options.filterByOppositeGender === true && user && currentUserGender === null) {
       return;
     }
-    // If no user, or filterByOppositeGender is false, or we have the gender - proceed
+    // Otherwise proceed with fetch
     fetchProfiles();
   }, [options.search, options.ageFrom, options.ageTo, options.city, user, currentUserGender, options.filterByOppositeGender]);
 
