@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Heart, Menu, X, User, MessageCircle, Search, LogOut, Sparkles, Users, Bell } from "lucide-react";
+import { Heart, Menu, X, User, MessageCircle, Search, LogOut, Sparkles, Users, Bell, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
@@ -220,8 +220,15 @@ const Navbar = () => {
                 to="/who-liked-me" 
                 className="font-body text-foreground py-3 px-4 rounded-lg hover:bg-accent transition-colors flex items-center gap-3"
               >
-                <Bell className="w-5 h-5 text-primary" />
-                מי עשה לי לייק
+                <Heart className="w-5 h-5 text-primary fill-primary" />
+                מי לייק אותי
+              </Link>
+              <Link 
+                to="/who-viewed-me" 
+                className="font-body text-foreground py-3 px-4 rounded-lg hover:bg-accent transition-colors flex items-center gap-3"
+              >
+                <Eye className="w-5 h-5 text-primary" />
+                מי צפה בי
               </Link>
               <Link 
                 to="/profile" 

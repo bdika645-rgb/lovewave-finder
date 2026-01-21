@@ -24,12 +24,14 @@ import Register from "./pages/Register";
 import Discover from "./pages/Discover";
 import Matches from "./pages/Matches";
 import WhoLikedMe from "./pages/WhoLikedMe";
+import WhoViewedMe from "./pages/WhoViewedMe";
 import Support from "./pages/Support";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import NotFound from "./pages/NotFound";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import BottomNavigation from "./components/BottomNavigation";
 
 // Admin Pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -109,6 +111,13 @@ const App = () => (
                   <ProtectedRoute>
                     <PageErrorBoundary pageName="WhoLikedMe">
                       <WhoLikedMe />
+                    </PageErrorBoundary>
+                  </ProtectedRoute>
+                } />
+                <Route path="/who-viewed-me" element={
+                  <ProtectedRoute>
+                    <PageErrorBoundary pageName="WhoViewedMe">
+                      <WhoViewedMe />
                     </PageErrorBoundary>
                   </ProtectedRoute>
                 } />
@@ -202,6 +211,7 @@ const App = () => (
                 {/* 404 */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
+              <BottomNavigation />
               </main>
             </BrowserRouter>
           </TooltipProvider>
