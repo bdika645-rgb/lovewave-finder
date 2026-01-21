@@ -7,9 +7,9 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { CurrentProfileProvider } from "@/hooks/useCurrentProfile";
 import { ThemeProvider } from "next-themes";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import PageErrorBoundary from "@/components/PageErrorBoundary";
 import AdminProtectedRoute from "@/components/AdminProtectedRoute";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import OnboardingTour from "@/components/OnboardingTour";
 import SkipToContent from "@/components/SkipToContent";
 
 // Pages
@@ -68,7 +68,6 @@ const App = () => (
               <SkipToContent />
               <Toaster />
               <Sonner />
-              <OnboardingTour />
               <BrowserRouter>
               <main id="main-content">
               <Routes>
@@ -87,32 +86,44 @@ const App = () => (
                 {/* Protected Routes */}
                 <Route path="/discover" element={
                   <ProtectedRoute>
-                    <Discover />
+                    <PageErrorBoundary pageName="Discover">
+                      <Discover />
+                    </PageErrorBoundary>
                   </ProtectedRoute>
                 } />
                 <Route path="/messages" element={
                   <ProtectedRoute>
-                    <Messages />
+                    <PageErrorBoundary pageName="Messages">
+                      <Messages />
+                    </PageErrorBoundary>
                   </ProtectedRoute>
                 } />
                 <Route path="/matches" element={
                   <ProtectedRoute>
-                    <Matches />
+                    <PageErrorBoundary pageName="Matches">
+                      <Matches />
+                    </PageErrorBoundary>
                   </ProtectedRoute>
                 } />
                 <Route path="/who-liked-me" element={
                   <ProtectedRoute>
-                    <WhoLikedMe />
+                    <PageErrorBoundary pageName="WhoLikedMe">
+                      <WhoLikedMe />
+                    </PageErrorBoundary>
                   </ProtectedRoute>
                 } />
                 <Route path="/profile" element={
                   <ProtectedRoute>
-                    <Profile />
+                    <PageErrorBoundary pageName="Profile">
+                      <Profile />
+                    </PageErrorBoundary>
                   </ProtectedRoute>
                 } />
                 <Route path="/settings" element={
                   <ProtectedRoute>
-                    <Settings />
+                    <PageErrorBoundary pageName="Settings">
+                      <Settings />
+                    </PageErrorBoundary>
                   </ProtectedRoute>
                 } />
                 

@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useMemo } from "react";
+import { useState, useCallback, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import SwipeCard from "@/components/SwipeCard";
 import ReportDialog from "@/components/ReportDialog";
@@ -94,7 +94,7 @@ const Discover = () => {
     }
   }, [currentIndex, availableProfiles.length]);
 
-  const handleLike = async () => {
+  const handleLike = useCallback(async () => {
     if (!user) {
       toast.error("נא להתחבר כדי לשלוח לייקים");
       return;
@@ -132,9 +132,9 @@ const Discover = () => {
     }
 
     goToNext();
-  };
+  }, [user, currentProfile, sendLike, recordAction, goToNext]);
 
-  const handlePass = async () => {
+  const handlePass = useCallback(async () => {
     if (!currentProfile) return;
     
     setPassedProfiles(prev => new Set([...prev, currentProfile.id]));
@@ -147,9 +147,9 @@ const Discover = () => {
     
     toast(`דילגת על ${currentProfile.name}`);
     goToNext();
-  };
+  }, [currentProfile, user, recordAction, goToNext]);
 
-  const handleSuperLike = async () => {
+  const handleSuperLike = useCallback(async () => {
     if (!user) {
       toast.error("נא להתחבר כדי לשלוח לייקים");
       return;
@@ -210,9 +210,9 @@ const Discover = () => {
     }
 
     goToNext();
-  };
+  }, [user, currentProfile, recordAction, goToNext]);
 
-  const handleUndo = async () => {
+  const handleUndo = useCallback(async () => {
     const { undoneAction, error } = await undoLastAction();
     
     if (error || !undoneAction) {
@@ -243,7 +243,7 @@ const Discover = () => {
 
     setCanUndo(false);
     toast.success("הפעולה בוטלה!");
-  };
+  }, [undoLastAction, profiles]);
 
   const resetProfiles = () => {
     setLikedProfiles(new Set());
@@ -279,7 +279,7 @@ const Discover = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentProfile, user]);
+  }, [currentProfile, user, handleLike, handlePass, handleSuperLike, handleUndo]);
 
   // Not logged in state
   if (!user) {

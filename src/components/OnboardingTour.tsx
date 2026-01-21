@@ -61,6 +61,7 @@ const OnboardingTour = ({ onComplete, forceShow = false }: OnboardingTourProps) 
   const [currentStep, setCurrentStep] = useState(0);
 
   const STORAGE_KEY = 'spark_onboarding_complete';
+  const DONT_SHOW_KEY = 'spark_onboarding_dont_show';
 
   useEffect(() => {
     if (forceShow) {
@@ -69,9 +70,10 @@ const OnboardingTour = ({ onComplete, forceShow = false }: OnboardingTourProps) 
     }
 
     const hasCompleted = localStorage.getItem(STORAGE_KEY);
-    if (!hasCompleted) {
+    const dontShow = localStorage.getItem(DONT_SHOW_KEY);
+    if (!hasCompleted && !dontShow) {
       // Wait a bit before showing to let the page load
-      const timer = setTimeout(() => setIsOpen(true), 1000);
+      const timer = setTimeout(() => setIsOpen(true), 2000);
       return () => clearTimeout(timer);
     }
   }, [forceShow]);
@@ -97,7 +99,7 @@ const OnboardingTour = ({ onComplete, forceShow = false }: OnboardingTourProps) 
   };
 
   const handleSkip = () => {
-    localStorage.setItem(STORAGE_KEY, 'true');
+    localStorage.setItem(DONT_SHOW_KEY, 'true');
     setIsOpen(false);
   };
 

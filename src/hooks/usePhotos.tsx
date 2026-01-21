@@ -51,15 +51,42 @@ export function usePhotos(profileId?: string) {
     if (!user || !myProfileId) return { url: null, error: new Error('Not authenticated') };
 
     try {
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        return { url: null, error: new Error('גודל הקובץ לא יכול לעלות על 5MB') };
+      }
+
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        return { url: null, error: new Error('נא להעלות קובץ תמונה בלבד') };
+      }
+
+      // Check bucket exists
+      const { data: buckets, error: bucketError } = await supabase.storage.listBuckets();
+      if (bucketError) {
+        console.error('Error listing buckets:', bucketError);
+      }
+      
+      const avatarsBucket = buckets?.find(b => b.name === 'avatars');
+      if (!avatarsBucket) {
+        console.warn('Avatars bucket not found, attempting upload anyway...');
+      }
+
       // Upload to storage
-      const fileExt = file.name.split('.').pop();
+      const fileExt = file.name.split('.').pop()?.toLowerCase() || 'jpg';
       const fileName = `${myProfileId}/${Date.now()}.${fileExt}`;
       
       const { error: uploadError } = await supabase.storage
         .from('avatars')
-        .upload(fileName, file);
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        throw new Error(`שגיאה בהעלאת התמונה: ${uploadError.message}`);
+      }
 
       // Get public URL
       const { data: urlData } = supabase.storage
@@ -79,7 +106,12 @@ export function usePhotos(profileId?: string) {
           display_order: maxOrder + 1,
         });
 
-      if (insertError) throw insertError;
+      if (insertError) {
+        console.error('Insert error:', insertError);
+        // Try to clean up uploaded file
+        await supabase.storage.from('avatars').remove([fileName]);
+        throw new Error(`שגיאה בשמירת התמונה: ${insertError.message}`);
+      }
 
       await fetchPhotos();
       return { url, error: null };
