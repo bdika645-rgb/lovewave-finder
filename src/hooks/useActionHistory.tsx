@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useMyProfileId } from './useMyProfileId';
 import { useLikes } from './useLikes';
 
 interface ActionHistoryItem {
@@ -12,7 +13,8 @@ interface ActionHistoryItem {
 
 export function useActionHistory() {
   const [loading, setLoading] = useState(false);
-  const { getMyProfileId, removeLike } = useLikes();
+  const { getMyProfileId, profileId: cachedProfileId } = useMyProfileId();
+  const { removeLike } = useLikes();
 
   const recordAction = useCallback(async (
     targetProfileId: string, 
@@ -20,7 +22,7 @@ export function useActionHistory() {
   ): Promise<{ error: Error | null }> => {
     try {
       setLoading(true);
-      const myProfileId = await getMyProfileId();
+      const myProfileId = cachedProfileId || await getMyProfileId();
       if (!myProfileId) throw new Error('Profile not found');
 
       const { error } = await supabase
@@ -39,11 +41,11 @@ export function useActionHistory() {
     } finally {
       setLoading(false);
     }
-  }, [getMyProfileId]);
+  }, [getMyProfileId, cachedProfileId]);
 
   const getLastAction = useCallback(async (): Promise<ActionHistoryItem | null> => {
     try {
-      const myProfileId = await getMyProfileId();
+      const myProfileId = cachedProfileId || await getMyProfileId();
       if (!myProfileId) return null;
 
       const { data, error } = await supabase
@@ -60,7 +62,7 @@ export function useActionHistory() {
       console.error('Error getting last action:', err);
       return null;
     }
-  }, [getMyProfileId]);
+  }, [getMyProfileId, cachedProfileId]);
 
   const undoLastAction = useCallback(async (): Promise<{ 
     error: Error | null; 

@@ -109,12 +109,12 @@ const SuccessStoriesSection = () => {
                         <div className="flex -space-x-4 rtl:space-x-reverse">
                           <img
                             src={story.image1}
-                            alt=""
+                            alt={`תמונת פרופיל של ${story.names.split(' ו')[0]}`}
                             className="w-16 h-16 rounded-full border-4 border-background object-cover"
                           />
                           <img
                             src={story.image2}
-                            alt=""
+                            alt={`תמונת פרופיל של ${story.names.split(' ו')[1] || 'בן/בת זוג'}`}
                             className="w-16 h-16 rounded-full border-4 border-background object-cover"
                           />
                         </div>

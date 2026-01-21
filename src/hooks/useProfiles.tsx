@@ -21,10 +21,10 @@ export function useProfiles(options: UseProfilesOptions = {}) {
   const [currentUserGender, setCurrentUserGender] = useState<string | null>(null);
   const { user } = useAuth();
 
-  // Fetch current user's gender for filtering
+  // Fetch current user's gender for filtering (only when filterByOppositeGender is explicitly true)
   useEffect(() => {
     const fetchCurrentUserGender = async () => {
-      if (user && options.filterByOppositeGender !== false) {
+      if (user && options.filterByOppositeGender === true) {
         const { data } = await supabase
           .from('profiles')
           .select('gender')
@@ -40,13 +40,14 @@ export function useProfiles(options: UseProfilesOptions = {}) {
   }, [user, options.filterByOppositeGender]);
 
   useEffect(() => {
-    // If we need to filter by opposite gender AND user is logged in AND we haven't fetched gender yet - wait
+    // If we explicitly want to filter by opposite gender AND user is logged in AND we haven't fetched gender yet - wait
     if (options.filterByOppositeGender === true && user && currentUserGender === null) {
       return;
     }
     // Otherwise proceed with fetch
     fetchProfiles();
-  }, [options.search, options.ageFrom, options.ageTo, options.city, user, currentUserGender, options.filterByOppositeGender]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [options.search, options.ageFrom, options.ageTo, options.city, user, currentUserGender, options.filterByOppositeGender, options.excludeCurrentUser]);
 
   const fetchProfiles = async () => {
     try {
@@ -56,13 +57,13 @@ export function useProfiles(options: UseProfilesOptions = {}) {
         .select('*')
         .order('created_at', { ascending: false });
 
-      // Exclude current user's profile if logged in
-      if (user && options.excludeCurrentUser !== false) {
+      // Exclude current user's profile if logged in AND explicitly requested
+      if (user && options.excludeCurrentUser === true) {
         query = query.neq('user_id', user.id);
       }
 
-      // Filter by opposite gender - men see women, women see men
-      if (currentUserGender && options.filterByOppositeGender !== false) {
+      // Filter by opposite gender only if explicitly set to true
+      if (options.filterByOppositeGender === true && currentUserGender) {
         const oppositeGender = currentUserGender === 'male' ? 'female' : 'male';
         query = query.eq('gender', oppositeGender);
       }

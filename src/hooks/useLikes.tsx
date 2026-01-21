@@ -1,24 +1,10 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from './useAuth';
+import { useMyProfileId } from './useMyProfileId';
 
 export function useLikes() {
-  const { user } = useAuth();
+  const { getMyProfileId, profileId: cachedProfileId } = useMyProfileId();
   const [loading, setLoading] = useState(false);
-
-  const getMyProfileId = useCallback(async (): Promise<string | null> => {
-    if (!user) return null;
-    
-    // Use RPC function for better performance
-    const { data, error } = await supabase.rpc('get_my_profile_id');
-
-    if (error) {
-      console.error('Error getting profile:', error);
-      return null;
-    }
-    
-    return data || null;
-  }, [user]);
 
   const sendLike = async (likedProfileId: string): Promise<{
     error: Error | null;
@@ -27,7 +13,7 @@ export function useLikes() {
   }> => {
     setLoading(true);
     try {
-      const myProfileId = await getMyProfileId();
+      const myProfileId = cachedProfileId || await getMyProfileId();
       if (!myProfileId) {
         throw new Error('Profile not found');
       }
@@ -72,7 +58,7 @@ export function useLikes() {
   const removeLike = async (likedProfileId: string): Promise<{ error: Error | null }> => {
     setLoading(true);
     try {
-      const myProfileId = await getMyProfileId();
+      const myProfileId = cachedProfileId || await getMyProfileId();
       if (!myProfileId) {
         throw new Error('Profile not found');
       }
@@ -93,7 +79,7 @@ export function useLikes() {
   };
 
   const checkIfLiked = async (profileId: string): Promise<boolean> => {
-    const myProfileId = await getMyProfileId();
+    const myProfileId = cachedProfileId || await getMyProfileId();
     if (!myProfileId) return false;
 
     const { data } = await supabase
