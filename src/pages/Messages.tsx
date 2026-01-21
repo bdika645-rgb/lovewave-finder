@@ -186,7 +186,7 @@ const Messages = () => {
                           <div className="relative">
                             <img 
                               src={match.matchedProfile.avatar_url || "/profiles/profile1.jpg"} 
-                              alt=""
+                              alt={`תמונת פרופיל של ${match.matchedProfile.name}`}
                               className="w-14 h-14 rounded-full object-cover border-2 border-primary group-hover:border-primary/80 transition-colors"
                             />
                             <span className="absolute -bottom-1 -right-1 w-5 h-5 bg-primary rounded-full flex items-center justify-center">
@@ -226,7 +226,7 @@ const Messages = () => {
                         <div className="relative">
                           <img 
                             src={conv.otherProfile?.avatar_url || "/profiles/profile1.jpg"} 
-                            alt=""
+                            alt={`תמונת פרופיל של ${conv.otherProfile?.name || "משתמש"}`}
                             className="w-14 h-14 rounded-full object-cover"
                           />
                           {conv.otherProfile?.is_online && (
@@ -276,7 +276,7 @@ const Messages = () => {
                       <Link to={`/member/${selectedConversation.otherProfile?.id}`} className="shrink-0">
                         <img 
                           src={selectedConversation.otherProfile?.avatar_url || "/profiles/profile1.jpg"}
-                          alt=""
+                          alt={`תמונת פרופיל של ${selectedConversation.otherProfile?.name || "משתמש"}`}
                           className="w-12 h-12 rounded-full object-cover hover:opacity-80 transition-opacity"
                         />
                       </Link>

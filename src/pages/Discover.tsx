@@ -53,6 +53,18 @@ const Discover = () => {
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
   const [currentProfilePhotos, setCurrentProfilePhotos] = useState<string[]>([]);
 
+  // Allow closing match overlay with ESC
+  useEffect(() => {
+    if (!showMatchAnimation) return;
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setShowMatchAnimation(false);
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [showMatchAnimation]);
+
   // Filter out already liked/passed profiles
   const availableProfiles = profiles.filter(
     (p) => !likedProfiles.has(p.id) && !passedProfiles.has(p.id)
@@ -405,14 +417,23 @@ const Discover = () => {
       
       {/* Match Animation Overlay */}
       {showMatchAnimation && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/95 backdrop-blur-md animate-fade-in">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-background/95 backdrop-blur-md animate-fade-in"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="match-title"
+          aria-describedby="match-description"
+        >
+          <div className="sr-only" role="status" aria-live="assertive">
+            יש התאמה עם {matchedName}
+          </div>
           <div className="text-center animate-scale-in">
             <div className="relative mb-8">
               <div className="flex items-center justify-center gap-4">
                 <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-primary shadow-elevated animate-pulse">
                   <img 
                     src={matchedImage} 
-                    alt={matchedName}
+                    alt={`תמונת פרופיל של ${matchedName}`}
                     className="w-full h-full object-cover"
                   />
                 </div>
@@ -421,10 +442,10 @@ const Discover = () => {
               <Sparkles className="w-8 h-8 text-secondary absolute -top-4 -right-4 animate-float" />
               <Sparkles className="w-6 h-6 text-primary absolute -bottom-2 -left-6 animate-float" style={{ animationDelay: "0.5s" }} />
             </div>
-            <h1 className="font-display text-5xl font-bold text-gradient mb-4">
+            <h1 id="match-title" className="font-display text-5xl font-bold text-gradient mb-4">
               יש התאמה! 🎉
             </h1>
-            <p className="text-xl text-muted-foreground mb-8">
+            <p id="match-description" className="text-xl text-muted-foreground mb-8">
               את/ה ו{matchedName} אהבתם אחד את השני!
             </p>
             <div className="flex gap-4 justify-center">
@@ -435,6 +456,7 @@ const Discover = () => {
                 variant="outline" 
                 size="lg" 
                 onClick={() => setShowMatchAnimation(false)}
+                aria-label="סגור חלון התאמה והמשך לגלות"
               >
                 המשיכו לגלות
               </Button>
