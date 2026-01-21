@@ -203,18 +203,18 @@ const Index = () => {
             <div>
               <h4 className="font-display text-lg font-semibold text-primary-foreground mb-4">תמיכה</h4>
               <nav className="flex flex-col gap-3">
-                <button onClick={() => {}} className="text-right text-primary-foreground/60 hover:text-primary-foreground transition-colors text-sm">
+                <a href="#faq" className="text-right text-primary-foreground/60 hover:text-primary-foreground transition-colors text-sm">
                   שאלות נפוצות
-                </button>
-                <button onClick={() => {}} className="text-right text-primary-foreground/60 hover:text-primary-foreground transition-colors text-sm">
+                </a>
+                <Link to="/support" className="text-primary-foreground/60 hover:text-primary-foreground transition-colors text-sm">
                   צור קשר
-                </button>
-                <button onClick={() => {}} className="text-right text-primary-foreground/60 hover:text-primary-foreground transition-colors text-sm">
+                </Link>
+                <Link to="/terms" className="text-primary-foreground/60 hover:text-primary-foreground transition-colors text-sm">
                   תנאי שימוש
-                </button>
-                <button onClick={() => {}} className="text-right text-primary-foreground/60 hover:text-primary-foreground transition-colors text-sm">
+                </Link>
+                <Link to="/privacy" className="text-primary-foreground/60 hover:text-primary-foreground transition-colors text-sm">
                   מדיניות פרטיות
-                </button>
+                </Link>
               </nav>
             </div>
           </div>
