@@ -16,7 +16,8 @@ import {
   UserX,
   Lightbulb,
   Menu,
-  X
+  X,
+  HelpCircle
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
@@ -29,6 +30,7 @@ const menuItems = [
   { icon: Heart, label: "מאצ'ים ולייקים", path: "/admin/matches" },
   { icon: MessageCircle, label: "הודעות", path: "/admin/messages" },
   { icon: Flag, label: "דיווחים", path: "/admin/reports" },
+  { icon: HelpCircle, label: "פניות תמיכה", path: "/admin/support" },
   { icon: UserX, label: "משתמשים חסומים", path: "/admin/blocked" },
   { icon: Image, label: "ניהול תוכן", path: "/admin/content" },
   { icon: Lightbulb, label: "טיפים", path: "/admin/tips" },

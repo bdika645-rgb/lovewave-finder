@@ -38,6 +38,7 @@ import AdminBlockedUsers from "./pages/admin/AdminBlockedUsers";
 import AdminContent from "./pages/admin/AdminContent";
 import AdminNotifications from "./pages/admin/AdminNotifications";
 import AdminTips from "./pages/admin/AdminTips";
+import AdminSupport from "./pages/admin/AdminSupport";
 
 const queryClient = new QueryClient();
 
@@ -105,7 +106,7 @@ const App = () => (
               <Route path="/admin/content" element={<AdminContent />} />
               <Route path="/admin/notifications" element={<AdminNotifications />} />
               <Route path="/admin/tips" element={<AdminTips />} />
-              
+              <Route path="/admin/support" element={<AdminSupport />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

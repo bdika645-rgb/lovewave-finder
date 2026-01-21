@@ -5,6 +5,8 @@ import SuccessStoriesSection from "@/components/SuccessStoriesSection";
 import FAQSection from "@/components/FAQSection";
 import StatsSection from "@/components/StatsSection";
 import DatingTipsSection from "@/components/DatingTipsSection";
+import AnimatedSection from "@/components/AnimatedSection";
+import AnimatedCard from "@/components/AnimatedCard";
 
 import { useProfiles } from "@/hooks/useProfiles";
 import { Heart, Shield, Sparkles, Users, Loader2 } from "lucide-react";
@@ -15,6 +17,7 @@ const Index = () => {
   // Fetch featured profiles from database (limit to 4)
   const { profiles, loading } = useProfiles({});
   const featuredProfiles = profiles.slice(0, 4);
+  
   return (
     <div className="min-h-screen" dir="rtl">
       <Navbar />
@@ -23,51 +26,57 @@ const Index = () => {
       {/* Features Section */}
       <section className="py-24 bg-muted/30">
         <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
+          <AnimatedSection className="text-center mb-16">
             <h2 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
               למה <span className="text-gradient">Spark</span>?
             </h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
               הפלטפורמה המובילה להיכרויות בישראל, עם מיליוני משתמשים וטכנולוגיה חכמה להתאמות מושלמות.
             </p>
-          </div>
+          </AnimatedSection>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-card p-8 rounded-3xl shadow-card card-hover text-center">
-              <div className="w-16 h-16 gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <Sparkles className="w-8 h-8 text-primary-foreground" />
+            <AnimatedCard index={0}>
+              <div className="bg-card p-8 rounded-3xl shadow-card text-center h-full">
+                <div className="w-16 h-16 gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-6">
+                  <Sparkles className="w-8 h-8 text-primary-foreground" />
+                </div>
+                <h3 className="font-display text-xl font-bold text-foreground mb-3">
+                  התאמה חכמה
+                </h3>
+                <p className="text-muted-foreground">
+                  האלגוריתם שלנו מנתח את ההעדפות שלכם ומציע התאמות מושלמות
+                </p>
               </div>
-              <h3 className="font-display text-xl font-bold text-foreground mb-3">
-                התאמה חכמה
-              </h3>
-              <p className="text-muted-foreground">
-                האלגוריתם שלנו מנתח את ההעדפות שלכם ומציע התאמות מושלמות
-              </p>
-            </div>
+            </AnimatedCard>
 
-            <div className="bg-card p-8 rounded-3xl shadow-card card-hover text-center">
-              <div className="w-16 h-16 gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <Shield className="w-8 h-8 text-primary-foreground" />
+            <AnimatedCard index={1}>
+              <div className="bg-card p-8 rounded-3xl shadow-card text-center h-full">
+                <div className="w-16 h-16 gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-6">
+                  <Shield className="w-8 h-8 text-primary-foreground" />
+                </div>
+                <h3 className="font-display text-xl font-bold text-foreground mb-3">
+                  פרטיות מלאה
+                </h3>
+                <p className="text-muted-foreground">
+                  המידע שלכם מאובטח ומוגן. אתם שולטים במה שאחרים רואים
+                </p>
               </div>
-              <h3 className="font-display text-xl font-bold text-foreground mb-3">
-                פרטיות מלאה
-              </h3>
-              <p className="text-muted-foreground">
-                המידע שלכם מאובטח ומוגן. אתם שולטים במה שאחרים רואים
-              </p>
-            </div>
+            </AnimatedCard>
 
-            <div className="bg-card p-8 rounded-3xl shadow-card card-hover text-center">
-              <div className="w-16 h-16 gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <Users className="w-8 h-8 text-primary-foreground" />
+            <AnimatedCard index={2}>
+              <div className="bg-card p-8 rounded-3xl shadow-card text-center h-full">
+                <div className="w-16 h-16 gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-6">
+                  <Users className="w-8 h-8 text-primary-foreground" />
+                </div>
+                <h3 className="font-display text-xl font-bold text-foreground mb-3">
+                  קהילה אמיתית
+                </h3>
+                <p className="text-muted-foreground">
+                  כל הפרופילים מאומתים. רק אנשים אמיתיים ורציניים
+                </p>
               </div>
-              <h3 className="font-display text-xl font-bold text-foreground mb-3">
-                קהילה אמיתית
-              </h3>
-              <p className="text-muted-foreground">
-                כל הפרופילים מאומתים. רק אנשים אמיתיים ורציניים
-              </p>
-            </div>
+            </AnimatedCard>
           </div>
         </div>
       </section>
@@ -75,14 +84,14 @@ const Index = () => {
       {/* Featured Members */}
       <section className="py-24">
         <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
+          <AnimatedSection className="text-center mb-16">
             <h2 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
               פרופילים <span className="text-gradient">מובחרים</span>
             </h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
               הכירו כמה מהמשתמשים הפעילים שלנו
             </p>
-          </div>
+          </AnimatedSection>
 
           {loading ? (
             <div className="flex justify-center py-12">
@@ -90,31 +99,32 @@ const Index = () => {
             </div>
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {featuredProfiles.map((profile) => (
-                <MemberCard 
-                  key={profile.id} 
-                  member={{
-                    id: profile.id,
-                    name: profile.name,
-                    age: profile.age,
-                    city: profile.city,
-                    bio: profile.bio || "",
-                    image: profile.avatar_url || "/profiles/profile1.jpg",
-                    interests: profile.interests || [],
-                    isOnline: profile.is_online || false,
-                  }}
-                />
+              {featuredProfiles.map((profile, index) => (
+                <AnimatedCard key={profile.id} index={index}>
+                  <MemberCard 
+                    member={{
+                      id: profile.id,
+                      name: profile.name,
+                      age: profile.age,
+                      city: profile.city,
+                      bio: profile.bio || "",
+                      image: profile.avatar_url || "/profiles/profile1.jpg",
+                      interests: profile.interests || [],
+                      isOnline: profile.is_online || false,
+                    }}
+                  />
+                </AnimatedCard>
               ))}
             </div>
           )}
 
-          <div className="text-center mt-12">
+          <AnimatedSection delay={0.3} className="text-center mt-12">
             <Link to="/members">
               <Button variant="hero" size="lg">
                 ראו עוד פרופילים
               </Button>
             </Link>
-          </div>
+          </AnimatedSection>
         </div>
       </section>
 
@@ -132,8 +142,8 @@ const Index = () => {
       <FAQSection />
 
       {/* CTA Section */}
-      <section className="py-24 gradient-primary">
-        <div className="container mx-auto px-6 text-center">
+      <section className="py-24 gradient-primary overflow-hidden">
+        <AnimatedSection className="container mx-auto px-6 text-center">
           <Heart className="w-16 h-16 text-primary-foreground mx-auto mb-6 animate-pulse-soft" />
           <h2 className="font-display text-4xl md:text-5xl font-bold text-primary-foreground mb-6">
             מוכנים להתחיל?
@@ -149,7 +159,7 @@ const Index = () => {
               הירשמו עכשיו - חינם
             </Button>
           </Link>
-        </div>
+        </AnimatedSection>
       </section>
 
       {/* Footer */}
