@@ -2,6 +2,7 @@ import { ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { Sparkles } from 'lucide-react';
 
 interface EmptyStateProps {
   icon: ReactNode;
@@ -13,6 +14,7 @@ interface EmptyStateProps {
   secondaryActionLabel?: string;
   secondaryActionLink?: string;
   className?: string;
+  showInvite?: boolean;
 }
 
 const EmptyState = ({
@@ -25,10 +27,11 @@ const EmptyState = ({
   secondaryActionLabel,
   secondaryActionLink,
   className,
+  showInvite = false,
 }: EmptyStateProps) => {
   return (
     <div className={cn("text-center py-16 px-6 max-w-md mx-auto", className)}>
-      <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mx-auto mb-6 text-muted-foreground">
+      <div className="w-24 h-24 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full flex items-center justify-center mx-auto mb-6 text-primary animate-pulse">
         {icon}
       </div>
       
@@ -36,7 +39,7 @@ const EmptyState = ({
         {title}
       </h3>
       
-      <p className="text-muted-foreground mb-8">
+      <p className="text-muted-foreground mb-8 leading-relaxed">
         {description}
       </p>
 
@@ -44,12 +47,14 @@ const EmptyState = ({
         {actionLabel && (actionLink || onAction) && (
           actionLink ? (
             <Link to={actionLink}>
-              <Button variant="hero" size="lg">
+              <Button variant="hero" size="lg" className="gap-2">
+                <Sparkles className="w-4 h-4" />
                 {actionLabel}
               </Button>
             </Link>
           ) : (
-            <Button variant="hero" size="lg" onClick={onAction}>
+            <Button variant="hero" size="lg" onClick={onAction} className="gap-2">
+              <Sparkles className="w-4 h-4" />
               {actionLabel}
             </Button>
           )
@@ -63,6 +68,17 @@ const EmptyState = ({
           </Link>
         )}
       </div>
+
+      {showInvite && (
+        <div className="mt-8 pt-8 border-t border-border">
+          <p className="text-sm text-muted-foreground mb-4">
+            🌟 יש לך חברים שמחפשים אהבה?
+          </p>
+          <Button variant="ghost" size="sm" className="text-primary hover:text-primary/80">
+            הזמן חברים ל-Spark
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

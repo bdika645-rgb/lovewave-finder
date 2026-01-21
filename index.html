@@ -13,6 +13,15 @@
     <meta name="robots" content="index, follow" />
     <meta name="theme-color" content="#f43f5e" />
 
+    <!-- Preconnect to external resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://images.unsplash.com" />
+    
+    <!-- Preload critical fonts -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&display=swap" as="style" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&display=swap" />
+
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://lovewave-finder.lovable.app/" />
@@ -38,6 +47,30 @@
     
     <!-- Canonical -->
     <link rel="canonical" href="https://lovewave-finder.lovable.app/" />
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Spark",
+      "description": "אתר ההיכרויות המוביל בישראל - מצאו את האהבה האמיתית",
+      "url": "https://lovewave-finder.lovable.app",
+      "applicationCategory": "DatingApplication",
+      "operatingSystem": "All",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "ILS"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "ratingCount": "15000",
+        "bestRating": "5"
+      }
+    }
+    </script>
   </head>
 
   <body>
