@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Heart, Menu, X, User, MessageCircle, Search, LogOut, Sparkles, Users } from "lucide-react";
+import { Heart, Menu, X, User, MessageCircle, Search, LogOut, Sparkles, Users, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
@@ -64,7 +64,7 @@ const Navbar = () => {
               } ${location.pathname === '/discover' ? 'text-primary' : ''}`}
             >
               <Sparkles className="w-4 h-4" />
-              Swipe
+              גלישה
             </Link>
             <Link 
               to="/members" 
@@ -173,7 +173,7 @@ const Navbar = () => {
                 className="font-body text-foreground py-3 px-4 rounded-lg hover:bg-accent transition-colors flex items-center gap-3"
               >
                 <Sparkles className="w-5 h-5 text-primary" />
-                Swipe
+                גלישה
               </Link>
               <Link 
                 to="/members" 

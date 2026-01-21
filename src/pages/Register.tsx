@@ -6,6 +6,7 @@ import { Heart, Mail, Lock, User, Eye, EyeOff, MapPin, Loader2, Calendar, Camera
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { PasswordStrengthMeter } from "@/components/PasswordStrengthMeter";
 import {
   Select,
   SelectContent,
@@ -460,6 +461,7 @@ const Register = () => {
                   )}
                 </button>
               </div>
+              <PasswordStrengthMeter password={formData.password} />
             </div>
 
             <div>
