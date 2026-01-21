@@ -1,12 +1,20 @@
 import { Link, useLocation } from "react-router-dom";
-import { Heart, Menu, X, User, MessageCircle, Search, LogOut, Sparkles, Users, Bell, Eye } from "lucide-react";
+import { Heart, Menu, X, User, MessageCircle, Search, LogOut, Sparkles, Bell, Eye, Settings, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
+import { useCurrentProfile } from "@/hooks/useCurrentProfile";
 import { Badge } from "@/components/ui/badge";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import NotificationBell from "@/components/NotificationBell";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -15,6 +23,7 @@ const Navbar = () => {
   const isHome = location.pathname === "/";
   const { user, signOut } = useAuth();
   const { unreadCount } = useUnreadMessages();
+  const { profile } = useCurrentProfile();
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -106,13 +115,22 @@ const Navbar = () => {
               )}
             </Link>
             <Link 
-              to="/profile" 
+              to="/who-viewed-me" 
               className={`font-body font-medium transition-colors hover:text-primary flex items-center gap-1 ${
                 isHome && !isScrolled ? "text-primary-foreground/80 hover:text-primary-foreground" : "text-muted-foreground"
-              } ${location.pathname === '/profile' ? 'text-primary' : ''}`}
+              } ${location.pathname === '/who-viewed-me' ? 'text-primary' : ''}`}
             >
-              <User className="w-4 h-4" />
-              פרופיל
+              <Eye className="w-4 h-4" />
+              צפו בי
+            </Link>
+            <Link 
+              to="/who-liked-me" 
+              className={`font-body font-medium transition-colors hover:text-primary flex items-center gap-1 ${
+                isHome && !isScrolled ? "text-primary-foreground/80 hover:text-primary-foreground" : "text-muted-foreground"
+              } ${location.pathname === '/who-liked-me' ? 'text-primary' : ''}`}
+            >
+              <Heart className="w-4 h-4 fill-current" />
+              לייקים
             </Link>
           </div>
 
@@ -121,24 +139,58 @@ const Navbar = () => {
             <ThemeToggle />
             {user ? (
               <>
-                <Link to="/who-liked-me" aria-label="מי עשה לי לייק">
-                  <Button 
-                    variant={isHome && !isScrolled ? "hero-outline" : "ghost"} 
-                    size="icon"
-                    className="relative"
-                    aria-label="מי עשה לי לייק"
-                  >
-                    <Bell className="w-5 h-5" aria-hidden="true" />
-                  </Button>
-                </Link>
-                <Button 
-                  variant={isHome && !isScrolled ? "hero-outline" : "ghost"} 
-                  onClick={handleLogout}
-                  aria-label="התנתק מהחשבון"
-                >
-                  <LogOut className="w-4 h-4 ml-1" aria-hidden="true" />
-                  התנתק
-                </Button>
+                {/* Profile Dropdown */}
+                <DropdownMenu dir="rtl">
+                  <DropdownMenuTrigger asChild>
+                    <Button 
+                      variant={isHome && !isScrolled ? "hero-outline" : "outline"} 
+                      className="gap-2"
+                    >
+                      <Avatar className="h-6 w-6">
+                        <AvatarImage src={profile?.avatar_url || undefined} alt={profile?.name} />
+                        <AvatarFallback className="text-xs">
+                          {profile?.name?.charAt(0) || "?"}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="hidden lg:inline">{profile?.name || "הפרופיל שלי"}</span>
+                      <ChevronDown className="w-4 h-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuItem asChild>
+                      <Link to="/profile" className="flex items-center gap-2 cursor-pointer">
+                        <User className="w-4 h-4" />
+                        הפרופיל שלי
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/who-liked-me" className="flex items-center gap-2 cursor-pointer">
+                        <Heart className="w-4 h-4" />
+                        מי לייק אותי
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/who-viewed-me" className="flex items-center gap-2 cursor-pointer">
+                        <Eye className="w-4 h-4" />
+                        מי צפה בי
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/settings" className="flex items-center gap-2 cursor-pointer">
+                        <Settings className="w-4 h-4" />
+                        הגדרות
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem 
+                      onClick={handleLogout}
+                      className="flex items-center gap-2 cursor-pointer text-destructive focus:text-destructive"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      התנתק
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </>
             ) : (
               <>
