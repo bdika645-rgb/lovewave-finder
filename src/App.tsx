@@ -5,6 +5,11 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ThemeProvider } from "next-themes";
+import ErrorBoundary from "@/components/ErrorBoundary";
+import AdminProtectedRoute from "@/components/AdminProtectedRoute";
+import ProtectedRoute from "@/components/ProtectedRoute";
+
+// Pages
 import Index from "./pages/Index";
 import Members from "./pages/Members";
 import MemberProfile from "./pages/MemberProfile";
@@ -22,7 +27,6 @@ import Privacy from "./pages/Privacy";
 import NotFound from "./pages/NotFound";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
-import ProtectedRoute from "./components/ProtectedRoute";
 
 // Admin Pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -40,81 +44,152 @@ import AdminNotifications from "./pages/admin/AdminNotifications";
 import AdminTips from "./pages/admin/AdminTips";
 import AdminSupport from "./pages/admin/AdminSupport";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      gcTime: 10 * 60 * 1000, // 10 minutes
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-      <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/discover" element={
-                <ProtectedRoute>
-                  <Discover />
-                </ProtectedRoute>
-              } />
-              <Route path="/members" element={<Members />} />
-              <Route path="/member/:id" element={<MemberProfile />} />
-              <Route path="/messages" element={
-                <ProtectedRoute>
-                  <Messages />
-                </ProtectedRoute>
-              } />
-              <Route path="/matches" element={
-                <ProtectedRoute>
-                  <Matches />
-                </ProtectedRoute>
-              } />
-              <Route path="/who-liked-me" element={
-                <ProtectedRoute>
-                  <WhoLikedMe />
-                </ProtectedRoute>
-              } />
-              <Route path="/profile" element={
-                <ProtectedRoute>
-                  <Profile />
-                </ProtectedRoute>
-              } />
-              <Route path="/settings" element={
-                <ProtectedRoute>
-                  <Settings />
-                </ProtectedRoute>
-              } />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="/support" element={<Support />} />
-              <Route path="/terms" element={<Terms />} />
-              <Route path="/privacy" element={<Privacy />} />
-              
-              {/* Admin Routes */}
-              <Route path="/admin" element={<AdminDashboard />} />
-              <Route path="/admin/users" element={<AdminUsers />} />
-              <Route path="/admin/matches" element={<AdminMatches />} />
-              <Route path="/admin/messages" element={<AdminMessages />} />
-              <Route path="/admin/analytics" element={<AdminAnalytics />} />
-              <Route path="/admin/roles" element={<AdminRoles />} />
-              <Route path="/admin/settings" element={<AdminSettings />} />
-              <Route path="/admin/reports" element={<AdminReports />} />
-              <Route path="/admin/activity" element={<AdminActivityLog />} />
-              <Route path="/admin/blocked" element={<AdminBlockedUsers />} />
-              <Route path="/admin/content" element={<AdminContent />} />
-              <Route path="/admin/notifications" element={<AdminNotifications />} />
-              <Route path="/admin/tips" element={<AdminTips />} />
-              <Route path="/admin/support" element={<AdminSupport />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-      </AuthProvider>
-    </ThemeProvider>
-  </QueryClientProvider>
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+        <AuthProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                {/* Public Routes */}
+                <Route path="/" element={<Index />} />
+                <Route path="/members" element={<Members />} />
+                <Route path="/member/:id" element={<MemberProfile />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
+                <Route path="/support" element={<Support />} />
+                <Route path="/terms" element={<Terms />} />
+                <Route path="/privacy" element={<Privacy />} />
+
+                {/* Protected Routes */}
+                <Route path="/discover" element={
+                  <ProtectedRoute>
+                    <Discover />
+                  </ProtectedRoute>
+                } />
+                <Route path="/messages" element={
+                  <ProtectedRoute>
+                    <Messages />
+                  </ProtectedRoute>
+                } />
+                <Route path="/matches" element={
+                  <ProtectedRoute>
+                    <Matches />
+                  </ProtectedRoute>
+                } />
+                <Route path="/who-liked-me" element={
+                  <ProtectedRoute>
+                    <WhoLikedMe />
+                  </ProtectedRoute>
+                } />
+                <Route path="/profile" element={
+                  <ProtectedRoute>
+                    <Profile />
+                  </ProtectedRoute>
+                } />
+                <Route path="/settings" element={
+                  <ProtectedRoute>
+                    <Settings />
+                  </ProtectedRoute>
+                } />
+                
+                {/* Admin Routes - Protected with Admin check */}
+                <Route path="/admin" element={
+                  <AdminProtectedRoute>
+                    <AdminDashboard />
+                  </AdminProtectedRoute>
+                } />
+                <Route path="/admin/users" element={
+                  <AdminProtectedRoute>
+                    <AdminUsers />
+                  </AdminProtectedRoute>
+                } />
+                <Route path="/admin/matches" element={
+                  <AdminProtectedRoute>
+                    <AdminMatches />
+                  </AdminProtectedRoute>
+                } />
+                <Route path="/admin/messages" element={
+                  <AdminProtectedRoute>
+                    <AdminMessages />
+                  </AdminProtectedRoute>
+                } />
+                <Route path="/admin/analytics" element={
+                  <AdminProtectedRoute>
+                    <AdminAnalytics />
+                  </AdminProtectedRoute>
+                } />
+                <Route path="/admin/roles" element={
+                  <AdminProtectedRoute>
+                    <AdminRoles />
+                  </AdminProtectedRoute>
+                } />
+                <Route path="/admin/settings" element={
+                  <AdminProtectedRoute>
+                    <AdminSettings />
+                  </AdminProtectedRoute>
+                } />
+                <Route path="/admin/reports" element={
+                  <AdminProtectedRoute>
+                    <AdminReports />
+                  </AdminProtectedRoute>
+                } />
+                <Route path="/admin/activity" element={
+                  <AdminProtectedRoute>
+                    <AdminActivityLog />
+                  </AdminProtectedRoute>
+                } />
+                <Route path="/admin/blocked" element={
+                  <AdminProtectedRoute>
+                    <AdminBlockedUsers />
+                  </AdminProtectedRoute>
+                } />
+                <Route path="/admin/content" element={
+                  <AdminProtectedRoute>
+                    <AdminContent />
+                  </AdminProtectedRoute>
+                } />
+                <Route path="/admin/notifications" element={
+                  <AdminProtectedRoute>
+                    <AdminNotifications />
+                  </AdminProtectedRoute>
+                } />
+                <Route path="/admin/tips" element={
+                  <AdminProtectedRoute>
+                    <AdminTips />
+                  </AdminProtectedRoute>
+                } />
+                <Route path="/admin/support" element={
+                  <AdminProtectedRoute>
+                    <AdminSupport />
+                  </AdminProtectedRoute>
+                } />
+
+                {/* 404 */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;

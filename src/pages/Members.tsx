@@ -1,13 +1,19 @@
 import { useState, useMemo } from "react";
 import Navbar from "@/components/Navbar";
 import MemberCard from "@/components/MemberCard";
+import SEOHead from "@/components/SEOHead";
+import EmptyState from "@/components/EmptyState";
+import { SkeletonGrid } from "@/components/ui/skeleton-card";
 import { useProfiles } from "@/hooks/useProfiles";
 import { useLikes } from "@/hooks/useLikes";
 import { useAuth } from "@/hooks/useAuth";
-import { Search, SlidersHorizontal, MapPin, X, Loader2 } from "lucide-react";
+import { usePagination } from "@/hooks/usePagination";
+import { Search, SlidersHorizontal, MapPin, X, Users, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+
+const ITEMS_PER_PAGE = 20;
 
 const Members = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -27,8 +33,16 @@ const Members = () => {
     ageFrom: activeFilters.ageFrom,
     ageTo: activeFilters.ageTo,
     city: activeFilters.city,
-    filterByOppositeGender: false, // Show all profiles
+    filterByOppositeGender: false,
   });
+
+  // Pagination
+  const pagination = usePagination({
+    totalItems: profiles.length,
+    itemsPerPage: ITEMS_PER_PAGE,
+  });
+
+  const paginatedProfiles = pagination.paginatedItems(profiles);
 
   const handleLike = async (memberId: string, memberName: string) => {
     if (!user) {
@@ -78,6 +92,7 @@ const Members = () => {
     
     setActiveFilters(filters);
     setShowFilters(false);
+    pagination.goToPage(1); // Reset to first page
     
     if (filterLabels.length > 0) {
       toast.success(`הופעלו ${filterLabels.length} פילטרים`);
@@ -92,6 +107,7 @@ const Members = () => {
     setLocationFilter("");
     setActiveFilters({});
     setSearchQuery("");
+    pagination.goToPage(1);
     toast.info("הפילטרים נוקו");
   };
 
@@ -105,29 +121,35 @@ const Members = () => {
 
   return (
     <div className="min-h-screen bg-muted/20" dir="rtl">
+      <SEOHead 
+        title="גלו פרופילים"
+        description="דפדפו בפרופילים של משתמשים ומצאו את ההתאמה המושלמת שלכם. אלפי פרופילים מאומתים מחכים לכם."
+        keywords="חיפוש פרופילים, היכרויות, דייטינג, פרופילים"
+      />
       <Navbar />
       
-      <div className="container mx-auto px-6 pt-28 pb-16">
+      <main className="container mx-auto px-6 pt-28 pb-16">
         {/* Header */}
-        <div className="text-center mb-12">
+        <header className="text-center mb-12">
           <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
             גלו את <span className="text-gradient">ההתאמה</span> שלכם
           </h1>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
             דפדפו בפרופילים ומצאו אנשים שמתאימים לכם
           </p>
-        </div>
+        </header>
 
         {/* Search & Filters */}
-        <div className="max-w-3xl mx-auto mb-12">
+        <section className="max-w-3xl mx-auto mb-12" aria-label="חיפוש וסינון">
           <div className="flex gap-3">
             <div className="relative flex-1">
-              <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+              <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" aria-hidden="true" />
               <Input
                 placeholder="חפשו לפי שם או עיר..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pr-12 h-14 rounded-xl bg-card border-border text-lg"
+                aria-label="חיפוש פרופילים"
               />
             </div>
             <Button 
@@ -135,27 +157,31 @@ const Members = () => {
               size="icon" 
               className={`h-14 w-14 rounded-xl ${activeFilterLabels.length > 0 ? 'bg-primary text-primary-foreground' : ''}`}
               onClick={() => setShowFilters(!showFilters)}
+              aria-label="פתח פילטרים"
+              aria-expanded={showFilters}
             >
-              <SlidersHorizontal className="w-5 h-5" />
+              <SlidersHorizontal className="w-5 h-5" aria-hidden="true" />
             </Button>
           </div>
 
           {/* Active Filters Tags */}
           {activeFilterLabels.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-4">
+            <div className="flex flex-wrap gap-2 mt-4" role="list" aria-label="פילטרים פעילים">
               {activeFilterLabels.map((filter, index) => (
                 <span 
                   key={index}
                   className="inline-flex items-center gap-1 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm"
+                  role="listitem"
                 >
                   {filter}
                 </span>
               ))}
               <button 
                 onClick={clearFilters}
-                className="inline-flex items-center gap-1 bg-destructive/10 text-destructive px-3 py-1 rounded-full text-sm hover:bg-destructive/20"
+                className="inline-flex items-center gap-1 bg-destructive/10 text-destructive px-3 py-1 rounded-full text-sm hover:bg-destructive/20 focus:outline-none focus:ring-2 focus:ring-destructive"
+                aria-label="נקה את כל הפילטרים"
               >
-                <X className="w-3 h-3" />
+                <X className="w-3 h-3" aria-hidden="true" />
                 נקה הכל
               </button>
             </div>
@@ -163,17 +189,18 @@ const Members = () => {
 
           {/* Filter Panel */}
           {showFilters && (
-            <div className="mt-4 p-6 bg-card rounded-2xl shadow-card animate-slide-up">
+            <div className="mt-4 p-6 bg-card rounded-2xl shadow-card animate-slide-up" role="region" aria-label="פילטרים">
               <div className="grid md:grid-cols-3 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-foreground mb-2 block">גיל</label>
-                  <div className="flex gap-2">
+                  <label className="text-sm font-medium text-foreground mb-2 block" id="age-label">גיל</label>
+                  <div className="flex gap-2" aria-labelledby="age-label">
                     <Input 
                       placeholder="מ-" 
                       className="h-10" 
                       type="number"
                       value={ageFrom}
                       onChange={(e) => setAgeFrom(e.target.value)}
+                      aria-label="גיל מינימלי"
                     />
                     <Input 
                       placeholder="עד" 
@@ -181,14 +208,16 @@ const Members = () => {
                       type="number"
                       value={ageTo}
                       onChange={(e) => setAgeTo(e.target.value)}
+                      aria-label="גיל מקסימלי"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-foreground mb-2 block">מיקום</label>
+                  <label className="text-sm font-medium text-foreground mb-2 block" htmlFor="location-filter">מיקום</label>
                   <div className="relative">
-                    <MapPin className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <MapPin className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
                     <Input 
+                      id="location-filter"
                       placeholder="עיר או אזור" 
                       className="pr-10 h-10"
                       value={locationFilter}
@@ -204,24 +233,22 @@ const Members = () => {
               </div>
             </div>
           )}
-        </div>
+        </section>
 
         {/* Loading State */}
         {loading && (
-          <div className="text-center py-16">
-            <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
-            <p className="text-muted-foreground">טוען פרופילים...</p>
-          </div>
+          <SkeletonGrid count={8} />
         )}
 
         {/* Error State */}
         {error && (
-          <div className="text-center py-16">
-            <p className="text-destructive mb-4">שגיאה בטעינת הפרופילים</p>
-            <Button variant="outline" onClick={() => window.location.reload()}>
-              נסה שוב
-            </Button>
-          </div>
+          <EmptyState
+            icon={<X className="w-10 h-10" />}
+            title="שגיאה בטעינה"
+            description="אירעה שגיאה בטעינת הפרופילים. נסו שוב."
+            actionLabel="נסה שוב"
+            onAction={() => window.location.reload()}
+          />
         )}
 
         {/* Results */}
@@ -232,43 +259,91 @@ const Members = () => {
               <p className="text-muted-foreground">
                 נמצאו <span className="font-semibold text-foreground">{profiles.length}</span> פרופילים
               </p>
+              <p className="text-sm text-muted-foreground">
+                עמוד {pagination.currentPage} מתוך {pagination.totalPages}
+              </p>
             </div>
 
             {/* Members Grid */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {profiles.map((profile) => (
-                <MemberCard 
-                  key={profile.id} 
-                  member={{
-                    id: profile.id,
-                    name: profile.name,
-                    age: profile.age,
-                    city: profile.city,
-                    bio: profile.bio || "",
-                    image: profile.avatar_url || "/profiles/profile1.jpg",
-                    interests: profile.interests || [],
-                    isOnline: profile.is_online || false,
-                    lastActive: profile.last_seen ? new Date(profile.last_seen).toLocaleString('he-IL') : undefined,
-                  }}
-                  onLike={() => handleLike(profile.id, profile.name)}
-                  onPass={() => handlePass(profile.name)}
-                />
-              ))}
-            </div>
+            {paginatedProfiles.length > 0 ? (
+              <>
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {paginatedProfiles.map((profile) => (
+                    <MemberCard 
+                      key={profile.id} 
+                      member={{
+                        id: profile.id,
+                        name: profile.name,
+                        age: profile.age,
+                        city: profile.city,
+                        bio: profile.bio || "",
+                        image: profile.avatar_url || "/profiles/profile1.jpg",
+                        interests: profile.interests || [],
+                        isOnline: profile.is_online || false,
+                        lastActive: profile.last_seen ? new Date(profile.last_seen).toLocaleString('he-IL') : undefined,
+                      }}
+                      onLike={() => handleLike(profile.id, profile.name)}
+                      onPass={() => handlePass(profile.name)}
+                    />
+                  ))}
+                </div>
 
-            {profiles.length === 0 && (
-              <div className="text-center py-16">
-                <p className="text-muted-foreground text-lg mb-4">לא נמצאו תוצאות. נסו לשנות את החיפוש.</p>
-                {activeFilterLabels.length > 0 && (
-                  <Button variant="outline" onClick={clearFilters}>
-                    נקה פילטרים
-                  </Button>
+                {/* Pagination Controls */}
+                {pagination.totalPages > 1 && (
+                  <nav className="flex items-center justify-center gap-2 mt-12" aria-label="ניווט בין דפים">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={pagination.prevPage}
+                      disabled={!pagination.hasPrevPage}
+                      aria-label="דף קודם"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </Button>
+
+                    <div className="flex items-center gap-1">
+                      {pagination.pageNumbers.map((pageNum, idx) => (
+                        pageNum < 0 ? (
+                          <span key={`ellipsis-${idx}`} className="px-2 text-muted-foreground">...</span>
+                        ) : (
+                          <Button
+                            key={pageNum}
+                            variant={pageNum === pagination.currentPage ? "default" : "ghost"}
+                            size="sm"
+                            onClick={() => pagination.goToPage(pageNum)}
+                            aria-label={`עבור לדף ${pageNum}`}
+                            aria-current={pageNum === pagination.currentPage ? "page" : undefined}
+                          >
+                            {pageNum}
+                          </Button>
+                        )
+                      ))}
+                    </div>
+
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={pagination.nextPage}
+                      disabled={!pagination.hasNextPage}
+                      aria-label="דף הבא"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </Button>
+                  </nav>
                 )}
-              </div>
+              </>
+            ) : (
+              <EmptyState
+                icon={<Users className="w-10 h-10" />}
+                title="לא נמצאו תוצאות"
+                description="לא נמצאו פרופילים התואמים את החיפוש שלכם. נסו לשנות את הפילטרים."
+                actionLabel="נקה פילטרים"
+                onAction={clearFilters}
+              />
             )}
           </>
         )}
-      </div>
+      </main>
     </div>
   );
 };

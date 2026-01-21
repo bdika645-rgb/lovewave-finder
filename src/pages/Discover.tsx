@@ -3,12 +3,15 @@ import Navbar from "@/components/Navbar";
 import SwipeCard from "@/components/SwipeCard";
 import ReportDialog from "@/components/ReportDialog";
 import DiscoverFilters, { DiscoverFiltersState } from "@/components/DiscoverFilters";
+import OnboardingTooltip from "@/components/OnboardingTooltip";
+import SEOHead from "@/components/SEOHead";
+import EmptyState from "@/components/EmptyState";
 import { useProfiles } from "@/hooks/useProfiles";
 import { useLikes } from "@/hooks/useLikes";
 import { useAuth } from "@/hooks/useAuth";
 import { useActionHistory } from "@/hooks/useActionHistory";
 import { Button } from "@/components/ui/button";
-import { Heart, Loader2, RefreshCcw, Sparkles } from "lucide-react";
+import { Heart, Loader2, RefreshCcw, Sparkles, ArrowRight, ArrowLeft, ArrowUp, Star } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -276,25 +279,21 @@ const Discover = () => {
   if (!user) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-background to-muted/30" dir="rtl">
+        <SEOHead 
+          title="גלו התאמות"
+          description="מצאו את ההתאמה המושלמת שלכם עם מנגנון הסוויפ החכם של Spark."
+        />
         <Navbar />
         <div className="container mx-auto px-6 pt-28 pb-16 flex items-center justify-center min-h-[calc(100vh-80px)]">
-          <div className="text-center max-w-md">
-            <Heart className="w-16 h-16 text-primary mx-auto mb-6" />
-            <h1 className="font-display text-3xl font-bold text-foreground mb-4">
-              התחברו כדי להתחיל
-            </h1>
-            <p className="text-muted-foreground mb-8">
-              צריך להתחבר כדי לגלות פרופילים ולשלוח לייקים
-            </p>
-            <div className="flex gap-4 justify-center">
-              <Link to="/login">
-                <Button variant="outline" size="lg">התחברות</Button>
-              </Link>
-              <Link to="/register">
-                <Button variant="hero" size="lg">הרשמה</Button>
-              </Link>
-            </div>
-          </div>
+          <EmptyState
+            icon={<Heart className="w-10 h-10" />}
+            title="התחברו כדי להתחיל"
+            description="צריך להתחבר כדי לגלות פרופילים ולשלוח לייקים"
+            actionLabel="הרשמה"
+            actionLink="/register"
+            secondaryActionLabel="התחברות"
+            secondaryActionLink="/login"
+          />
         </div>
       </div>
     );
@@ -303,6 +302,7 @@ const Discover = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-background to-muted/30" dir="rtl">
+        <SEOHead title="גלו התאמות" />
         <Navbar />
         <div className="container mx-auto px-6 pt-28 pb-16 flex items-center justify-center min-h-[calc(100vh-80px)]">
           <div className="text-center">
@@ -317,29 +317,57 @@ const Discover = () => {
   if (availableProfiles.length === 0) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-background to-muted/30" dir="rtl">
+        <SEOHead title="גלו התאמות" />
         <Navbar />
         <div className="container mx-auto px-6 pt-28 pb-16 flex items-center justify-center min-h-[calc(100vh-80px)]">
-          <div className="text-center max-w-md">
-            <Sparkles className="w-16 h-16 text-muted-foreground/50 mx-auto mb-6" />
-            <h1 className="font-display text-3xl font-bold text-foreground mb-4">
-              אין עוד פרופילים
-            </h1>
-            <p className="text-muted-foreground mb-8">
-              סיימתם לעבור על כל הפרופילים הזמינים. נסו שוב מאוחר יותר או אפסו את הרשימה.
-            </p>
-            <Button variant="hero" size="lg" onClick={resetProfiles}>
-              <RefreshCcw className="w-5 h-5" />
-              אפס פרופילים
-            </Button>
-          </div>
+          <EmptyState
+            icon={<Sparkles className="w-10 h-10" />}
+            title="אין עוד פרופילים"
+            description="סיימתם לעבור על כל הפרופילים הזמינים. נסו שוב מאוחר יותר או אפסו את הרשימה."
+            actionLabel="אפס פרופילים"
+            onAction={resetProfiles}
+          />
         </div>
       </div>
     );
   }
 
+  const onboardingSteps = [
+    {
+      title: "גררו ימינה ללייק",
+      description: "מצאתם מישהו שמוצא חן בעיניכם? גררו את הכרטיס ימינה או לחצו על כפתור הלב.",
+      icon: <ArrowRight className="w-6 h-6" />,
+    },
+    {
+      title: "גררו שמאלה לדלג",
+      description: "לא מרגישים חיבור? גררו שמאלה או לחצו על X כדי לעבור לפרופיל הבא.",
+      icon: <ArrowLeft className="w-6 h-6" />,
+    },
+    {
+      title: "גררו למעלה לסופר לייק",
+      description: "מישהו ממש מיוחד? גררו למעלה לשליחת סופר לייק שיבלוט מעל האחרים.",
+      icon: <ArrowUp className="w-6 h-6" />,
+    },
+    {
+      title: "מזל טוב על התאמה!",
+      description: "כשיש לייק הדדי - נוצרת התאמה ותוכלו להתחיל לשוחח!",
+      icon: <Star className="w-6 h-6" />,
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/30" dir="rtl">
+      <SEOHead 
+        title="גלו התאמות"
+        description="מצאו את ההתאמה המושלמת שלכם עם מנגנון הסוויפ החכם של Spark."
+      />
       <Navbar />
+
+      {/* Onboarding Tooltip */}
+      <OnboardingTooltip
+        steps={onboardingSteps}
+        storageKey="spark-discover-onboarding"
+      />
       
       {/* Match Animation Overlay */}
       {showMatchAnimation && (
