@@ -11,6 +11,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
 import { useProfileStats } from "@/hooks/useProfileStats";
 import PhotoUpload from "@/components/PhotoUpload";
+import PhotoGallery from "@/components/PhotoGallery";
 import {
   Select,
   SelectContent,
@@ -468,6 +469,16 @@ const Profile = () => {
                   )}
                 </div>
               </div>
+            </div>
+
+            {/* Photo Gallery */}
+            <div className="bg-card rounded-2xl p-6 shadow-card">
+              <PhotoGallery
+                profileId={profile.id}
+                currentAvatarUrl={profile.avatar_url}
+                onAvatarChange={handlePhotoUploadComplete}
+                editable={isEditing}
+              />
             </div>
           </div>
 

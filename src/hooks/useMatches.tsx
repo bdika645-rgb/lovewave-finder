@@ -19,18 +19,15 @@ export function useMatches() {
   const getMyProfileId = useCallback(async (): Promise<string | null> => {
     if (!user) return null;
     
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('id')
-      .eq('user_id', user.id)
-      .single();
+    // Use RPC function for better performance
+    const { data, error } = await supabase.rpc('get_my_profile_id');
 
     if (error) {
       console.error('Error getting profile:', error);
       return null;
     }
     
-    return data?.id || null;
+    return data || null;
   }, [user]);
 
   const fetchMatches = useCallback(async () => {

@@ -3,9 +3,10 @@ import SkipToContent from "@/components/SkipToContent";
 import TypingIndicator from "@/components/TypingIndicator";
 import IcebreakerButton from "@/components/IcebreakerButton";
 import ReadReceipt from "@/components/ReadReceipt";
+import ConversationMenu from "@/components/ConversationMenu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Send, Search, MoreVertical, Loader2, MessageCircle, Heart, ChevronRight } from "lucide-react";
+import { Send, Search, Loader2, MessageCircle, Heart, ChevronRight } from "lucide-react";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { toast } from "sonner";
 import { useConversations } from "@/hooks/useConversations";
@@ -13,6 +14,7 @@ import { useMessages } from "@/hooks/useMessages";
 import { useMatches } from "@/hooks/useMatches";
 import { useTypingStatus } from "@/hooks/useTypingStatus";
 import { Link } from "react-router-dom";
+import type { Tables } from "@/integrations/supabase/types";
 
 const Messages = () => {
   const { conversations, loading: conversationsLoading, createOrGetConversation, getMyProfileId, refetch: refetchConversations } = useConversations();
@@ -295,9 +297,19 @@ const Messages = () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-1 md:gap-2 shrink-0">
-                      <Button variant="ghost" size="icon" aria-label="אפשרויות נוספות">
-                        <MoreVertical className="w-5 h-5" />
-                      </Button>
+                      <ConversationMenu
+                        conversationId={selectedConversationId!}
+                        otherProfileId={selectedConversation.otherProfile?.id || ''}
+                        otherProfileName={selectedConversation.otherProfile?.name || ''}
+                        onConversationDeleted={() => {
+                          setSelectedConversationId(null);
+                          refetchConversations();
+                        }}
+                        onUserBlocked={() => {
+                          setSelectedConversationId(null);
+                          refetchConversations();
+                        }}
+                      />
                     </div>
                   </div>
 
@@ -344,7 +356,7 @@ const Messages = () => {
                                 {isMine && (
                                   <ReadReceipt 
                                     isRead={message.is_read || false} 
-                                    readAt={(message as any).read_at}
+                                    readAt={message.read_at || undefined}
                                     className={isMine ? "text-primary-foreground/70" : ""}
                                   />
                                 )}
