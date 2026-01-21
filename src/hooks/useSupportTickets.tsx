@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from './useAuth';
 
 interface SupportTicket {
   name: string;
@@ -11,6 +12,7 @@ interface SupportTicket {
 export function useSupportTickets() {
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
 
   const submitTicket = async (ticket: SupportTicket): Promise<{ success: boolean; error: Error | null }> => {
     try {
@@ -25,6 +27,7 @@ export function useSupportTickets() {
           subject: ticket.subject?.trim() || null,
           message: ticket.message.trim(),
           status: 'open',
+          user_id: user?.id || null,
         });
 
       if (insertError) throw insertError;

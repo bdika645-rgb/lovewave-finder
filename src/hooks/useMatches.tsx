@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
+import { useMyProfileId } from './useMyProfileId';
 import type { Tables } from '@/integrations/supabase/types';
 
 type Match = Tables<'matches'>;
@@ -15,20 +16,7 @@ export function useMatches() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
-
-  const getMyProfileId = useCallback(async (): Promise<string | null> => {
-    if (!user) return null;
-    
-    // Use RPC function for better performance
-    const { data, error } = await supabase.rpc('get_my_profile_id');
-
-    if (error) {
-      console.error('Error getting profile:', error);
-      return null;
-    }
-    
-    return data || null;
-  }, [user]);
+  const { getMyProfileId, profileId: cachedProfileId } = useMyProfileId();
 
   const fetchMatches = useCallback(async () => {
     if (!user) {
@@ -39,7 +27,7 @@ export function useMatches() {
 
     try {
       setLoading(true);
-      const myProfileId = await getMyProfileId();
+      const myProfileId = cachedProfileId || await getMyProfileId();
       
       if (!myProfileId) {
         setMatches([]);
@@ -93,7 +81,7 @@ export function useMatches() {
     } finally {
       setLoading(false);
     }
-  }, [user, getMyProfileId]);
+  }, [user, getMyProfileId, cachedProfileId]);
 
   useEffect(() => {
     fetchMatches();

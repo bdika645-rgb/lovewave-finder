@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useLikes } from './useLikes';
+import { useMyProfileId } from './useMyProfileId';
 
 export type ReportReason = 
   | 'fake_profile'
@@ -21,7 +21,7 @@ export const reportReasons: { value: ReportReason; label: string }[] = [
 
 export function useReportProfile() {
   const [loading, setLoading] = useState(false);
-  const { getMyProfileId } = useLikes();
+  const { getMyProfileId, profileId: cachedProfileId } = useMyProfileId();
 
   const reportProfile = async (
     reportedProfileId: string,
@@ -30,7 +30,7 @@ export function useReportProfile() {
   ): Promise<{ error: Error | null }> => {
     try {
       setLoading(true);
-      const myProfileId = await getMyProfileId();
+      const myProfileId = cachedProfileId || await getMyProfileId();
       
       if (!myProfileId) {
         throw new Error('Profile not found');

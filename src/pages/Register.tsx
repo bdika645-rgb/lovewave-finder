@@ -331,18 +331,19 @@ const Register = () => {
               </div>
               <div>
                 <label className="text-sm font-medium text-foreground mb-2 block">
-                  גיל
+                  גיל <span className="text-muted-foreground text-xs">(18-120)</span>
                 </label>
                 <div className="relative">
                   <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                   <Input
                     type="number"
-                    placeholder="גיל"
+                    placeholder="הזן את הגיל שלך"
                     value={formData.age}
                     onChange={(e) => setFormData({...formData, age: e.target.value})}
                     className="pr-10 h-12"
                     min="18"
                     max="120"
+                    aria-label="גיל בשנים"
                   />
                 </div>
               </div>
