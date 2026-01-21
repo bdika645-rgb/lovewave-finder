@@ -6,15 +6,21 @@ import DiscoverFilters, { DiscoverFiltersState } from "@/components/DiscoverFilt
 import OnboardingTooltip from "@/components/OnboardingTooltip";
 import SEOHead from "@/components/SEOHead";
 import EmptyState from "@/components/EmptyState";
+import SkipToContent from "@/components/SkipToContent";
 import { useProfiles } from "@/hooks/useProfiles";
 import { useLikes } from "@/hooks/useLikes";
 import { useAuth } from "@/hooks/useAuth";
 import { useActionHistory } from "@/hooks/useActionHistory";
 import { Button } from "@/components/ui/button";
-import { Heart, Loader2, RefreshCcw, Sparkles, ArrowRight, ArrowLeft, ArrowUp, Star } from "lucide-react";
+import { Heart, Loader2, RefreshCcw, Sparkles, ArrowRight, ArrowLeft, ArrowUp, Star, Undo2 } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const Discover = () => {
   const { user } = useAuth();
@@ -279,12 +285,13 @@ const Discover = () => {
   if (!user) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-background to-muted/30" dir="rtl">
+        <SkipToContent />
         <SEOHead 
           title="גלו התאמות"
           description="מצאו את ההתאמה המושלמת שלכם עם מנגנון הסוויפ החכם של Spark."
         />
         <Navbar />
-        <div className="container mx-auto px-6 pt-28 pb-16 flex items-center justify-center min-h-[calc(100vh-80px)]">
+        <main id="main-content" className="container mx-auto px-6 pt-28 pb-16 flex items-center justify-center min-h-[calc(100vh-80px)]">
           <EmptyState
             icon={<Heart className="w-10 h-10" />}
             title="התחברו כדי להתחיל"
@@ -294,7 +301,7 @@ const Discover = () => {
             secondaryActionLabel="התחברות"
             secondaryActionLink="/login"
           />
-        </div>
+        </main>
       </div>
     );
   }
@@ -302,14 +309,15 @@ const Discover = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-background to-muted/30" dir="rtl">
+        <SkipToContent />
         <SEOHead title="גלו התאמות" />
         <Navbar />
-        <div className="container mx-auto px-6 pt-28 pb-16 flex items-center justify-center min-h-[calc(100vh-80px)]">
-          <div className="text-center">
+        <main id="main-content" className="container mx-auto px-6 pt-28 pb-16 flex items-center justify-center min-h-[calc(100vh-80px)]">
+          <div className="text-center" role="status" aria-live="polite">
             <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
             <p className="text-muted-foreground">טוען פרופילים...</p>
           </div>
-        </div>
+        </main>
       </div>
     );
   }
@@ -317,9 +325,10 @@ const Discover = () => {
   if (availableProfiles.length === 0) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-background to-muted/30" dir="rtl">
+        <SkipToContent />
         <SEOHead title="גלו התאמות" />
         <Navbar />
-        <div className="container mx-auto px-6 pt-28 pb-16 flex items-center justify-center min-h-[calc(100vh-80px)]">
+        <main id="main-content" className="container mx-auto px-6 pt-28 pb-16 flex items-center justify-center min-h-[calc(100vh-80px)]">
           <EmptyState
             icon={<Sparkles className="w-10 h-10" />}
             title="אין עוד פרופילים"
@@ -327,7 +336,7 @@ const Discover = () => {
             actionLabel="אפס פרופילים"
             onAction={resetProfiles}
           />
-        </div>
+        </main>
       </div>
     );
   }
@@ -357,6 +366,7 @@ const Discover = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/30" dir="rtl">
+      <SkipToContent />
       <SEOHead 
         title="גלו התאמות"
         description="מצאו את ההתאמה המושלמת שלכם עם מנגנון הסוויפ החכם של Spark."
@@ -368,6 +378,29 @@ const Discover = () => {
         steps={onboardingSteps}
         storageKey="spark-discover-onboarding"
       />
+      
+      {/* Global Undo Button - Outside swipe card for visibility */}
+      {canUndo && (
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-40 md:bottom-8 md:left-8 md:translate-x-0">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={handleUndo}
+                className="shadow-elevated bg-card hover:bg-accent gap-2 animate-fade-in"
+                aria-label="בטל פעולה אחרונה (Ctrl+Z)"
+              >
+                <Undo2 className="w-5 h-5" />
+                <span className="hidden md:inline">בטל</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="top">
+              <p>בטל פעולה אחרונה (Ctrl+Z)</p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
+      )}
       
       {/* Match Animation Overlay */}
       {showMatchAnimation && (
