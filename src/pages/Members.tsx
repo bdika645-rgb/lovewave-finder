@@ -440,7 +440,7 @@ const Members = () => {
                     <div className="flex items-center gap-1">
                       {pagination.pageNumbers.map((pageNum, idx) => (
                         pageNum < 0 ? (
-                          <span key={`ellipsis-${idx}`} className="px-2 text-muted-foreground">...</span>
+                          <span key={`ellipsis-${idx}`} className="px-2 text-muted-foreground" aria-hidden="true">...</span>
                         ) : (
                           <Button
                             key={pageNum}

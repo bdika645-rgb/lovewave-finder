@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import LazyImage from "@/components/LazyImage";
 import { Heart, Loader2, Star, Eye, Sparkles } from "lucide-react";
 import { useLikes } from "@/hooks/useLikes";
 import { toast } from "sonner";
@@ -165,10 +166,11 @@ const WhoLikedMe = () => {
 
                 <Link to={`/member/${liker.id}`}>
                   <div className="aspect-[4/5] relative overflow-hidden">
-                    <img
+                    <LazyImage
                       src={liker.avatar_url || "/profiles/profile1.jpg"}
-                      alt={liker.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      alt={`תמונת פרופיל של ${liker.name}`}
+                      className="w-full h-full group-hover:scale-105 transition-transform duration-300"
+                      priority={false}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
                     <div className="absolute bottom-4 right-4 left-4 text-white">
