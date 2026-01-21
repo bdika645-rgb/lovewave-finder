@@ -416,6 +416,7 @@ export type Database = {
           created_at: string
           id: string
           is_read: boolean | null
+          read_at: string | null
           sender_id: string
         }
         Insert: {
@@ -424,6 +425,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_read?: boolean | null
+          read_at?: string | null
           sender_id: string
         }
         Update: {
@@ -432,6 +434,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_read?: boolean | null
+          read_at?: string | null
           sender_id?: string
         }
         Relationships: [
@@ -746,6 +749,30 @@ export type Database = {
           },
         ]
       }
+      typing_status: {
+        Row: {
+          conversation_id: string
+          id: string
+          is_typing: boolean | null
+          profile_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          conversation_id: string
+          id?: string
+          is_typing?: boolean | null
+          profile_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          conversation_id?: string
+          id?: string
+          is_typing?: boolean | null
+          profile_id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -815,6 +842,14 @@ export type Database = {
     }
     Functions: {
       get_my_profile_id: { Args: never; Returns: string }
+      get_random_icebreaker: {
+        Args: { category_filter?: string }
+        Returns: {
+          category: string
+          id: string
+          question: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

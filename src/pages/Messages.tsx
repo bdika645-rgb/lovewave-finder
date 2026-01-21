@@ -1,12 +1,17 @@
 import Navbar from "@/components/Navbar";
+import SkipToContent from "@/components/SkipToContent";
+import TypingIndicator from "@/components/TypingIndicator";
+import IcebreakerButton from "@/components/IcebreakerButton";
+import ReadReceipt from "@/components/ReadReceipt";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Send, Search, MoreVertical, Loader2, MessageCircle, Heart, ChevronRight } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { toast } from "sonner";
 import { useConversations } from "@/hooks/useConversations";
 import { useMessages } from "@/hooks/useMessages";
 import { useMatches } from "@/hooks/useMatches";
+import { useTypingStatus } from "@/hooks/useTypingStatus";
 import { Link } from "react-router-dom";
 
 const Messages = () => {
@@ -17,8 +22,10 @@ const Messages = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sendingMessage, setSendingMessage] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [myProfileId, setMyProfileId] = useState<string | null>(null);
 
   const { messages, loading: messagesLoading, sendMessage, markAsRead } = useMessages(selectedConversationId);
+  const { othersTyping, setTyping } = useTypingStatus(selectedConversationId, myProfileId);
 
   // Get selected conversation details
   const selectedConversation = conversations.find(c => c.id === selectedConversationId);
@@ -38,15 +45,22 @@ const Messages = () => {
     }
   }, [selectedConversationId, messages.length, markAsRead, refetchConversations]);
 
-  const [myProfileId, setMyProfileId] = useState<string | null>(null);
-  
   useEffect(() => {
     getMyProfileId().then(setMyProfileId);
   }, [getMyProfileId]);
 
+  // Handle typing indicator
+  const handleMessageChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setMessageText(e.target.value);
+    if (e.target.value.length > 0) {
+      setTyping(true);
+    }
+  }, [setTyping]);
+
   const handleSend = async () => {
     if (!messageText.trim() || !selectedConversationId || sendingMessage) return;
     
+    setTyping(false);
     setSendingMessage(true);
     const { error } = await sendMessage(messageText);
     setSendingMessage(false);
@@ -72,6 +86,11 @@ const Messages = () => {
     } else {
       toast.error("שגיאה ביצירת השיחה");
     }
+  };
+
+  const handleIcebreakerSelect = (question: string) => {
+    setMessageText(question);
+    setTyping(true);
   };
 
   const filteredConversations = conversations.filter(conv =>
@@ -100,9 +119,10 @@ const Messages = () => {
   if (conversationsLoading || matchesLoading) {
     return (
       <div className="min-h-screen bg-muted/20" dir="rtl">
+        <SkipToContent />
         <Navbar />
         <div className="container mx-auto px-6 pt-24 pb-6 flex items-center justify-center h-[calc(100vh-80px)]">
-          <Loader2 className="w-12 h-12 text-primary animate-spin" />
+          <Loader2 className="w-12 h-12 text-primary animate-spin" aria-label="טוען..." />
         </div>
       </div>
     );
@@ -112,20 +132,21 @@ const Messages = () => {
 
   return (
     <div className="min-h-screen bg-muted/20" dir="rtl">
+      <SkipToContent />
       <Navbar />
 
-      <div className="container mx-auto px-6 pt-24 pb-6">
+      <main id="main-content" className="container mx-auto px-6 pt-24 pb-6">
         <div className="bg-card rounded-3xl shadow-card overflow-hidden h-[calc(100vh-120px)]">
           {hasNoConversationsOrMatches ? (
             <div className="flex flex-col items-center justify-center h-full p-8 text-center">
-              <Heart className="w-16 h-16 text-muted-foreground/50 mb-4" />
+              <Heart className="w-16 h-16 text-muted-foreground/50 mb-4" aria-hidden="true" />
               <h2 className="font-display text-2xl font-bold text-foreground mb-2">עדיין אין התאמות</h2>
               <p className="text-muted-foreground mb-6 max-w-md">
                 התחילו לעשות לייקים לפרופילים ותקבלו התאמות! כשתהיה לכם התאמה, תוכלו להתחיל לשוחח.
               </p>
               <Link to="/members">
                 <Button variant="hero" size="lg">
-                  <Search className="w-5 h-5" />
+                  <Search className="w-5 h-5" aria-hidden="true" />
                   גלו פרופילים
                 </Button>
               </Link>
@@ -137,12 +158,13 @@ const Messages = () => {
                 <div className="p-4 border-b border-border">
                   <h2 className="font-display text-lg md:text-xl font-bold text-foreground mb-4">הודעות</h2>
                   <div className="relative">
-                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
                     <Input 
                       placeholder="חפש בהודעות..." 
                       className="pr-10 bg-muted/50 border-none"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
+                      aria-label="חיפוש בהודעות"
                     />
                   </div>
                 </div>
@@ -157,15 +179,16 @@ const Messages = () => {
                           key={match.id}
                           onClick={() => startConversationFromMatch(match.matchedProfile.id)}
                           className="flex-shrink-0 text-center group"
+                          aria-label={`התחל שיחה עם ${match.matchedProfile.name}`}
                         >
                           <div className="relative">
                             <img 
                               src={match.matchedProfile.avatar_url || "/profiles/profile1.jpg"} 
-                              alt={match.matchedProfile.name}
+                              alt=""
                               className="w-14 h-14 rounded-full object-cover border-2 border-primary group-hover:border-primary/80 transition-colors"
                             />
                             <span className="absolute -bottom-1 -right-1 w-5 h-5 bg-primary rounded-full flex items-center justify-center">
-                              <Heart className="w-3 h-3 text-primary-foreground fill-current" />
+                              <Heart className="w-3 h-3 text-primary-foreground fill-current" aria-hidden="true" />
                             </span>
                           </div>
                           <p className="text-xs mt-1 text-foreground truncate max-w-[60px]">
@@ -177,10 +200,10 @@ const Messages = () => {
                   </div>
                 )}
                 
-                <div className="overflow-y-auto h-[calc(100%-100px)]">
+                <div className="overflow-y-auto h-[calc(100%-100px)]" role="list" aria-label="רשימת שיחות">
                   {filteredConversations.length === 0 && conversations.length === 0 && matches.length > 0 ? (
                     <div className="p-8 text-center text-muted-foreground">
-                      <MessageCircle className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                      <MessageCircle className="w-12 h-12 mx-auto mb-3 opacity-50" aria-hidden="true" />
                       <p>לחצו על התאמה כדי להתחיל שיחה!</p>
                     </div>
                   ) : filteredConversations.length === 0 ? (
@@ -195,15 +218,17 @@ const Messages = () => {
                         className={`w-full p-4 flex items-center gap-3 hover:bg-muted/50 transition-colors ${
                           selectedConversationId === conv.id ? "bg-accent" : ""
                         }`}
+                        role="listitem"
+                        aria-selected={selectedConversationId === conv.id}
                       >
                         <div className="relative">
                           <img 
                             src={conv.otherProfile?.avatar_url || "/profiles/profile1.jpg"} 
-                            alt={conv.otherProfile?.name}
+                            alt=""
                             className="w-14 h-14 rounded-full object-cover"
                           />
                           {conv.otherProfile?.is_online && (
-                            <span className="absolute bottom-0 right-0 w-4 h-4 bg-success rounded-full border-2 border-card" />
+                            <span className="absolute bottom-0 right-0 w-4 h-4 bg-success rounded-full border-2 border-card" aria-label="מחובר/ת" />
                           )}
                         </div>
                         <div className="flex-1 text-right">
@@ -218,7 +243,7 @@ const Messages = () => {
                               {conv.lastMessage?.content || "התחילו לשוחח!"}
                             </p>
                             {conv.unreadCount > 0 && (
-                              <span className="bg-primary text-primary-foreground text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                              <span className="bg-primary text-primary-foreground text-xs w-5 h-5 rounded-full flex items-center justify-center" aria-label={`${conv.unreadCount} הודעות שלא נקראו`}>
                                 {conv.unreadCount}
                               </span>
                             )}
@@ -241,6 +266,7 @@ const Messages = () => {
                       size="icon" 
                       className="md:hidden shrink-0"
                       onClick={() => setSelectedConversationId(null)}
+                      aria-label="חזרה לרשימת השיחות"
                     >
                       <ChevronRight className="w-5 h-5" />
                     </Button>
@@ -248,7 +274,7 @@ const Messages = () => {
                       <Link to={`/member/${selectedConversation.otherProfile?.id}`} className="shrink-0">
                         <img 
                           src={selectedConversation.otherProfile?.avatar_url || "/profiles/profile1.jpg"}
-                          alt={selectedConversation.otherProfile?.name}
+                          alt=""
                           className="w-12 h-12 rounded-full object-cover hover:opacity-80 transition-opacity"
                         />
                       </Link>
@@ -259,27 +285,36 @@ const Messages = () => {
                         >
                           {selectedConversation.otherProfile?.name}
                         </Link>
-                        <p className="text-sm text-muted-foreground">
-                          {selectedConversation.otherProfile?.is_online ? "מחובר/ת" : "לא מחובר/ת"}
-                        </p>
+                        <div className="text-sm text-muted-foreground">
+                          {othersTyping.length > 0 ? (
+                            <TypingIndicator />
+                          ) : (
+                            selectedConversation.otherProfile?.is_online ? "מחובר/ת" : "לא מחובר/ת"
+                          )}
+                        </div>
                       </div>
                     </div>
                     <div className="flex items-center gap-1 md:gap-2 shrink-0">
-                      <Button variant="ghost" size="icon">
+                      <Button variant="ghost" size="icon" aria-label="אפשרויות נוספות">
                         <MoreVertical className="w-5 h-5" />
                       </Button>
                     </div>
                   </div>
 
                   {/* Messages */}
-                  <div className="flex-1 overflow-y-auto p-6 space-y-4">
+                  <div 
+                    className="flex-1 overflow-y-auto p-6 space-y-4" 
+                    role="log" 
+                    aria-label="הודעות"
+                    aria-live="polite"
+                  >
                     {messagesLoading ? (
                       <div className="flex items-center justify-center h-full">
-                        <Loader2 className="w-8 h-8 text-primary animate-spin" />
+                        <Loader2 className="w-8 h-8 text-primary animate-spin" aria-label="טוען הודעות..." />
                       </div>
                     ) : messages.length === 0 ? (
                       <div className="flex flex-col items-center justify-center h-full text-center">
-                        <MessageCircle className="w-12 h-12 text-muted-foreground/50 mb-3" />
+                        <MessageCircle className="w-12 h-12 text-muted-foreground/50 mb-3" aria-hidden="true" />
                         <p className="text-muted-foreground">שלחו הודעה ראשונה!</p>
                       </div>
                     ) : (
@@ -298,11 +333,22 @@ const Messages = () => {
                               }`}
                             >
                               <p>{message.content}</p>
-                              <p className={`text-xs mt-1 ${
-                                isMine ? "text-primary-foreground/70" : "text-muted-foreground"
+                              <div className={`flex items-center gap-1 mt-1 ${
+                                isMine ? "justify-end" : ""
                               }`}>
-                                {formatTime(message.created_at)}
-                              </p>
+                                <span className={`text-xs ${
+                                  isMine ? "text-primary-foreground/70" : "text-muted-foreground"
+                                }`}>
+                                  {formatTime(message.created_at)}
+                                </span>
+                                {isMine && (
+                                  <ReadReceipt 
+                                    isRead={message.is_read || false} 
+                                    readAt={(message as any).read_at}
+                                    className={isMine ? "text-primary-foreground/70" : ""}
+                                  />
+                                )}
+                              </div>
                             </div>
                           </div>
                         );
@@ -314,18 +360,25 @@ const Messages = () => {
                   {/* Message Input */}
                   <div className="p-2 md:p-4 border-t border-border">
                     <div className="flex items-center gap-1 md:gap-2">
+                      <IcebreakerButton 
+                        onSelect={handleIcebreakerSelect}
+                        disabled={sendingMessage}
+                      />
                       <Input
                         placeholder="כתבו הודעה..."
                         value={messageText}
-                        onChange={(e) => setMessageText(e.target.value)}
+                        onChange={handleMessageChange}
                         onKeyDown={(e) => e.key === "Enter" && handleSend()}
+                        onBlur={() => setTyping(false)}
                         className="flex-1 h-10 md:h-12 rounded-full bg-muted/50 border-none text-sm md:text-base"
+                        aria-label="כתיבת הודעה"
                       />
                       <Button 
                         variant="hero" 
                         size="icon"
                         onClick={handleSend}
                         disabled={!messageText.trim() || sendingMessage}
+                        aria-label="שליחת הודעה"
                       >
                         {sendingMessage ? (
                           <Loader2 className="w-5 h-5 animate-spin" />
@@ -339,7 +392,7 @@ const Messages = () => {
               ) : (
                 <div className="flex items-center justify-center h-full">
                   <div className="text-center">
-                    <MessageCircle className="w-16 h-16 text-muted-foreground/50 mx-auto mb-4" />
+                    <MessageCircle className="w-16 h-16 text-muted-foreground/50 mx-auto mb-4" aria-hidden="true" />
                     <p className="text-muted-foreground">בחרו שיחה להתחיל</p>
                   </div>
                 </div>
@@ -347,7 +400,7 @@ const Messages = () => {
             </div>
           )}
         </div>
-      </div>
+      </main>
     </div>
   );
 };
