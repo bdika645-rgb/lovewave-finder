@@ -43,13 +43,13 @@ const HeroSection = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link to="/members">
+            <Link to="/register">
               <Button variant="hero" size="xl" className="gap-3">
                 <Crown className="w-5 h-5" />
-                הצטרפו לאליטה
+                הצטרפו עכשיו - חינם
               </Button>
             </Link>
-            <Link to="/members">
+            <Link to="/discover">
               <Button variant="hero-outline" size="xl">
                 גלו פרופילים
               </Button>

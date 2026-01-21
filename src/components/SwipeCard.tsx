@@ -173,8 +173,9 @@ const SwipeCard = ({
           size="icon"
           onClick={onUndo}
           className="absolute -left-16 top-1/2 -translate-y-1/2 z-10 rounded-full shadow-card"
+          aria-label="בטל פעולה אחרונה"
         >
-          <Undo2 className="w-5 h-5" />
+          <Undo2 className="w-5 h-5" aria-hidden="true" />
         </Button>
       )}
 
@@ -194,16 +195,18 @@ const SwipeCard = ({
       >
         {/* Like Indicator */}
         <div 
-          className="absolute top-8 right-8 z-20 border-4 border-green-500 text-green-500 font-bold text-2xl px-4 py-2 rounded-lg rotate-[-20deg] pointer-events-none"
+          className="absolute top-8 right-8 z-20 border-4 border-success text-success font-bold text-2xl px-4 py-2 rounded-lg rotate-[-20deg] pointer-events-none"
           style={{ opacity: likeOpacity }}
+          aria-hidden="true"
         >
           LIKE ❤️
         </div>
 
         {/* Nope Indicator */}
         <div 
-          className="absolute top-8 left-8 z-20 border-4 border-red-500 text-red-500 font-bold text-2xl px-4 py-2 rounded-lg rotate-[20deg] pointer-events-none"
+          className="absolute top-8 left-8 z-20 border-4 border-destructive text-destructive font-bold text-2xl px-4 py-2 rounded-lg rotate-[20deg] pointer-events-none"
           style={{ opacity: passOpacity }}
+          aria-hidden="true"
         >
           NOPE ✕
         </div>
@@ -212,6 +215,7 @@ const SwipeCard = ({
         <div 
           className="absolute top-1/3 left-1/2 -translate-x-1/2 z-20 border-4 border-secondary text-secondary font-bold text-2xl px-4 py-2 rounded-lg pointer-events-none"
           style={{ opacity: superLikeOpacity }}
+          aria-hidden="true"
         >
           SUPER ⭐
         </div>
@@ -270,7 +274,7 @@ const SwipeCard = ({
           {/* Online Badge */}
           {member.isOnline && (
             <div className="absolute top-12 right-4 flex items-center gap-2 glass-effect px-3 py-1.5 rounded-full">
-              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+              <span className="w-2 h-2 bg-success rounded-full animate-pulse" aria-hidden="true" />
               <span className="text-xs font-medium text-foreground">מחובר/ת</span>
             </div>
           )}
@@ -326,14 +330,15 @@ const SwipeCard = ({
       </div>
 
       {/* Action Buttons */}
-      <div className="flex items-center justify-center gap-4 mt-6">
+      <div className="flex items-center justify-center gap-4 mt-6" role="group" aria-label="פעולות על פרופיל">
         <Button
           variant="pass"
           size="icon-xl"
           onClick={handlePass}
           className="shadow-card hover:shadow-elevated transition-all hover:scale-110"
+          aria-label={`דלג על ${member.name}`}
         >
-          <X className="w-8 h-8" />
+          <X className="w-8 h-8" aria-hidden="true" />
         </Button>
         
         {onSuperLike && (
@@ -341,8 +346,9 @@ const SwipeCard = ({
             size="icon-lg"
             onClick={handleSuperLike}
             className="bg-secondary text-secondary-foreground hover:bg-secondary/90 shadow-card transition-all hover:scale-110"
+            aria-label={`שלח סופר לייק ל${member.name}`}
           >
-            <Star className="w-6 h-6" />
+            <Star className="w-6 h-6" aria-hidden="true" />
           </Button>
         )}
 
@@ -351,8 +357,9 @@ const SwipeCard = ({
           size="icon-xl"
           onClick={handleLike}
           className="shadow-card hover:shadow-elevated transition-all hover:scale-110"
+          aria-label={`עשה לייק ל${member.name}`}
         >
-          <Heart className="w-8 h-8" />
+          <Heart className="w-8 h-8" aria-hidden="true" />
         </Button>
       </div>
     </div>

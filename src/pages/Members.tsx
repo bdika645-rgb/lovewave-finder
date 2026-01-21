@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import Navbar from "@/components/Navbar";
 import MemberCard from "@/components/MemberCard";
 import SEOHead from "@/components/SEOHead";
@@ -8,16 +8,19 @@ import { useProfiles } from "@/hooks/useProfiles";
 import { useLikes } from "@/hooks/useLikes";
 import { useAuth } from "@/hooks/useAuth";
 import { usePagination } from "@/hooks/usePagination";
-import { Search, SlidersHorizontal, MapPin, X, Users, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, SlidersHorizontal, MapPin, X, Users, ChevronLeft, ChevronRight, Grid3X3, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
+import { Link } from "react-router-dom";
 
 const ITEMS_PER_PAGE = 20;
 
 const Members = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [showFilters, setShowFilters] = useState(false);
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const { user } = useAuth();
   const { sendLike } = useLikes();
   
@@ -254,37 +257,97 @@ const Members = () => {
         {/* Results */}
         {!loading && !error && (
           <>
-            {/* Results Count */}
+            {/* Results Count & View Toggle */}
             <div className="flex items-center justify-between mb-6">
               <p className="text-muted-foreground">
                 נמצאו <span className="font-semibold text-foreground">{profiles.length}</span> פרופילים
               </p>
-              <p className="text-sm text-muted-foreground">
-                עמוד {pagination.currentPage} מתוך {pagination.totalPages}
-              </p>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-1 bg-muted rounded-lg p-1" role="group" aria-label="בחר תצוגה">
+                  <Button
+                    variant={viewMode === "grid" ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => setViewMode("grid")}
+                    aria-label="תצוגת רשת"
+                    aria-pressed={viewMode === "grid"}
+                  >
+                    <Grid3X3 className="w-4 h-4" aria-hidden="true" />
+                  </Button>
+                  <Button
+                    variant={viewMode === "list" ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => setViewMode("list")}
+                    aria-label="תצוגת רשימה"
+                    aria-pressed={viewMode === "list"}
+                  >
+                    <List className="w-4 h-4" aria-hidden="true" />
+                  </Button>
+                </div>
+                <p className="text-sm text-muted-foreground hidden sm:block">
+                  עמוד {pagination.currentPage} מתוך {pagination.totalPages}
+                </p>
+              </div>
             </div>
 
             {/* Members Grid */}
             {paginatedProfiles.length > 0 ? (
               <>
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <div className={viewMode === "grid" 
+                  ? "grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" 
+                  : "flex flex-col gap-4"
+                }>
                   {paginatedProfiles.map((profile) => (
-                    <MemberCard 
-                      key={profile.id} 
-                      member={{
-                        id: profile.id,
-                        name: profile.name,
-                        age: profile.age,
-                        city: profile.city,
-                        bio: profile.bio || "",
-                        image: profile.avatar_url || "/profiles/profile1.jpg",
-                        interests: profile.interests || [],
-                        isOnline: profile.is_online || false,
-                        lastActive: profile.last_seen ? new Date(profile.last_seen).toLocaleString('he-IL') : undefined,
-                      }}
-                      onLike={() => handleLike(profile.id, profile.name)}
-                      onPass={() => handlePass(profile.name)}
-                    />
+                    viewMode === "grid" ? (
+                      <MemberCard 
+                        key={profile.id} 
+                        member={{
+                          id: profile.id,
+                          name: profile.name,
+                          age: profile.age,
+                          city: profile.city,
+                          bio: profile.bio || "",
+                          image: profile.avatar_url || "/profiles/profile1.jpg",
+                          interests: profile.interests || [],
+                          isOnline: profile.is_online || false,
+                          lastActive: profile.last_seen ? new Date(profile.last_seen).toLocaleString('he-IL') : undefined,
+                        }}
+                        onLike={() => handleLike(profile.id, profile.name)}
+                        onPass={() => handlePass(profile.name)}
+                      />
+                    ) : (
+                      <Link 
+                        key={profile.id} 
+                        to={`/member/${profile.id}`}
+                        className="flex items-center gap-4 p-4 bg-card rounded-xl border border-border hover:shadow-card transition-shadow"
+                      >
+                        <img 
+                          src={profile.avatar_url || "/profiles/profile1.jpg"} 
+                          alt={profile.name}
+                          className="w-16 h-16 rounded-full object-cover"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="font-semibold text-foreground truncate">
+                              {profile.name}, {profile.age}
+                            </h3>
+                            {profile.is_online && (
+                              <span className="w-2 h-2 bg-success rounded-full" aria-label="מחובר/ת" />
+                            )}
+                          </div>
+                          <p className="text-sm text-muted-foreground truncate">{profile.city}</p>
+                          {profile.bio && (
+                            <p className="text-sm text-muted-foreground line-clamp-1 mt-1">{profile.bio}</p>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {(profile.interests || []).slice(0, 2).map((interest) => (
+                            <Badge key={interest} variant="secondary" className="hidden sm:inline-flex">
+                              {interest}
+                            </Badge>
+                          ))}
+                        </div>
+                      </Link>
+                    )
                   ))}
                 </div>
 
