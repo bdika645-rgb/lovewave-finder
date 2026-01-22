@@ -22,8 +22,8 @@ const HeroSection = () => {
       </div>
 
       {/* Decorative Elements */}
-      <div className="absolute top-1/4 left-10 w-32 h-32 bg-primary/5 rounded-full blur-3xl animate-pulse-soft" />
-      <div className="absolute bottom-1/4 right-10 w-40 h-40 bg-secondary/10 rounded-full blur-3xl animate-float" />
+      <div className="absolute top-1/4 left-10 w-32 h-32 bg-primary/5 rounded-full blur-3xl animate-pulse-soft" aria-hidden="true" />
+      <div className="absolute bottom-1/4 right-10 w-40 h-40 bg-secondary/10 rounded-full blur-3xl animate-float" aria-hidden="true" />
 
       {/* Content */}
       <div className="relative z-10 container mx-auto px-6 text-center">
@@ -81,7 +81,7 @@ const HeroSection = () => {
       </div>
 
       {/* Scroll Indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-float">
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-float" aria-hidden="true">
         <div className="w-6 h-10 border-2 border-primary/40 rounded-full flex justify-center pt-2">
           <div className="w-1 h-2 bg-primary/60 rounded-full animate-pulse" />
         </div>
