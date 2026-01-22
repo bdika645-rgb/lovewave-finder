@@ -174,18 +174,20 @@ export function DiscoverFilters({ filters, onFiltersChange, activeFilterCount }:
               בחרו תחומי עניין שחשובים לכם
             </p>
             <div 
-              className="flex flex-wrap gap-2 max-h-48 overflow-y-auto" 
+              className="relative flex flex-wrap gap-2 max-h-48 overflow-y-auto scroll-smooth-ios pb-6" 
               role="group" 
               aria-describedby="interests-description"
               aria-label="בחירת תחומי עניין"
+              style={{ WebkitOverflowScrolling: 'touch' }}
             >
+              <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-card to-transparent pointer-events-none" aria-hidden="true" />
               {allInterests.map(interest => (
                 <button
                   key={interest}
                   type="button"
                   onClick={() => toggleInterest(interest)}
                   aria-pressed={localFilters.interests.includes(interest)}
-                  className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
+                  className={`inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer min-h-[36px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
                     localFilters.interests.includes(interest) 
                       ? "bg-primary text-primary-foreground border-transparent" 
                       : "border-input hover:bg-primary/10"

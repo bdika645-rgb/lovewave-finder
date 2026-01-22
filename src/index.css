@@ -402,4 +402,49 @@
       grid-template-columns: repeat(3, 1fr);
     }
   }
+
+  /* Smooth scrolling for iOS */
+  .scroll-smooth-ios {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+
+  /* Scroll fade gradient for lists */
+  .scroll-fade-bottom::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2rem;
+    background: linear-gradient(to top, hsl(var(--card)), transparent);
+    pointer-events: none;
+  }
+
+  .scroll-fade-top::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2rem;
+    background: linear-gradient(to bottom, hsl(var(--card)), transparent);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Focus ring improvements for dark mode */
+  .focus-ring-visible:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--ring));
+  }
+
+  /* Improved contrast for muted text */
+  .text-muted-contrast {
+    color: hsl(var(--muted-foreground) / 0.9);
+  }
+
+  .dark .text-muted-contrast {
+    color: hsl(var(--muted-foreground) / 1);
+  }
 }

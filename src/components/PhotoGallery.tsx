@@ -197,9 +197,20 @@ const PhotoGallery = ({
 
               {/* Drag handle */}
               {editable && (
-                <div className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <GripVertical className="w-5 h-5 text-white drop-shadow-lg" />
-                </div>
+                <button
+                  type="button"
+                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:opacity-100 cursor-grab active:cursor-grabbing"
+                  aria-label="גרור לשינוי סדר"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      // Keyboard reorder could be implemented here
+                    }
+                  }}
+                >
+                  <GripVertical className="w-5 h-5 text-white drop-shadow-lg" aria-hidden="true" />
+                </button>
               )}
 
               {/* Actions overlay */}
