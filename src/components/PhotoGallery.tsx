@@ -1,5 +1,5 @@
-import { useState, useRef } from 'react';
-import { Plus, X, GripVertical, Star, Loader2, Camera, Trash2 } from 'lucide-react';
+import { useMemo, useState, useRef } from 'react';
+import { Plus, X, GripVertical, Star, Loader2, Camera, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { usePhotos } from '@/hooks/usePhotos';
 import { cn } from '@/lib/utils';
@@ -26,7 +26,31 @@ const PhotoGallery = ({
   const [deleting, setDeleting] = useState<string | null>(null);
   const [settingAvatar, setSettingAvatar] = useState<string | null>(null);
   const [draggedId, setDraggedId] = useState<string | null>(null);
+  const [liveMessage, setLiveMessage] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const photosCountLabel = useMemo(() => `${photos.length}/${maxPhotos}`, [photos.length, maxPhotos]);
+
+  const announce = (msg: string) => {
+    // Force screen readers to re-announce even if same message repeats
+    setLiveMessage('');
+    window.setTimeout(() => setLiveMessage(msg), 50);
+  };
+
+  const movePhoto = async (photoId: string, direction: 'forward' | 'backward') => {
+    const orderedIds = photos.map(p => p.id);
+    const from = orderedIds.indexOf(photoId);
+    if (from === -1) return;
+
+    const to = direction === 'forward' ? from - 1 : from + 1;
+    if (to < 0 || to >= orderedIds.length) return;
+
+    orderedIds.splice(from, 1);
+    orderedIds.splice(to, 0, photoId);
+
+    await reorderPhotos(orderedIds);
+    announce(`התמונה הועברה למיקום ${to + 1} מתוך ${orderedIds.length}`);
+  };
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -128,9 +152,12 @@ const PhotoGallery = ({
 
   return (
     <div className="space-y-4" dir="rtl">
+      <div className="sr-only" aria-live="polite" aria-atomic="true">
+        {liveMessage}
+      </div>
       <div className="flex items-center justify-between">
         <h3 className="font-display text-lg font-semibold text-foreground">
-          גלריית תמונות ({photos.length}/{maxPhotos})
+          גלריית תמונות ({photosCountLabel})
         </h3>
         {editable && photos.length < maxPhotos && (
           <Button
@@ -164,6 +191,9 @@ const PhotoGallery = ({
           const isAvatar = photo.url === currentAvatarUrl;
           const isDeleting = deleting === photo.id;
           const isSettingAvatar = settingAvatar === photo.url;
+          const index = photos.findIndex(p => p.id === photo.id);
+          const canMoveForward = editable && index > 0;
+          const canMoveBackward = editable && index < photos.length - 1;
 
           return (
             <div
@@ -172,6 +202,18 @@ const PhotoGallery = ({
               onDragStart={() => handleDragStart(photo.id)}
               onDragOver={handleDragOver}
               onDrop={() => handleDrop(photo.id)}
+              onKeyDown={(e) => {
+                if (!editable) return;
+                if (!e.altKey) return;
+                if (e.key === 'ArrowRight') {
+                  e.preventDefault();
+                  movePhoto(photo.id, 'forward');
+                }
+                if (e.key === 'ArrowLeft') {
+                  e.preventDefault();
+                  movePhoto(photo.id, 'backward');
+                }
+              }}
               className={cn(
                 "relative aspect-square rounded-xl overflow-hidden group",
                 "border-2 transition-all",
@@ -179,6 +221,9 @@ const PhotoGallery = ({
                 draggedId === photo.id && "opacity-50",
                 editable && "cursor-move"
               )}
+              tabIndex={editable ? 0 : -1}
+              role={editable ? 'group' : undefined}
+              aria-label={editable ? `תמונה ${index + 1} מתוך ${photos.length}` : undefined}
             >
               <LazyImage
                 src={photo.url}
@@ -205,7 +250,7 @@ const PhotoGallery = ({
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
-                      // Keyboard reorder could be implemented here
+                      announce('טיפ: אפשר להזיז עם Alt + חצים כשהתמונה בפוקוס');
                     }
                   }}
                 >
@@ -216,6 +261,28 @@ const PhotoGallery = ({
               {/* Actions overlay */}
               {editable && (
                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                  {/* Reorder (keyboard/touch friendly) */}
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    className="h-9 w-9"
+                    onClick={() => movePhoto(photo.id, 'forward')}
+                    disabled={!canMoveForward}
+                    aria-label="העבר קדימה"
+                  >
+                    <ChevronRight className="w-4 h-4" aria-hidden="true" />
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    className="h-9 w-9"
+                    onClick={() => movePhoto(photo.id, 'backward')}
+                    disabled={!canMoveBackward}
+                    aria-label="העבר אחורה"
+                  >
+                    <ChevronLeft className="w-4 h-4" aria-hidden="true" />
+                  </Button>
+
                   {!isAvatar && (
                     <Button
                       variant="secondary"
@@ -223,6 +290,7 @@ const PhotoGallery = ({
                       className="h-9 w-9"
                       onClick={() => handleSetAvatar(photo.url)}
                       disabled={isSettingAvatar}
+                      aria-label="הגדר כתמונת פרופיל ראשית"
                     >
                       {isSettingAvatar ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
@@ -237,6 +305,7 @@ const PhotoGallery = ({
                     className="h-9 w-9"
                     onClick={() => handleDelete(photo.id)}
                     disabled={isDeleting}
+                    aria-label="מחק תמונה"
                   >
                     {isDeleting ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
@@ -260,8 +329,10 @@ const PhotoGallery = ({
               "flex flex-col items-center justify-center gap-2",
               "text-muted-foreground hover:border-primary hover:text-primary",
               "transition-colors",
+              "focus:outline-none focus:ring-2 focus:ring-primary",
               uploading && "opacity-50 cursor-not-allowed"
             )}
+            aria-label="הוסף תמונה"
           >
             {uploading ? (
               <Loader2 className="w-8 h-8 animate-spin" />

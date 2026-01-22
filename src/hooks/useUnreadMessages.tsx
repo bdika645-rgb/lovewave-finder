@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useMyProfileId } from './useMyProfileId';
@@ -8,6 +8,7 @@ export function useUnreadMessages() {
   const { profileId } = useMyProfileId();
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const refetchTimeoutRef = useRef<number | null>(null);
 
   const fetchUnreadCount = useCallback(async () => {
     if (!user || !profileId) {
@@ -55,6 +56,15 @@ export function useUnreadMessages() {
     // Subscribe to new messages
     if (!user) return;
 
+    const scheduleRefetch = () => {
+      if (refetchTimeoutRef.current) {
+        window.clearTimeout(refetchTimeoutRef.current);
+      }
+      refetchTimeoutRef.current = window.setTimeout(() => {
+        fetchUnreadCount();
+      }, 250);
+    };
+
     const channel = supabase
       .channel('unread-messages')
       .on(
@@ -64,9 +74,7 @@ export function useUnreadMessages() {
           schema: 'public',
           table: 'messages',
         },
-        () => {
-          fetchUnreadCount();
-        }
+        () => scheduleRefetch()
       )
       .on(
         'postgres_changes',
@@ -75,13 +83,15 @@ export function useUnreadMessages() {
           schema: 'public',
           table: 'messages',
         },
-        () => {
-          fetchUnreadCount();
-        }
+        () => scheduleRefetch()
       )
       .subscribe();
 
     return () => {
+      if (refetchTimeoutRef.current) {
+        window.clearTimeout(refetchTimeoutRef.current);
+        refetchTimeoutRef.current = null;
+      }
       supabase.removeChannel(channel);
     };
   }, [fetchUnreadCount, user]);

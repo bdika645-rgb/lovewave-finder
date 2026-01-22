@@ -36,7 +36,10 @@ export function useRealtimeMessages({
           ...(conversationId ? { filter: `conversation_id=eq.${conversationId}` } : {}),
         },
         (payload) => {
-          console.log('New message received:', payload);
+          if (import.meta.env.DEV) {
+            // eslint-disable-next-line no-console
+            console.log('New message received:', payload);
+          }
           onNewMessage?.(payload.new);
         }
       )
@@ -55,7 +58,10 @@ export function useRealtimeMessages({
         }
       )
       .subscribe((status) => {
-        console.log('Realtime subscription status:', status);
+        if (import.meta.env.DEV) {
+          // eslint-disable-next-line no-console
+          console.log('Realtime subscription status:', status);
+        }
       });
 
     return () => {
