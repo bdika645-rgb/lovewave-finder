@@ -131,50 +131,15 @@ export function useConversations() {
 
   const createOrGetConversation = async (otherProfileId: string): Promise<string | null> => {
     try {
-      const myProfileId = cachedProfileId || await getMyProfileId();
-      if (!myProfileId) return null;
+      // Server-side creation prevents unauthorized participant injection.
+      const { data, error } = await supabase.functions.invoke('create-conversation', {
+        body: { otherProfileId },
+      });
 
-      // Check if conversation already exists
-      const { data: myParticipations } = await supabase
-        .from('conversation_participants')
-        .select('conversation_id')
-        .eq('profile_id', myProfileId);
+      if (error) throw error;
+      if (!data?.conversationId) return null;
 
-      if (myParticipations && myParticipations.length > 0) {
-        const conversationIds = myParticipations.map(p => p.conversation_id);
-        
-        const { data: otherParticipations } = await supabase
-          .from('conversation_participants')
-          .select('conversation_id')
-          .eq('profile_id', otherProfileId)
-          .in('conversation_id', conversationIds);
-
-        if (otherParticipations && otherParticipations.length > 0) {
-          // Conversation exists
-          return otherParticipations[0].conversation_id;
-        }
-      }
-
-      // Create new conversation
-      const { data: newConversation, error: convError } = await supabase
-        .from('conversations')
-        .insert({})
-        .select()
-        .single();
-
-      if (convError) throw convError;
-
-      // Add participants
-      const { error: participantsError } = await supabase
-        .from('conversation_participants')
-        .insert([
-          { conversation_id: newConversation.id, profile_id: myProfileId },
-          { conversation_id: newConversation.id, profile_id: otherProfileId },
-        ]);
-
-      if (participantsError) throw participantsError;
-
-      return newConversation.id;
+      return data.conversationId as string;
     } catch (err) {
       console.error('Error creating conversation:', err);
       return null;
