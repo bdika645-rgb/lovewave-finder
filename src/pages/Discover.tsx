@@ -7,6 +7,7 @@ import OnboardingTooltip from "@/components/OnboardingTooltip";
 import SEOHead from "@/components/SEOHead";
 import EmptyState from "@/components/EmptyState";
 import SkipToContent from "@/components/SkipToContent";
+import FullPageLoader from "@/components/FullPageLoader";
 import { useProfiles } from "@/hooks/useProfiles";
 import { useLikes } from "@/hooks/useLikes";
 import { useAuth } from "@/hooks/useAuth";
@@ -324,12 +325,10 @@ const Discover = () => {
         <SkipToContent />
         <SEOHead title="גלו התאמות" />
         <Navbar />
-        <main id="main-content" className="container mx-auto px-6 pt-28 pb-16 flex items-center justify-center min-h-[calc(100vh-80px)]">
-          <div className="text-center" role="status" aria-live="polite">
-            <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
-            <p className="text-muted-foreground">טוען פרופילים...</p>
-          </div>
-        </main>
+        <FullPageLoader
+          label="טוען פרופילים..."
+          className="min-h-[calc(100vh-80px)] bg-transparent flex items-center justify-center"
+        />
       </div>
     );
   }
