@@ -118,13 +118,15 @@ export function PhotoUpload({ profileId, currentAvatarUrl, onUploadComplete }: P
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" role="group" aria-label="העלאת תמונת פרופיל">
       <input
         ref={fileInputRef}
         type="file"
         accept="image/*"
         onChange={handleFileSelect}
-        className="hidden"
+        className="sr-only"
+        id="photo-upload-input"
+        aria-label="בחירת קובץ תמונה להעלאה"
       />
 
       {previewUrl ? (
@@ -145,16 +147,18 @@ export function PhotoUpload({ profileId, currentAvatarUrl, onUploadComplete }: P
                 size="icon"
                 className="absolute bottom-0 left-0"
                 onClick={() => fileInputRef.current?.click()}
+                aria-label="שנה תמונת פרופיל"
               >
-                <Camera className="w-4 h-4" />
+                <Camera className="w-4 h-4" aria-hidden="true" />
               </Button>
               <Button
                 variant="ghost"
                 size="icon"
                 className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground hover:bg-destructive/90 w-8 h-8"
                 onClick={handleRemovePhoto}
+                aria-label="הסר תמונת פרופיל"
               >
-                <X className="w-4 h-4" />
+                <X className="w-4 h-4" aria-hidden="true" />
               </Button>
             </>
           )}
@@ -163,13 +167,15 @@ export function PhotoUpload({ profileId, currentAvatarUrl, onUploadComplete }: P
         <button
           onClick={() => fileInputRef.current?.click()}
           disabled={uploading}
-          className="w-32 h-32 mx-auto rounded-full border-2 border-dashed border-primary/30 flex flex-col items-center justify-center gap-2 hover:border-primary hover:bg-primary/5 transition-colors cursor-pointer"
+          className="w-32 h-32 mx-auto rounded-full border-2 border-dashed border-primary/30 flex flex-col items-center justify-center gap-2 hover:border-primary hover:bg-primary/5 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+          aria-label="העלה תמונת פרופיל"
+          aria-busy={uploading}
         >
           {uploading ? (
-            <Loader2 className="w-8 h-8 text-primary animate-spin" />
+            <Loader2 className="w-8 h-8 text-primary animate-spin" aria-hidden="true" />
           ) : (
             <>
-              <Plus className="w-8 h-8 text-primary" />
+              <Plus className="w-8 h-8 text-primary" aria-hidden="true" />
               <span className="text-sm text-muted-foreground">הוסף תמונה</span>
             </>
           )}

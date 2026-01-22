@@ -56,10 +56,10 @@ const SuccessStoriesSection = () => {
   };
 
   return (
-    <section className="py-24 bg-muted/30 overflow-hidden">
+    <section className="py-24 bg-muted/30 overflow-hidden" aria-labelledby="success-stories-heading">
       <div className="container mx-auto px-6">
         <AnimatedSection className="text-center mb-16">
-          <h2 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
+          <h2 id="success-stories-heading" className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
             סיפורי <span className="text-gradient">הצלחה</span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
@@ -71,22 +71,27 @@ const SuccessStoriesSection = () => {
           className="relative"
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
+          onFocus={() => setIsPaused(true)}
+          onBlur={() => setIsPaused(false)}
+          role="region"
+          aria-roledescription="carousel"
+          aria-label="סיפורי הצלחה"
         >
           {/* Navigation Arrows */}
           <button
             onClick={prevSlide}
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-card rounded-full shadow-lg flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors -translate-x-6 md:translate-x-0"
-            aria-label="Previous stories"
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-card rounded-full shadow-lg flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors -translate-x-6 md:translate-x-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            aria-label="סיפורים קודמים"
           >
-            <ChevronLeft className="w-6 h-6" />
+            <ChevronLeft className="w-6 h-6" aria-hidden="true" />
           </button>
           
           <button
             onClick={nextSlide}
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-card rounded-full shadow-lg flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors translate-x-6 md:translate-x-0"
-            aria-label="Next stories"
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-card rounded-full shadow-lg flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors translate-x-6 md:translate-x-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            aria-label="סיפורים הבאים"
           >
-            <ChevronRight className="w-6 h-6" />
+            <ChevronRight className="w-6 h-6" aria-hidden="true" />
           </button>
 
           {/* Stories Slider */}
@@ -101,6 +106,7 @@ const SuccessStoriesSection = () => {
                 exit="exit"
                 transition={{ duration: 0.4, ease: "easeInOut" }}
                 className="grid md:grid-cols-2 gap-8"
+                aria-live="polite"
               >
                 {getCurrentStories().map((story) => (
                   <Card key={story.id} className="overflow-hidden border-gold/20 h-full">
@@ -109,12 +115,14 @@ const SuccessStoriesSection = () => {
                         <div className="flex -space-x-4 rtl:space-x-reverse">
                           <img
                             src={story.image1}
-                            alt={`תמונת פרופיל של ${story.names.split(' ו')[0]}`}
+                            alt=""
+                            aria-hidden="true"
                             className="w-16 h-16 rounded-full border-4 border-background object-cover"
                           />
                           <img
                             src={story.image2}
-                            alt={`תמונת פרופיל של ${story.names.split(' ו')[1] || 'בן/בת זוג'}`}
+                            alt=""
+                            aria-hidden="true"
                             className="w-16 h-16 rounded-full border-4 border-background object-cover"
                           />
                         </div>
@@ -126,15 +134,15 @@ const SuccessStoriesSection = () => {
                             {story.location} • {story.date}
                           </p>
                         </div>
-                        <Heart className="w-6 h-6 text-primary fill-primary mr-auto" />
+                        <Heart className="w-6 h-6 text-primary fill-primary mr-auto" aria-hidden="true" />
                       </div>
                       
-                      <div className="relative">
-                        <Quote className="w-8 h-8 text-primary/20 absolute -top-2 -right-2" />
+                      <blockquote className="relative">
+                        <Quote className="w-8 h-8 text-primary/20 absolute -top-2 -right-2" aria-hidden="true" />
                         <p className="text-muted-foreground leading-relaxed pr-6">
                           {story.story}
                         </p>
-                      </div>
+                      </blockquote>
                     </CardContent>
                   </Card>
                 ))}
@@ -143,7 +151,7 @@ const SuccessStoriesSection = () => {
           </div>
 
           {/* Dots Indicator */}
-          <div className="flex justify-center gap-2 mt-8">
+          <div className="flex justify-center gap-2 mt-8" role="tablist" aria-label="בחירת סיפור">
             {Array.from({ length: totalPages }).map((_, index) => (
               <button
                 key={index}
@@ -151,12 +159,14 @@ const SuccessStoriesSection = () => {
                   setDirection(index > currentIndex ? 1 : -1);
                   setCurrentIndex(index);
                 }}
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                className={`w-3 h-3 rounded-full transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
                   index === currentIndex 
                     ? "bg-primary w-8" 
                     : "bg-primary/30 hover:bg-primary/50"
                 }`}
-                aria-label={`Go to slide ${index + 1}`}
+                role="tab"
+                aria-selected={index === currentIndex}
+                aria-label={`עבור לסיפור ${index + 1}`}
               />
             ))}
           </div>

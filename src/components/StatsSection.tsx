@@ -59,27 +59,28 @@ const StatsSection = () => {
   ];
 
   return (
-    <section className="py-16 gradient-primary">
+    <section className="py-16 gradient-primary" aria-labelledby="stats-heading">
+      <h2 id="stats-heading" className="sr-only">סטטיסטיקות האתר</h2>
       <div className="container mx-auto px-6">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+        <dl className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
           {statItems.map((stat, index) => (
             <div key={index} className="text-center">
-              <stat.icon className="w-8 h-8 text-primary-foreground/80 mx-auto mb-3" />
+              <stat.icon className="w-8 h-8 text-primary-foreground/80 mx-auto mb-3" aria-hidden="true" />
               {loading && !isStatsEmpty ? (
-                <div className="flex justify-center">
-                  <Loader2 className="w-6 h-6 text-primary-foreground/60 animate-spin" />
+                <div className="flex justify-center" role="status" aria-label="טוען נתונים">
+                  <Loader2 className="w-6 h-6 text-primary-foreground/60 animate-spin" aria-hidden="true" />
                 </div>
               ) : (
-                <p className="font-display text-2xl md:text-3xl font-bold text-primary-foreground animate-fade-in">
+                <dd className="font-display text-2xl md:text-3xl font-bold text-primary-foreground animate-fade-in">
                   {stat.value}
-                </p>
+                </dd>
               )}
-              <p className="text-primary-foreground/70 text-sm mt-1">
+              <dt className="text-primary-foreground/70 text-sm mt-1">
                 {stat.label}
-              </p>
+              </dt>
             </div>
           ))}
-        </div>
+        </dl>
       </div>
     </section>
   );

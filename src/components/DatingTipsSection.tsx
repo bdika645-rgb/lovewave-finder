@@ -1,5 +1,4 @@
 import { datingTips } from "@/data/members";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Lightbulb, User, MessageSquare, Calendar, Sparkles } from "lucide-react";
 
@@ -20,13 +19,13 @@ const getCategoryIcon = (category: string) => {
 
 const DatingTipsSection = () => {
   return (
-    <section className="py-24 bg-muted/30">
+    <section className="py-24 bg-muted/30" aria-labelledby="dating-tips-heading">
       <div className="container mx-auto px-6">
         <div className="text-center mb-16">
-          <div className="inline-flex items-center justify-center w-16 h-16 gradient-primary rounded-2xl mb-6">
+          <div className="inline-flex items-center justify-center w-16 h-16 gradient-primary rounded-2xl mb-6" aria-hidden="true">
             <Lightbulb className="w-8 h-8 text-primary-foreground" />
           </div>
-          <h2 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
+          <h2 id="dating-tips-heading" className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
             טיפים <span className="text-gradient">לדייטינג</span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
@@ -34,28 +33,28 @@ const DatingTipsSection = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6" role="list" aria-label="רשימת טיפים">
           {datingTips.map((tip) => {
             const Icon = getCategoryIcon(tip.category);
             return (
-              <Card key={tip.id} className="card-hover border-gold/10">
-                <CardHeader className="pb-3">
+              <article key={tip.id} className="card-hover border-gold/10 bg-card rounded-lg border shadow-sm" role="listitem">
+                <div className="pb-3 p-6">
                   <div className="flex items-center justify-between">
                     <Badge variant="secondary" className="bg-primary/10 text-primary">
                       {tip.category}
                     </Badge>
-                    <Icon className="w-5 h-5 text-primary" />
+                    <Icon className="w-5 h-5 text-primary" aria-hidden="true" />
                   </div>
-                  <CardTitle className="font-display text-lg mt-3">
+                  <h3 className="font-display text-lg mt-3 font-semibold">
                     {tip.title}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
+                  </h3>
+                </div>
+                <div className="p-6 pt-0">
                   <p className="text-muted-foreground text-sm leading-relaxed">
                     {tip.content}
                   </p>
-                </CardContent>
-              </Card>
+                </div>
+              </article>
             );
           })}
         </div>
