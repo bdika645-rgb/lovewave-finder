@@ -772,6 +772,7 @@ export type Database = {
           id: string
           message: string
           name: string
+          profile_id: string | null
           resolved_at: string | null
           resolved_by: string | null
           status: string
@@ -786,6 +787,7 @@ export type Database = {
           id?: string
           message: string
           name: string
+          profile_id?: string | null
           resolved_at?: string | null
           resolved_by?: string | null
           status?: string
@@ -800,6 +802,7 @@ export type Database = {
           id?: string
           message?: string
           name?: string
+          profile_id?: string | null
           resolved_at?: string | null
           resolved_by?: string | null
           status?: string
@@ -808,6 +811,13 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "support_tickets_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "support_tickets_resolved_by_fkey"
             columns: ["resolved_by"]
