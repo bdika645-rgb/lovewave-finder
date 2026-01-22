@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useAdminAuth } from "@/hooks/useAdminAuth";
 
 export interface AppSettings {
   site_name: string;
@@ -34,9 +35,18 @@ export function useAppSettings() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
+  const { isAdmin, loading: adminLoading } = useAdminAuth();
+
   const fetchSettings = useCallback(async () => {
     try {
       setLoading(true);
+
+      // app_settings is admin-only. For non-admins, we silently fall back to defaults.
+      if (adminLoading || !isAdmin) {
+        setError(null);
+        setSettings(defaultSettings);
+        return;
+      }
       
       const { data, error: fetchError } = await supabase
         .from("app_settings")
@@ -69,7 +79,7 @@ export function useAppSettings() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [adminLoading, isAdmin]);
 
   useEffect(() => {
     fetchSettings();
@@ -78,6 +88,11 @@ export function useAppSettings() {
   const updateSettings = async (newSettings: Partial<AppSettings>) => {
     try {
       setSaving(true);
+
+      if (adminLoading || !isAdmin) {
+        toast.error("אין לך הרשאה לעדכן הגדרות מערכת");
+        return;
+      }
 
       const updates = Object.entries(newSettings).map(([key, value]) => ({
         key,
