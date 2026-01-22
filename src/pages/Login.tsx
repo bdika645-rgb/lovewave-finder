@@ -3,6 +3,8 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import SEOHead from "@/components/SEOHead";
+import FieldError from "@/components/FieldError";
+import { useFormValidation } from "@/hooks/useFormValidation";
 import { Heart, Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
@@ -15,6 +17,7 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { signIn, user, loading } = useAuth();
+  const { errors, setFieldError, clearFieldError, getFieldProps } = useFormValidation();
 
   // Redirect if already logged in
   useEffect(() => {
@@ -31,23 +34,30 @@ const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validation
+    let isValid = true;
+    
+    // Validation with inline errors
     if (!email.trim()) {
-      toast.error("נא להזין כתובת אימייל");
-      return;
+      setFieldError('email', 'נא להזין כתובת אימייל');
+      isValid = false;
+    } else if (!validateEmail(email)) {
+      setFieldError('email', 'כתובת האימייל אינה תקינה');
+      isValid = false;
+    } else {
+      clearFieldError('email');
     }
-    if (!validateEmail(email)) {
-      toast.error("כתובת האימייל אינה תקינה");
-      return;
-    }
+
     if (!password.trim()) {
-      toast.error("נא להזין סיסמה");
-      return;
+      setFieldError('password', 'נא להזין סיסמה');
+      isValid = false;
+    } else if (password.length < 6) {
+      setFieldError('password', 'הסיסמה חייבת להכיל לפחות 6 תווים');
+      isValid = false;
+    } else {
+      clearFieldError('password');
     }
-    if (password.length < 6) {
-      toast.error("הסיסמה חייבת להכיל לפחות 6 תווים");
-      return;
-    }
+
+    if (!isValid) return;
 
     setIsLoading(true);
     
@@ -105,37 +115,48 @@ const Login = () => {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="text-sm font-medium text-foreground mb-2 block">
+              <label htmlFor="login-email" className="text-sm font-medium text-foreground mb-2 block">
                 אימייל
               </label>
               <div className="relative">
                 <Mail className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input
+                  id="login-email"
                   type="email"
                   placeholder="your@email.com"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="pr-10 h-12"
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (validateEmail(e.target.value)) clearFieldError('email');
+                  }}
+                  className={`pr-10 h-12 ${errors.email ? 'border-destructive' : ''}`}
                   autoComplete="email"
                   dir="ltr"
+                  {...getFieldProps('email')}
                 />
               </div>
+              <FieldError id="email-error" message={errors.email?.message} />
             </div>
 
             <div>
-              <label className="text-sm font-medium text-foreground mb-2 block">
+              <label htmlFor="login-password" className="text-sm font-medium text-foreground mb-2 block">
                 סיסמה
               </label>
               <div className="relative">
                 <Lock className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input
+                  id="login-password"
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="pr-10 pl-10 h-12"
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (e.target.value.length >= 6) clearFieldError('password');
+                  }}
+                  className={`pr-10 pl-10 h-12 ${errors.password ? 'border-destructive' : ''}`}
                   autoComplete="current-password"
                   dir="ltr"
+                  {...getFieldProps('password')}
                 />
                 <button
                   type="button"
@@ -150,6 +171,7 @@ const Login = () => {
                   )}
                 </button>
               </div>
+              <FieldError id="password-error" message={errors.password?.message} />
             </div>
 
             <div className="flex items-center justify-between text-sm">

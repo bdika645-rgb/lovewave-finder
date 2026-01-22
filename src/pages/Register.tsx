@@ -8,6 +8,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { PasswordStrengthMeter } from "@/components/PasswordStrengthMeter";
 import SEOHead from "@/components/SEOHead";
+import FieldError from "@/components/FieldError";
+import PostRegistrationOnboarding from "@/components/PostRegistrationOnboarding";
+import { useFormValidation } from "@/hooks/useFormValidation";
 import {
   Select,
   SelectContent,
@@ -38,9 +41,11 @@ const Register = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const { signUp, user, loading } = useAuth();
+  const { errors, setFieldError, clearFieldError, getFieldProps } = useFormValidation();
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -70,36 +75,59 @@ const Register = () => {
   };
 
   const validateStep1 = () => {
+    let isValid = true;
+
     if (!formData.name.trim() || formData.name.trim().length < 2) {
-      toast.error("השם חייב להכיל לפחות 2 תווים");
-      return false;
+      setFieldError('name', 'השם חייב להכיל לפחות 2 תווים');
+      isValid = false;
+    } else {
+      clearFieldError('name');
     }
+
     if (!formData.email.trim() || !validateEmail(formData.email)) {
-      toast.error("נא להזין כתובת אימייל תקינה");
-      return false;
+      setFieldError('email', 'נא להזין כתובת אימייל תקינה');
+      isValid = false;
+    } else {
+      clearFieldError('email');
     }
+
     if (!formData.gender) {
-      toast.error("נא לבחור מגדר");
-      return false;
+      setFieldError('gender', 'נא לבחור מגדר');
+      isValid = false;
+    } else {
+      clearFieldError('gender');
     }
+
     if (!formData.city.trim()) {
-      toast.error("נא לבחור עיר");
-      return false;
+      setFieldError('city', 'נא לבחור עיר');
+      isValid = false;
+    } else {
+      clearFieldError('city');
     }
+
     const age = parseInt(formData.age);
     if (isNaN(age) || age < 18 || age > 120) {
-      toast.error("גיל חייב להיות מספר בין 18 ל-120");
-      return false;
+      setFieldError('age', 'גיל חייב להיות מספר בין 18 ל-120');
+      isValid = false;
+    } else {
+      clearFieldError('age');
     }
+
     if (formData.password.length < 6) {
-      toast.error("הסיסמה חייבת להכיל לפחות 6 תווים");
-      return false;
+      setFieldError('password', 'הסיסמה חייבת להכיל לפחות 6 תווים');
+      isValid = false;
+    } else {
+      clearFieldError('password');
     }
+
     if (formData.password !== formData.confirmPassword) {
-      toast.error("הסיסמאות לא תואמות");
-      return false;
+      setFieldError('confirmPassword', 'הסיסמאות לא תואמות');
+      isValid = false;
+    } else {
+      clearFieldError('confirmPassword');
     }
-    return true;
+
+    return isValid;
   };
 
   const handleNextStep = () => {
@@ -180,7 +208,7 @@ const Register = () => {
     
     setIsLoading(false);
     toast.success("נרשמת בהצלחה! ברוכים הבאים ל-Spark 💕");
-    navigate("/members");
+    setShowOnboarding(true);
   };
 
   if (loading) {
@@ -282,38 +310,50 @@ const Register = () => {
                     </div>
 
                     <div>
-                      <label className="text-sm font-medium text-foreground mb-2 block">
+                      <label htmlFor="register-name" className="text-sm font-medium text-foreground mb-2 block">
                         שם מלא *
                       </label>
                       <div className="relative">
                         <User className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                         <Input
+                          id="register-name"
                           type="text"
                           placeholder="השם שלך"
                           value={formData.name}
-                          onChange={(e) => setFormData({...formData, name: e.target.value})}
-                          className="pr-10 h-12"
+                          onChange={(e) => {
+                            setFormData({...formData, name: e.target.value});
+                            if (e.target.value.trim().length >= 2) clearFieldError('name');
+                          }}
+                          className={`pr-10 h-12 ${errors.name ? 'border-destructive' : ''}`}
                           autoComplete="name"
+                          {...getFieldProps('name')}
                         />
                       </div>
+                      <FieldError id="name-error" message={errors.name?.message} />
                     </div>
 
                     <div>
-                      <label className="text-sm font-medium text-foreground mb-2 block">
+                      <label htmlFor="register-email" className="text-sm font-medium text-foreground mb-2 block">
                         אימייל *
                       </label>
                       <div className="relative">
                         <Mail className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                         <Input
+                          id="register-email"
                           type="email"
                           placeholder="your@email.com"
                           value={formData.email}
-                          onChange={(e) => setFormData({...formData, email: e.target.value})}
-                          className="pr-10 h-12"
+                          onChange={(e) => {
+                            setFormData({...formData, email: e.target.value});
+                            if (validateEmail(e.target.value)) clearFieldError('email');
+                          }}
+                          className={`pr-10 h-12 ${errors.email ? 'border-destructive' : ''}`}
                           autoComplete="email"
                           dir="ltr"
+                          {...getFieldProps('email')}
                         />
                       </div>
+                      <FieldError id="email-error" message={errors.email?.message} />
                     </div>
 
                     {/* Gender Selection */}
@@ -321,14 +361,21 @@ const Register = () => {
                       <label className="text-sm font-medium text-foreground mb-2 block">
                         מגדר *
                       </label>
-                      <div className="grid grid-cols-2 gap-3" role="radiogroup" aria-label="בחירת מגדר">
+                      <div 
+                        className={`grid grid-cols-2 gap-3 ${errors.gender ? 'ring-2 ring-destructive rounded-lg' : ''}`} 
+                        role="radiogroup" 
+                        aria-label="בחירת מגדר"
+                        aria-describedby={errors.gender ? 'gender-error' : undefined}
+                      >
                         <button
                           type="button"
-                          onClick={() => setFormData({...formData, gender: "male"})}
+                          onClick={() => {
+                            setFormData({...formData, gender: "male"});
+                            clearFieldError('gender');
+                          }}
                           role="radio"
                           aria-checked={formData.gender === "male"}
-                          aria-pressed={formData.gender === "male"}
-                          className={`h-12 rounded-lg border-2 transition-all flex items-center justify-center gap-2 ${
+                          className={`h-12 rounded-lg border-2 transition-all flex items-center justify-center gap-2 focus-ring ${
                             formData.gender === "male" 
                               ? "border-primary bg-primary/10 text-primary" 
                               : "border-border hover:border-primary/50"
@@ -339,11 +386,13 @@ const Register = () => {
                         </button>
                         <button
                           type="button"
-                          onClick={() => setFormData({...formData, gender: "female"})}
+                          onClick={() => {
+                            setFormData({...formData, gender: "female"});
+                            clearFieldError('gender');
+                          }}
                           role="radio"
                           aria-checked={formData.gender === "female"}
-                          aria-pressed={formData.gender === "female"}
-                          className={`h-12 rounded-lg border-2 transition-all flex items-center justify-center gap-2 ${
+                          className={`h-12 rounded-lg border-2 transition-all flex items-center justify-center gap-2 focus-ring ${
                             formData.gender === "female" 
                               ? "border-primary bg-primary/10 text-primary" 
                               : "border-border hover:border-primary/50"
@@ -353,6 +402,7 @@ const Register = () => {
                           אישה
                         </button>
                       </div>
+                      <FieldError id="gender-error" message={errors.gender?.message} />
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
@@ -376,38 +426,50 @@ const Register = () => {
                         </Select>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-foreground mb-2 block">
+                        <label htmlFor="register-age" className="text-sm font-medium text-foreground mb-2 block">
                           גיל *
                         </label>
                         <div className="relative">
                           <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                           <Input
+                            id="register-age"
                             type="number"
                             placeholder="גיל"
                             value={formData.age}
-                            onChange={(e) => setFormData({...formData, age: e.target.value})}
-                            className="pr-10 h-12"
+                            onChange={(e) => {
+                              setFormData({...formData, age: e.target.value});
+                              const age = parseInt(e.target.value);
+                              if (!isNaN(age) && age >= 18 && age <= 120) clearFieldError('age');
+                            }}
+                            className={`pr-10 h-12 ${errors.age ? 'border-destructive' : ''}`}
                             min="18"
                             max="120"
+                            {...getFieldProps('age')}
                           />
                         </div>
+                        <FieldError id="age-error" message={errors.age?.message} />
                       </div>
                     </div>
 
                     <div>
-                      <label className="text-sm font-medium text-foreground mb-2 block">
+                      <label htmlFor="register-password" className="text-sm font-medium text-foreground mb-2 block">
                         סיסמה *
                       </label>
                       <div className="relative">
                         <Lock className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                         <Input
+                          id="register-password"
                           type={showPassword ? "text" : "password"}
                           placeholder="לפחות 6 תווים"
                           value={formData.password}
-                          onChange={(e) => setFormData({...formData, password: e.target.value})}
-                          className="pr-10 pl-10 h-12"
+                          onChange={(e) => {
+                            setFormData({...formData, password: e.target.value});
+                            if (e.target.value.length >= 6) clearFieldError('password');
+                          }}
+                          className={`pr-10 pl-10 h-12 ${errors.password ? 'border-destructive' : ''}`}
                           autoComplete="new-password"
                           dir="ltr"
+                          {...getFieldProps('password')}
                         />
                         <button
                           type="button"
@@ -423,24 +485,31 @@ const Register = () => {
                         </button>
                       </div>
                       <PasswordStrengthMeter password={formData.password} />
+                      <FieldError id="password-error" message={errors.password?.message} />
                     </div>
 
                     <div>
-                      <label className="text-sm font-medium text-foreground mb-2 block">
+                      <label htmlFor="register-confirm-password" className="text-sm font-medium text-foreground mb-2 block">
                         אישור סיסמה *
                       </label>
                       <div className="relative">
                         <Lock className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                         <Input
+                          id="register-confirm-password"
                           type="password"
                           placeholder="הזן שוב את הסיסמה"
                           value={formData.confirmPassword}
-                          onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
-                          className="pr-10 h-12"
+                          onChange={(e) => {
+                            setFormData({...formData, confirmPassword: e.target.value});
+                            if (e.target.value === formData.password) clearFieldError('confirmPassword');
+                          }}
+                          className={`pr-10 h-12 ${errors.confirmPassword ? 'border-destructive' : ''}`}
                           autoComplete="new-password"
                           dir="ltr"
+                          {...getFieldProps('confirmPassword')}
                         />
                       </div>
+                      <FieldError id="confirmPassword-error" message={errors.confirmPassword?.message} />
                     </div>
 
                     <Button type="submit" variant="hero" size="lg" className="w-full gap-2">
@@ -599,6 +668,14 @@ const Register = () => {
           </div>
         </div>
       </div>
+
+      {/* Post-registration Onboarding */}
+      {showOnboarding && (
+        <PostRegistrationOnboarding 
+          forceShow={true}
+          onComplete={() => navigate("/discover")} 
+        />
+      )}
     </>
   );
 };
