@@ -34,12 +34,15 @@ const Settings = () => {
   const { deleteAccount, loading: deleteLoading } = useDeleteAccount();
 
   const [localSettings, setLocalSettings] = useState(settings);
+  const [notificationsStatus, setNotificationsStatus] = useState<string>("");
+  const [privacyStatus, setPrivacyStatus] = useState<string>("");
 
   useEffect(() => {
     setLocalSettings(settings);
   }, [settings]);
 
   const handleSaveNotifications = async () => {
+    setNotificationsStatus("");
     const { error } = await updateSettings({
       email_notifications: localSettings.email_notifications,
       push_notifications: localSettings.push_notifications,
@@ -49,12 +52,15 @@ const Settings = () => {
 
     if (error) {
       toast.error("שגיאה בשמירת ההגדרות");
+      setNotificationsStatus("שגיאה בשמירה");
     } else {
       toast.success("הגדרות ההתראות נשמרו!");
+      setNotificationsStatus("נשמר");
     }
   };
 
   const handleSavePrivacy = async () => {
+    setPrivacyStatus("");
     const { error } = await updateSettings({
       show_online_status: localSettings.show_online_status,
       show_last_seen: localSettings.show_last_seen,
@@ -63,8 +69,10 @@ const Settings = () => {
 
     if (error) {
       toast.error("שגיאה בשמירת ההגדרות");
+      setPrivacyStatus("שגיאה בשמירה");
     } else {
       toast.success("הגדרות הפרטיות נשמרו!");
+      setPrivacyStatus("נשמר");
     }
   };
 
@@ -112,6 +120,10 @@ const Settings = () => {
     <div className="min-h-screen bg-muted/20" dir="rtl">
       <Navbar />
 
+      <div className="sr-only" aria-live="polite" aria-atomic="true">
+        {notificationsStatus || privacyStatus}
+      </div>
+
       <div className="container mx-auto px-6 pt-28 pb-16 max-w-2xl">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
@@ -119,9 +131,10 @@ const Settings = () => {
             variant="ghost" 
             size="icon" 
             onClick={() => navigate("/profile")}
-            className="rounded-full"
+            className="rounded-full focus-ring"
+            aria-label="חזרה לפרופיל"
           >
-            <ArrowRight className="w-5 h-5" />
+            <ArrowRight className="w-5 h-5" aria-hidden="true" />
           </Button>
           <div>
             <h1 className="font-display text-3xl font-bold text-foreground">הגדרות</h1>
@@ -152,13 +165,18 @@ const Settings = () => {
           </Card>
 
           {/* Notifications */}
-          <Card>
+          <Card aria-busy={saving ? true : undefined}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Bell className="w-5 h-5 text-primary" aria-hidden="true" />
                 התראות
               </CardTitle>
               <CardDescription>בחר אילו התראות תרצה לקבל</CardDescription>
+              {notificationsStatus && (
+                <p className="text-sm text-muted-foreground" aria-live="polite">
+                  {notificationsStatus}
+                </p>
+              )}
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="flex items-center justify-between">
@@ -171,6 +189,7 @@ const Settings = () => {
                   onCheckedChange={(checked) => setLocalSettings({...localSettings, email_notifications: checked})}
                   aria-labelledby="email-notifications-label"
                   aria-describedby="email-notifications-desc"
+                  disabled={saving}
                 />
               </div>
               
@@ -186,6 +205,7 @@ const Settings = () => {
                   onCheckedChange={(checked) => setLocalSettings({...localSettings, push_notifications: checked})}
                   aria-labelledby="push-notifications-label"
                   aria-describedby="push-notifications-desc"
+                  disabled={saving}
                 />
               </div>
               
@@ -201,6 +221,7 @@ const Settings = () => {
                   onCheckedChange={(checked) => setLocalSettings({...localSettings, match_notifications: checked})}
                   aria-labelledby="match-notifications-label"
                   aria-describedby="match-notifications-desc"
+                  disabled={saving}
                 />
               </div>
               
@@ -216,6 +237,7 @@ const Settings = () => {
                   onCheckedChange={(checked) => setLocalSettings({...localSettings, message_notifications: checked})}
                   aria-labelledby="message-notifications-label"
                   aria-describedby="message-notifications-desc"
+                  disabled={saving}
                 />
               </div>
 
@@ -224,6 +246,7 @@ const Settings = () => {
                 className="w-full mt-4"
                 onClick={handleSaveNotifications}
                 disabled={saving}
+                aria-disabled={saving}
               >
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : "שמור הגדרות התראות"}
               </Button>
@@ -231,13 +254,18 @@ const Settings = () => {
           </Card>
 
           {/* Privacy */}
-          <Card>
+          <Card aria-busy={saving ? true : undefined}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Eye className="w-5 h-5 text-primary" aria-hidden="true" />
                 פרטיות
               </CardTitle>
               <CardDescription>שליטה במה שאחרים רואים</CardDescription>
+              {privacyStatus && (
+                <p className="text-sm text-muted-foreground" aria-live="polite">
+                  {privacyStatus}
+                </p>
+              )}
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="flex items-center justify-between">
@@ -250,6 +278,7 @@ const Settings = () => {
                   onCheckedChange={(checked) => setLocalSettings({...localSettings, show_online_status: checked})}
                   aria-labelledby="online-status-label"
                   aria-describedby="online-status-desc"
+                  disabled={saving}
                 />
               </div>
               
@@ -265,6 +294,7 @@ const Settings = () => {
                   onCheckedChange={(checked) => setLocalSettings({...localSettings, show_last_seen: checked})}
                   aria-labelledby="last-seen-label"
                   aria-describedby="last-seen-desc"
+                  disabled={saving}
                 />
               </div>
               
@@ -280,6 +310,7 @@ const Settings = () => {
                   onCheckedChange={(checked) => setLocalSettings({...localSettings, profile_visible: checked})}
                   aria-labelledby="profile-visible-label"
                   aria-describedby="profile-visible-desc"
+                  disabled={saving}
                 />
               </div>
 
@@ -288,6 +319,7 @@ const Settings = () => {
                 className="w-full mt-4"
                 onClick={handleSavePrivacy}
                 disabled={saving}
+                aria-disabled={saving}
               >
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : "שמור הגדרות פרטיות"}
               </Button>
@@ -324,7 +356,7 @@ const Settings = () => {
                 className="w-full"
                 onClick={handleLogout}
               >
-                התנתק מכל המכשירים
+                התנתק
               </Button>
             </CardContent>
           </Card>
