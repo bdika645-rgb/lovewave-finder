@@ -1,4 +1,5 @@
 import { successStories } from "@/data/members";
+import { useLandingContent } from "@/contexts/LandingContentContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Heart, Quote, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
@@ -9,6 +10,8 @@ const SuccessStoriesSection = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const { content } = useLandingContent();
+  const { successStories: storiesContent } = content;
 
   // Show 2 stories at a time on desktop, 1 on mobile
   const storiesPerPage = 2;
@@ -60,10 +63,10 @@ const SuccessStoriesSection = () => {
       <div className="container mx-auto px-6">
         <AnimatedSection className="text-center mb-16">
           <h2 id="success-stories-heading" className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
-            סיפורי <span className="text-gradient">הצלחה</span>
+            {storiesContent.title} <span className="text-gradient">{storiesContent.titleHighlight}</span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            זוגות אמיתיים שמצאו את האהבה דרך Spark
+            {storiesContent.description}
           </p>
         </AnimatedSection>
 

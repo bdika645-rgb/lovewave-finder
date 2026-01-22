@@ -1,4 +1,5 @@
 import { useSiteStatistics } from "@/hooks/useSiteStatistics";
+import { useLandingContent } from "@/contexts/LandingContentContext";
 import { Users, Heart, MessageCircle, MapPin, TrendingUp, Clock, Loader2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -15,6 +16,8 @@ const demoStats = {
 const StatsSection = () => {
   const { stats, loading } = useSiteStatistics();
   const { user } = useAuth();
+  const { content } = useLandingContent();
+  const { stats: statsContent } = content;
 
   // Use demo stats for non-authenticated users or when stats are all zeros
   const isStatsEmpty = !user || (
@@ -29,32 +32,32 @@ const StatsSection = () => {
     {
       icon: Users,
       value: displayStats.totalMembers,
-      label: "חברים רשומים",
+      label: statsContent.stat1Label,
     },
     {
       icon: Heart,
       value: displayStats.successfulMatches,
-      label: "זוגות מאושרים",
+      label: statsContent.stat2Label,
     },
     {
       icon: MessageCircle,
       value: displayStats.messagesPerDay,
-      label: "הודעות ביום",
+      label: statsContent.stat3Label,
     },
     {
       icon: TrendingUp,
       value: displayStats.dailyActiveUsers,
-      label: "משתמשים פעילים",
+      label: statsContent.stat4Label,
     },
     {
       icon: MapPin,
       value: displayStats.mostActiveCity,
-      label: "העיר הפעילה ביותר",
+      label: statsContent.stat5Label,
     },
     {
       icon: Clock,
       value: displayStats.averageMatchTime,
-      label: "זמן ממוצע למאצ'",
+      label: statsContent.stat6Label,
     },
   ];
 

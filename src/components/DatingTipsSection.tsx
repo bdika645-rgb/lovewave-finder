@@ -1,4 +1,5 @@
 import { datingTips } from "@/data/members";
+import { useLandingContent } from "@/contexts/LandingContentContext";
 import { Badge } from "@/components/ui/badge";
 import { Lightbulb, User, MessageSquare, Calendar, Sparkles } from "lucide-react";
 
@@ -18,6 +19,9 @@ const getCategoryIcon = (category: string) => {
 };
 
 const DatingTipsSection = () => {
+  const { content } = useLandingContent();
+  const { datingTips: tipsContent } = content;
+
   return (
     <section className="py-24 bg-muted/30" aria-labelledby="dating-tips-heading">
       <div className="container mx-auto px-6">
@@ -26,10 +30,10 @@ const DatingTipsSection = () => {
             <Lightbulb className="w-8 h-8 text-primary-foreground" />
           </div>
           <h2 id="dating-tips-heading" className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
-            טיפים <span className="text-gradient">לדייטינג</span>
+            {tipsContent.title} <span className="text-gradient">{tipsContent.titleHighlight}</span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            עצות מקצועיות שיעזרו לכם למצוא את האהבה
+            {tipsContent.description}
           </p>
         </div>
 
