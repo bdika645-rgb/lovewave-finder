@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 
 interface SiteStatistics {
   totalMembers: string;
@@ -24,8 +26,19 @@ export function useSiteStatistics() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const { user } = useAuth();
+  const { isAdmin, loading: adminLoading } = useAdminAuth();
+
   const fetchStats = useCallback(async () => {
     try {
+      // Only admins can read/refresh site_statistics. For everyone else we keep safe defaults
+      // (the landing page already swaps in demo numbers where appropriate).
+      if (!user || adminLoading || !isAdmin) {
+        setError(null);
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
       
       // First, update the statistics
@@ -68,58 +81,10 @@ export function useSiteStatistics() {
     } catch (err) {
       console.error('Error fetching site statistics:', err);
       setError((err as Error).message);
-      
-      // Fallback: calculate stats directly if RPC fails
-      await fetchStatsDirectly();
     } finally {
       setLoading(false);
     }
-  }, []);
-
-  const fetchStatsDirectly = async () => {
-    try {
-      // Get total visible members
-      const { count: totalMembers } = await supabase
-        .from('profiles')
-        .select('*', { count: 'exact', head: true })
-        .eq('is_blocked', false)
-        .eq('is_visible', true);
-
-      // Get total matches
-      const { count: totalMatches } = await supabase
-        .from('matches')
-        .select('*', { count: 'exact', head: true });
-
-      // Get messages from last 7 days
-      const sevenDaysAgo = new Date();
-      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-      
-      const { count: recentMessages } = await supabase
-        .from('messages')
-        .select('*', { count: 'exact', head: true })
-        .gte('created_at', sevenDaysAgo.toISOString());
-
-      // Get active users (last 24 hours)
-      const oneDayAgo = new Date();
-      oneDayAgo.setDate(oneDayAgo.getDate() - 1);
-      
-      const { count: activeUsers } = await supabase
-        .from('profiles')
-        .select('*', { count: 'exact', head: true })
-        .gte('last_seen', oneDayAgo.toISOString());
-
-      setStats({
-        totalMembers: formatNumber(totalMembers || 0),
-        successfulMatches: formatNumber(totalMatches || 0),
-        messagesPerDay: formatNumber(Math.round((recentMessages || 0) / 7)),
-        dailyActiveUsers: formatNumber(activeUsers || 0),
-        mostActiveCity: 'תל אביב',
-        averageMatchTime: '3 ימים',
-      });
-    } catch (err) {
-      console.error('Error fetching stats directly:', err);
-    }
-  };
+  }, [user, adminLoading, isAdmin]);
 
   useEffect(() => {
     fetchStats();
