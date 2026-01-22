@@ -203,7 +203,7 @@ const Messages = () => {
                         <button
                           key={match.id}
                           onClick={() => startConversationFromMatch(match.matchedProfile.id)}
-                          className="flex-shrink-0 text-center group"
+                          className="flex-shrink-0 text-center group focus-ring rounded-xl"
                           aria-label={`התחל שיחה עם ${match.matchedProfile.name}`}
                         >
                           <div className="relative">
@@ -258,7 +258,7 @@ const Messages = () => {
                         onClick={() => handleSelectConversation(conv.id)}
                         className={`w-full p-4 flex items-center gap-3 hover:bg-muted/50 transition-colors ${
                           selectedConversationId === conv.id ? "bg-accent" : ""
-                        }`}
+                        } focus-ring`}
                         role="listitem"
                         aria-selected={selectedConversationId === conv.id}
                       >
@@ -312,7 +312,7 @@ const Messages = () => {
                       <ChevronRight className="w-5 h-5" />
                     </Button>
                     <div className="flex items-center gap-3 min-w-0 flex-1">
-                      <Link to={`/member/${selectedConversation.otherProfile?.id}`} className="shrink-0">
+                      <Link to={`/member/${selectedConversation.otherProfile?.id}`} className="shrink-0 rounded-full focus-ring">
                         <img 
                           src={selectedConversation.otherProfile?.avatar_url || "/profiles/profile1.jpg"}
                           alt={`תמונת פרופיל של ${selectedConversation.otherProfile?.name || "משתמש"}`}

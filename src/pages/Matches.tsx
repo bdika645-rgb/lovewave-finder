@@ -87,7 +87,13 @@ const Matches = () => {
         </nav>
 
         {loading ? (
-          <div className="flex justify-center py-20" role="status" aria-label="טוען התאמות">
+          <div
+            className="flex justify-center py-20"
+            role="status"
+            aria-label="טוען התאמות"
+            aria-live="polite"
+            aria-busy="true"
+          >
             <Loader2 className="w-12 h-12 text-primary animate-spin" aria-hidden="true" />
             <span className="sr-only">טוען התאמות...</span>
           </div>

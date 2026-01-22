@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Heart, Mail, ArrowRight, Loader2, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 import { usePasswordReset } from "@/hooks/usePasswordReset";
@@ -94,18 +95,25 @@ const ForgotPassword = () => {
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium text-foreground mb-2 block">
+                  <Label htmlFor="email" className="text-sm font-medium text-foreground mb-2 block">
                     אימייל
-                  </label>
+                  </Label>
                   <div className="relative">
-                    <Mail className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                    <Mail
+                      className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground"
+                      aria-hidden="true"
+                    />
                     <Input
+                      id="email"
                       type="email"
                       placeholder="your@email.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       className="pr-10 h-12"
                       dir="ltr"
+                      autoComplete="email"
+                      inputMode="email"
+                      required
                     />
                   </div>
                 </div>
