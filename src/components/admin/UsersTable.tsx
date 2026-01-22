@@ -188,6 +188,7 @@ export default function UsersTable({
 
   const isAllSelected = users.length > 0 && selectedIds.size === users.length;
   const isSomeSelected = selectedIds.size > 0;
+  const isMixedSelected = isSomeSelected && !isAllSelected;
 
   return (
     <>
@@ -199,12 +200,20 @@ export default function UsersTable({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             className="mb-4 p-3 bg-primary/10 border border-primary/20 rounded-lg flex flex-wrap items-center gap-2 sm:gap-4"
+            role="status"
+            aria-live="polite"
           >
             <div className="flex items-center gap-2">
               <Badge variant="default" className="text-sm">
                 {selectedIds.size} נבחרו
               </Badge>
-              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={clearSelection}>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7 focus-ring"
+                onClick={clearSelection}
+                aria-label="נקה בחירה"
+              >
                 <X className="w-4 h-4" />
               </Button>
             </div>
@@ -225,12 +234,12 @@ export default function UsersTable({
               {onBulkUpdateRole && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm" className="gap-1">
+                    <Button variant="outline" size="sm" className="gap-1 focus-ring" aria-label="שנה תפקיד (בחירה מרובה)">
                       <Shield className="w-4 h-4" />
                       <span className="hidden sm:inline">שנה תפקיד</span>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent>
+                  <DropdownMenuContent className="z-50">
                     <DropdownMenuItem onClick={() => handleBulkRoleChange("admin")}>
                       <ShieldCheck className="w-4 h-4 ml-2" />
                       מנהל
@@ -281,9 +290,10 @@ export default function UsersTable({
             <TableRow className="bg-muted/50">
               <TableHead className="w-12">
                 <Checkbox 
-                  checked={isAllSelected}
+                  checked={isAllSelected ? true : isMixedSelected ? "indeterminate" : false}
                   onCheckedChange={toggleSelectAll}
                   aria-label="בחר הכל"
+                  aria-checked={isMixedSelected ? "mixed" : isAllSelected}
                 />
               </TableHead>
               <TableHead className="text-right">משתמש</TableHead>
@@ -343,11 +353,16 @@ export default function UsersTable({
                 <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="focus-ring"
+                        aria-label={`פעולות עבור ${user.name}`}
+                      >
                         <MoreHorizontal className="w-4 h-4" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuContent align="end" className="w-48 z-50">
                       <DropdownMenuItem onClick={() => onView(user)}>
                         <Eye className="w-4 h-4 ml-2" />
                         צפייה בפרופיל
@@ -425,6 +440,9 @@ export default function UsersTable({
           <DialogHeader>
             <DialogTitle>חסימת משתמש: {selectedUser?.name}</DialogTitle>
           </DialogHeader>
+          <p className="text-sm text-muted-foreground" id="blockDialogDesc">
+            ציין סיבת חסימה כדי שנוכל לתעד את הפעולה ביומן.
+          </p>
           <div className="space-y-4 pt-4">
             <div>
               <Label htmlFor="blockReason">סיבת החסימה</Label>
@@ -437,7 +455,7 @@ export default function UsersTable({
               />
             </div>
             <div className="flex gap-2 justify-end">
-              <Button variant="outline" onClick={() => setBlockDialogOpen(false)}>
+              <Button variant="outline" onClick={() => setBlockDialogOpen(false)} className="focus-ring">
                 ביטול
               </Button>
               <Button 
@@ -477,6 +495,9 @@ export default function UsersTable({
           <DialogHeader>
             <DialogTitle>חסימת {selectedIds.size} משתמשים</DialogTitle>
           </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            הפעולה תחסום את כל המשתמשים שנבחרו ותשמור סיבת חסימה לתיעוד.
+          </p>
           <div className="space-y-4 pt-4">
             <div>
               <Label htmlFor="bulkBlockReason">סיבת החסימה</Label>
@@ -489,7 +510,7 @@ export default function UsersTable({
               />
             </div>
             <div className="flex gap-2 justify-end">
-              <Button variant="outline" onClick={() => setBulkBlockDialogOpen(false)}>
+              <Button variant="outline" onClick={() => setBulkBlockDialogOpen(false)} className="focus-ring">
                 ביטול
               </Button>
               <Button 
@@ -511,6 +532,9 @@ export default function UsersTable({
           <DialogHeader>
             <DialogTitle>שליחת התראה ל-{selectedIds.size} משתמשים</DialogTitle>
           </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            כתבו הודעה קצרה וברורה. מומלץ לכלול הנחיה לפעולה.
+          </p>
           <div className="space-y-4 pt-4">
             <div>
               <Label htmlFor="notifyMessage">תוכן ההתראה</Label>
@@ -523,7 +547,7 @@ export default function UsersTable({
               />
             </div>
             <div className="flex gap-2 justify-end">
-              <Button variant="outline" onClick={() => setBulkNotifyDialogOpen(false)}>
+              <Button variant="outline" onClick={() => setBulkNotifyDialogOpen(false)} className="focus-ring">
                 ביטול
               </Button>
               <Button 

@@ -69,6 +69,7 @@ export default function AdminHeader({ onOpenSearch }: AdminHeaderProps) {
       <CommandPalette />
       
       <header className="sticky top-0 z-40 bg-card/95 backdrop-blur-md border-b border-border">
+        <a href="#admin-main" className="skip-link">דלג לתוכן הניהול</a>
         <div className="flex items-center justify-between h-16 px-4 lg:px-6">
           {/* Page Title & Breadcrumb */}
           <div className="flex items-center gap-4 mr-14 lg:mr-0">
@@ -77,9 +78,9 @@ export default function AdminHeader({ onOpenSearch }: AdminHeaderProps) {
                 variant="ghost"
                 size="icon"
                 asChild
-                className="shrink-0 hidden sm:flex"
+                className="shrink-0 hidden sm:flex focus-ring"
               >
-                <Link to="/admin">
+                <Link to="/admin" aria-label="חזרה ללוח הבקרה">
                   <ChevronLeft className="w-4 h-4 rtl:rotate-180" />
                 </Link>
               </Button>
@@ -115,6 +116,7 @@ export default function AdminHeader({ onOpenSearch }: AdminHeaderProps) {
             variant="outline"
             className="hidden md:flex w-full max-w-sm h-9 justify-start text-muted-foreground gap-2 mx-4"
             onClick={handleSearchClick}
+            aria-label="חיפוש מהיר (קיצור: Ctrl/⌘ + K)"
           >
             <Search className="w-4 h-4" />
             <span className="text-sm">חיפוש מהיר...</span>
@@ -136,6 +138,7 @@ export default function AdminHeader({ onOpenSearch }: AdminHeaderProps) {
               size="icon"
               className="md:hidden"
               onClick={handleSearchClick}
+              aria-label="פתח חיפוש מהיר"
             >
               <Search className="w-5 h-5" />
             </Button>
@@ -146,7 +149,7 @@ export default function AdminHeader({ onOpenSearch }: AdminHeaderProps) {
             {/* User Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+                <Button variant="ghost" className="relative h-9 w-9 rounded-full focus-ring" aria-label="תפריט משתמש">
                   <Avatar className="h-9 w-9 border-2 border-primary/20">
                     <AvatarImage src={profile?.avatar_url || undefined} alt={profile?.name || "Admin"} />
                     <AvatarFallback className="bg-primary/10 text-primary text-sm font-semibold">
