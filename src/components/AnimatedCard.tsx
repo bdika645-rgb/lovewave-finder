@@ -1,5 +1,5 @@
-import { motion } from "framer-motion";
-import { ReactNode } from "react";
+import { motion, useReducedMotion } from "framer-motion";
+import { ReactNode, useMemo } from "react";
 
 interface AnimatedCardProps {
   children: ReactNode;
@@ -12,9 +12,17 @@ const AnimatedCard = ({
   className = "", 
   index = 0 
 }: AnimatedCardProps) => {
+  const reducedMotion = useReducedMotion();
+
+  const shouldAnimate = useMemo(() => {
+    if (reducedMotion) return false;
+    if (typeof window === "undefined") return false;
+    return "IntersectionObserver" in window;
+  }, [reducedMotion]);
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 40, scale: 0.95 }}
+      initial={shouldAnimate ? { opacity: 0, y: 40, scale: 0.95 } : { opacity: 1, y: 0, scale: 1 }}
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true, margin: "-50px" }}
       transition={{ 
@@ -23,8 +31,8 @@ const AnimatedCard = ({
         ease: [0.25, 0.46, 0.45, 0.94]
       }}
       whileHover={{ 
-        y: -8, 
-        transition: { duration: 0.2 } 
+        y: -8,
+        transition: { duration: 0.2 },
       }}
       className={className}
     >

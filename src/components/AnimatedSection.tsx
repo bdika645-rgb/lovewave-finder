@@ -1,5 +1,5 @@
-import { motion } from "framer-motion";
-import { ReactNode } from "react";
+import { motion, useReducedMotion } from "framer-motion";
+import { ReactNode, useMemo } from "react";
 
 interface AnimatedSectionProps {
   children: ReactNode;
@@ -14,6 +14,14 @@ const AnimatedSection = ({
   delay = 0,
   direction = "up" 
 }: AnimatedSectionProps) => {
+  const reducedMotion = useReducedMotion();
+
+  const shouldAnimate = useMemo(() => {
+    if (reducedMotion) return false;
+    if (typeof window === "undefined") return false;
+    return "IntersectionObserver" in window;
+  }, [reducedMotion]);
+
   const getInitialPosition = () => {
     switch (direction) {
       case "up": return { y: 60, x: 0 };
@@ -24,12 +32,13 @@ const AnimatedSection = ({
     }
   };
 
+  const initial = shouldAnimate
+    ? { opacity: 0, ...getInitialPosition() }
+    : { opacity: 1, x: 0, y: 0 };
+
   return (
     <motion.div
-      initial={{ 
-        opacity: 0, 
-        ...getInitialPosition() 
-      }}
+      initial={initial}
       whileInView={{ 
         opacity: 1, 
         x: 0, 
