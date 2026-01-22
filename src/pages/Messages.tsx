@@ -236,6 +236,11 @@ const Messages = () => {
                     <div className="p-8 text-center text-muted-foreground" role="status" aria-live="polite">
                       <p className="mb-3">לא נמצאו שיחות</p>
                       {hasActiveSearch && (
+                        <p className="text-sm mb-4">
+                          נסו שם פרטי או מילת מפתח מההודעה האחרונה.
+                        </p>
+                      )}
+                      {hasActiveSearch && (
                         <Button
                           variant="outline"
                           size="sm"
@@ -363,9 +368,12 @@ const Messages = () => {
                         <span className="sr-only">טוען הודעות...</span>
                       </div>
                     ) : messages.length === 0 ? (
-                      <div className="flex flex-col items-center justify-center h-full text-center">
+                      <div className="flex flex-col items-center justify-center h-full text-center" role="status" aria-live="polite">
                         <MessageCircle className="w-12 h-12 text-muted-foreground/50 mb-3" aria-hidden="true" />
-                        <p className="text-muted-foreground">שלחו הודעה ראשונה!</p>
+                        <p className="text-muted-foreground mb-2">שלחו הודעה ראשונה!</p>
+                        <p className="text-sm text-muted-foreground">
+                          טיפ: נסו משפט פתיחה קצר או השתמשו בכפתור השאלה (Icebreaker).
+                        </p>
                       </div>
                     ) : (
                       messages.map((message) => {

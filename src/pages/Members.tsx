@@ -475,6 +475,14 @@ const Members = () => {
                 description="לא נמצאו פרופילים התואמים את החיפוש שלכם. נסו לשנות את הפילטרים."
                 actionLabel="נקה פילטרים"
                 onAction={clearFilters}
+                secondaryActionLabel="עברו לגילוי"
+                secondaryActionLink="/discover"
+                tips={[
+                  searchQuery ? "נסו לחפש רק שם פרטי או רק עיר" : null,
+                  activeFilters.city ? "נסו לנקות את פילטר המיקום" : null,
+                  activeFilters.ageFrom || activeFilters.ageTo ? "נסו להרחיב את טווח הגילאים" : null,
+                  activeFilterLabels.length > 0 ? "טיפ: התחילו מניקוי פילטרים ובחרו מחדש רק אחד" : null,
+                ].filter(Boolean) as string[]}
               />
             )}
           </>
