@@ -46,8 +46,9 @@ const WhoViewedMe = () => {
         </div>
 
         {loading ? (
-          <div className="flex justify-center py-20">
-            <Loader2 className="w-12 h-12 text-primary animate-spin" />
+          <div className="flex justify-center py-20" role="status" aria-label="טוען צפיות">
+            <Loader2 className="w-12 h-12 text-primary animate-spin" aria-hidden="true" />
+            <span className="sr-only">טוען צפיות...</span>
           </div>
         ) : views.length === 0 ? (
           <div className="text-center py-20">

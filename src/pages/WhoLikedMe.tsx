@@ -119,8 +119,8 @@ const WhoLikedMe = () => {
       <div className="pt-24 pb-12 px-4 max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 bg-pink-100 text-pink-600 dark:bg-pink-900/30 dark:text-pink-400 px-4 py-2 rounded-full mb-4">
-            <Eye className="w-5 h-5" />
+          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full mb-4">
+            <Eye className="w-5 h-5" aria-hidden="true" />
             <span className="font-medium">{likers.length} אנשים</span>
           </div>
           <h1 className="font-display text-4xl font-bold text-foreground mb-2">
@@ -132,8 +132,9 @@ const WhoLikedMe = () => {
         </div>
 
         {loading ? (
-          <div className="flex justify-center py-20">
-            <Loader2 className="w-12 h-12 text-primary animate-spin" />
+          <div className="flex justify-center py-20" role="status" aria-label="טוען לייקים">
+            <Loader2 className="w-12 h-12 text-primary animate-spin" aria-hidden="true" />
+            <span className="sr-only">טוען לייקים...</span>
           </div>
         ) : likers.length === 0 ? (
           <div className="text-center py-20">
@@ -158,8 +159,8 @@ const WhoLikedMe = () => {
                 className="bg-card rounded-3xl overflow-hidden shadow-card card-hover relative group"
               >
                 {liker.is_super && (
-                  <Badge className="absolute top-3 right-3 z-10 bg-gradient-to-r from-yellow-400 to-orange-500 text-white gap-1">
-                    <Star className="w-3 h-3 fill-current" />
+                  <Badge className="absolute top-3 right-3 z-10 bg-primary text-primary-foreground gap-1">
+                    <Star className="w-3 h-3 fill-current" aria-hidden="true" />
                     Super Like
                   </Badge>
                 )}

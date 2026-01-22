@@ -50,7 +50,10 @@ export function useTypingStatus(conversationId: string | null, myProfileId: stri
         },
         (payload) => {
           if (payload.eventType === 'DELETE') {
-            setTypingUsers(prev => prev.filter(t => t.profile_id !== (payload.old as any).profile_id));
+            const oldRow = payload.old as Partial<TypingUser> | null;
+            const oldProfileId = oldRow?.profile_id;
+            if (!oldProfileId) return;
+            setTypingUsers(prev => prev.filter(t => t.profile_id !== oldProfileId));
           } else {
             const newStatus = payload.new as TypingUser;
             setTypingUsers(prev => {

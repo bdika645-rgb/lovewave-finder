@@ -4,6 +4,7 @@ import TypingIndicator from "@/components/TypingIndicator";
 import IcebreakerButton from "@/components/IcebreakerButton";
 import ReadReceipt from "@/components/ReadReceipt";
 import ConversationMenu from "@/components/ConversationMenu";
+import FullPageLoader from "@/components/FullPageLoader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Send, Search, Loader2, MessageCircle, Heart, ChevronRight } from "lucide-react";
@@ -122,13 +123,11 @@ const Messages = () => {
 
   if (conversationsLoading || matchesLoading) {
     return (
-      <div className="min-h-screen bg-muted/20" dir="rtl">
+      <>
         <SkipToContent />
         <Navbar />
-        <div className="container mx-auto px-6 pt-24 pb-6 flex items-center justify-center h-[calc(100vh-80px)]">
-          <Loader2 className="w-12 h-12 text-primary animate-spin" aria-label="טוען..." />
-        </div>
-      </div>
+        <FullPageLoader label="טוען שיחות..." className="min-h-screen bg-muted/20 flex items-center justify-center" />
+      </>
     );
   }
 
@@ -359,7 +358,8 @@ const Messages = () => {
                     style={{ WebkitOverflowScrolling: 'touch' }}
                     role="log" 
                     aria-label="הודעות"
-                    aria-live="polite"
+                    aria-live="off"
+                    aria-relevant="additions"
                     aria-busy={messagesLoading}
                   >
                     {messagesLoading ? (
