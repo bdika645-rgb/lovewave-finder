@@ -181,6 +181,41 @@
     animation: fade-in 0.8s ease-out;
   }
 
+  /* Respect reduced-motion preferences (accessibility) */
+  @media (prefers-reduced-motion: reduce) {
+    html:focus-within {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+
+    /* Disable our decorative motion helpers */
+    .animate-float,
+    .animate-pulse-soft,
+    .animate-slide-up,
+    .animate-fade-in,
+    .animate-wiggle,
+    .animate-swipe-right,
+    .animate-swipe-left,
+    .animate-scale-in,
+    .shimmer {
+      animation: none !important;
+    }
+
+    .card-hover,
+    .card-hover:hover {
+      transition: none !important;
+      transform: none !important;
+    }
+  }
+
   .glass-effect {
     backdrop-filter: blur(12px);
     background: hsla(0, 0%, 100%, 0.8);
