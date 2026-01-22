@@ -45,7 +45,7 @@ const BottomNavigation = () => {
               <Link
                 to={item.path}
                 className={cn(
-                  "flex flex-col items-center justify-center h-full relative transition-colors min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset",
+                  "flex flex-col items-center justify-center h-full relative transition-colors min-h-[44px] min-w-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-lg",
                   isActive 
                     ? "text-primary" 
                     : "text-muted-foreground hover:text-foreground"

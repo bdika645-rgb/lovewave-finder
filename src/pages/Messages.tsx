@@ -138,34 +138,38 @@ const Messages = () => {
       <Navbar />
 
       <main id="main-content" className="container mx-auto px-6 pt-24 pb-6">
+        <h1 className="sr-only">הודעות</h1>
         <div className="bg-card rounded-3xl shadow-card overflow-hidden h-[calc(100vh-120px)]">
           {hasNoConversationsOrMatches ? (
             <div className="flex flex-col items-center justify-center h-full p-8 text-center">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center mb-6 animate-pulse-soft">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center mb-6 animate-pulse-soft" aria-hidden="true">
                 <Heart className="w-10 h-10 text-primary" aria-hidden="true" />
               </div>
               <h2 className="font-display text-2xl font-bold text-foreground mb-3">עדיין אין שיחות</h2>
               <p className="text-muted-foreground mb-6 max-w-md leading-relaxed">
-                כשתקבלו התאמה הדדית עם מישהו, תוכלו להתחיל לשוחח כאן. 
-                בינתיים, גלו פרופילים ושלחו לייקים!
+                כשתקבלו התאמה הדדית עם מישהו, תוכלו להתחיל לשוחח כאן.
               </p>
-              <div className="bg-muted/50 rounded-xl p-4 mb-6 max-w-sm w-full text-right" dir="rtl">
-                <p className="text-sm font-medium text-foreground mb-2">💡 טיפים להתאמות:</p>
-                <ul className="text-sm text-muted-foreground space-y-1">
-                  <li>• העלו תמונת פרופיל ברורה</li>
-                  <li>• כתבו ביו קצר ומעניין</li>
-                  <li>• היו פעילים ושלחו לייקים</li>
-                </ul>
+              
+              {/* Numbered Steps */}
+              <div className="bg-muted/50 rounded-xl p-5 mb-6 max-w-sm w-full" dir="rtl">
+                <p className="text-sm font-medium text-foreground mb-3">🚀 איך להתחיל?</p>
+                <ol className="text-sm text-muted-foreground space-y-2 list-decimal list-inside text-right">
+                  <li>גלו פרופילים בעמוד הגילוי</li>
+                  <li>שלחו לייקים לאנשים שמוצאים חן בעיניכם</li>
+                  <li>כשיש לייק הדדי — נוצרת התאמה!</li>
+                  <li>התחילו לשוחח עם ההתאמות שלכם</li>
+                </ol>
               </div>
+              
               <div className="flex flex-col sm:flex-row gap-3">
                 <Link to="/discover">
-                  <Button variant="hero" size="lg" className="gap-2">
+                  <Button variant="hero" size="lg" className="gap-2 w-full sm:w-auto">
                     <Search className="w-5 h-5" aria-hidden="true" />
                     גלו פרופילים
                   </Button>
                 </Link>
                 <Link to="/profile">
-                  <Button variant="outline" size="lg">
+                  <Button variant="outline" size="lg" className="w-full sm:w-auto">
                     שפרו את הפרופיל
                   </Button>
                 </Link>
@@ -176,7 +180,7 @@ const Messages = () => {
               {/* Conversations List */}
               <div className={`border-l border-border ${selectedConversationId ? 'hidden md:block' : 'block'}`}>
                 <div className="p-4 border-b border-border">
-                  <h2 className="font-display text-lg md:text-xl font-bold text-foreground mb-4">הודעות</h2>
+                  <h2 className="font-display text-lg md:text-xl font-bold text-foreground mb-4">שיחות</h2>
                   <div className="relative">
                     <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
                     <Input 
@@ -220,7 +224,7 @@ const Messages = () => {
                   </div>
                 )}
                 
-                <div className="overflow-y-auto h-[calc(100%-100px)]" role="list" aria-label="רשימת שיחות">
+                <div className="overflow-y-auto h-[calc(100%-100px)] scroll-smooth-ios" style={{ WebkitOverflowScrolling: 'touch' }} role="list" aria-label="רשימת שיחות">
                   {filteredConversations.length === 0 && conversations.length === 0 && matches.length > 0 ? (
                     <div className="p-8 text-center text-muted-foreground">
                       <MessageCircle className="w-12 h-12 mx-auto mb-3 opacity-50" aria-hidden="true" />
@@ -333,14 +337,17 @@ const Messages = () => {
 
                   {/* Messages */}
                   <div 
-                    className="flex-1 overflow-y-auto p-6 space-y-4" 
+                    className="flex-1 overflow-y-auto p-6 space-y-4 scroll-smooth" 
+                    style={{ WebkitOverflowScrolling: 'touch' }}
                     role="log" 
                     aria-label="הודעות"
                     aria-live="polite"
+                    aria-busy={messagesLoading}
                   >
                     {messagesLoading ? (
-                      <div className="flex items-center justify-center h-full">
-                        <Loader2 className="w-8 h-8 text-primary animate-spin" aria-label="טוען הודעות..." />
+                      <div className="flex items-center justify-center h-full" role="status">
+                        <Loader2 className="w-8 h-8 text-primary animate-spin" aria-hidden="true" />
+                        <span className="sr-only">טוען הודעות...</span>
                       </div>
                     ) : messages.length === 0 ? (
                       <div className="flex flex-col items-center justify-center h-full text-center">

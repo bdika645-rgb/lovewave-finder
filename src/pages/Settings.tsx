@@ -134,7 +134,7 @@ const Settings = () => {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Shield className="w-5 h-5 text-primary" />
+                <Shield className="w-5 h-5 text-primary" aria-hidden="true" />
                 פרטי חשבון
               </CardTitle>
               <CardDescription>מידע בסיסי על החשבון שלך</CardDescription>
@@ -155,7 +155,7 @@ const Settings = () => {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Bell className="w-5 h-5 text-primary" />
+                <Bell className="w-5 h-5 text-primary" aria-hidden="true" />
                 התראות
               </CardTitle>
               <CardDescription>בחר אילו התראות תרצה לקבל</CardDescription>
@@ -163,12 +163,14 @@ const Settings = () => {
             <CardContent className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <Label>התראות אימייל</Label>
-                  <p className="text-sm text-muted-foreground">קבל עדכונים למייל</p>
+                  <Label id="email-notifications-label">התראות אימייל</Label>
+                  <p className="text-sm text-muted-foreground" id="email-notifications-desc">קבל עדכונים למייל</p>
                 </div>
                 <Switch 
                   checked={localSettings.email_notifications}
                   onCheckedChange={(checked) => setLocalSettings({...localSettings, email_notifications: checked})}
+                  aria-labelledby="email-notifications-label"
+                  aria-describedby="email-notifications-desc"
                 />
               </div>
               
@@ -176,12 +178,14 @@ const Settings = () => {
               
               <div className="flex items-center justify-between">
                 <div>
-                  <Label>התראות פוש</Label>
-                  <p className="text-sm text-muted-foreground">קבל התראות לטלפון</p>
+                  <Label id="push-notifications-label">התראות פוש</Label>
+                  <p className="text-sm text-muted-foreground" id="push-notifications-desc">קבל התראות לטלפון</p>
                 </div>
                 <Switch 
                   checked={localSettings.push_notifications}
                   onCheckedChange={(checked) => setLocalSettings({...localSettings, push_notifications: checked})}
+                  aria-labelledby="push-notifications-label"
+                  aria-describedby="push-notifications-desc"
                 />
               </div>
               
@@ -189,12 +193,14 @@ const Settings = () => {
               
               <div className="flex items-center justify-between">
                 <div>
-                  <Label>התאמות חדשות</Label>
-                  <p className="text-sm text-muted-foreground">התראה כשיש התאמה חדשה</p>
+                  <Label id="match-notifications-label">התאמות חדשות</Label>
+                  <p className="text-sm text-muted-foreground" id="match-notifications-desc">התראה כשיש התאמה חדשה</p>
                 </div>
                 <Switch 
                   checked={localSettings.match_notifications}
                   onCheckedChange={(checked) => setLocalSettings({...localSettings, match_notifications: checked})}
+                  aria-labelledby="match-notifications-label"
+                  aria-describedby="match-notifications-desc"
                 />
               </div>
               
@@ -202,12 +208,14 @@ const Settings = () => {
               
               <div className="flex items-center justify-between">
                 <div>
-                  <Label>הודעות</Label>
-                  <p className="text-sm text-muted-foreground">התראה על הודעות חדשות</p>
+                  <Label id="message-notifications-label">הודעות</Label>
+                  <p className="text-sm text-muted-foreground" id="message-notifications-desc">התראה על הודעות חדשות</p>
                 </div>
                 <Switch 
                   checked={localSettings.message_notifications}
                   onCheckedChange={(checked) => setLocalSettings({...localSettings, message_notifications: checked})}
+                  aria-labelledby="message-notifications-label"
+                  aria-describedby="message-notifications-desc"
                 />
               </div>
 
@@ -226,7 +234,7 @@ const Settings = () => {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Eye className="w-5 h-5 text-primary" />
+                <Eye className="w-5 h-5 text-primary" aria-hidden="true" />
                 פרטיות
               </CardTitle>
               <CardDescription>שליטה במה שאחרים רואים</CardDescription>
@@ -234,12 +242,14 @@ const Settings = () => {
             <CardContent className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <Label>הצג סטטוס אונליין</Label>
-                  <p className="text-sm text-muted-foreground">אחרים יראו כשאתה מחובר</p>
+                  <Label id="online-status-label">הצג סטטוס אונליין</Label>
+                  <p className="text-sm text-muted-foreground" id="online-status-desc">אחרים יראו כשאתה מחובר</p>
                 </div>
                 <Switch 
                   checked={localSettings.show_online_status}
                   onCheckedChange={(checked) => setLocalSettings({...localSettings, show_online_status: checked})}
+                  aria-labelledby="online-status-label"
+                  aria-describedby="online-status-desc"
                 />
               </div>
               
@@ -247,12 +257,14 @@ const Settings = () => {
               
               <div className="flex items-center justify-between">
                 <div>
-                  <Label>הצג נצפה לאחרונה</Label>
-                  <p className="text-sm text-muted-foreground">הצג מתי היית מחובר לאחרונה</p>
+                  <Label id="last-seen-label">הצג נצפה לאחרונה</Label>
+                  <p className="text-sm text-muted-foreground" id="last-seen-desc">הצג מתי היית מחובר לאחרונה</p>
                 </div>
                 <Switch 
                   checked={localSettings.show_last_seen}
                   onCheckedChange={(checked) => setLocalSettings({...localSettings, show_last_seen: checked})}
+                  aria-labelledby="last-seen-label"
+                  aria-describedby="last-seen-desc"
                 />
               </div>
               
@@ -260,12 +272,14 @@ const Settings = () => {
               
               <div className="flex items-center justify-between">
                 <div>
-                  <Label>הפרופיל שלי גלוי</Label>
-                  <p className="text-sm text-muted-foreground">אחרים יכולים לראות את הפרופיל שלך</p>
+                  <Label id="profile-visible-label">הפרופיל שלי גלוי</Label>
+                  <p className="text-sm text-muted-foreground" id="profile-visible-desc">אחרים יכולים לראות את הפרופיל שלך</p>
                 </div>
                 <Switch 
                   checked={localSettings.profile_visible}
                   onCheckedChange={(checked) => setLocalSettings({...localSettings, profile_visible: checked})}
+                  aria-labelledby="profile-visible-label"
+                  aria-describedby="profile-visible-desc"
                 />
               </div>
 
@@ -284,7 +298,7 @@ const Settings = () => {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Lock className="w-5 h-5 text-primary" />
+                <Lock className="w-5 h-5 text-primary" aria-hidden="true" />
                 אבטחה
               </CardTitle>
               <CardDescription>הגדרות אבטחת חשבון</CardDescription>
@@ -319,7 +333,7 @@ const Settings = () => {
           <Card className="border-destructive/50">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-destructive">
-                <Trash2 className="w-5 h-5" />
+                <Trash2 className="w-5 h-5" aria-hidden="true" />
                 אזור מסוכן
               </CardTitle>
               <CardDescription>פעולות בלתי הפיכות</CardDescription>

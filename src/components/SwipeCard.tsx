@@ -195,29 +195,29 @@ const SwipeCard = ({
       >
         {/* Like Indicator */}
         <div 
-          className="absolute top-8 right-8 z-20 border-4 border-success text-success font-bold text-2xl px-4 py-2 rounded-lg rotate-[-20deg] pointer-events-none"
+          className="absolute top-8 right-8 z-20 border-4 border-success text-success font-bold text-2xl px-4 py-2 rounded-lg rotate-[-20deg] pointer-events-none bg-background/80"
           style={{ opacity: likeOpacity }}
           aria-hidden="true"
         >
-          LIKE ❤️
+          לייק ❤️
         </div>
 
         {/* Nope Indicator */}
         <div 
-          className="absolute top-8 left-8 z-20 border-4 border-destructive text-destructive font-bold text-2xl px-4 py-2 rounded-lg rotate-[20deg] pointer-events-none"
+          className="absolute top-8 left-8 z-20 border-4 border-destructive text-destructive font-bold text-2xl px-4 py-2 rounded-lg rotate-[20deg] pointer-events-none bg-background/80"
           style={{ opacity: passOpacity }}
           aria-hidden="true"
         >
-          NOPE ✕
+          דלג ✕
         </div>
 
         {/* Super Like Indicator */}
         <div 
-          className="absolute top-1/3 left-1/2 -translate-x-1/2 z-20 border-4 border-secondary text-secondary font-bold text-2xl px-4 py-2 rounded-lg pointer-events-none"
+          className="absolute top-1/3 left-1/2 -translate-x-1/2 z-20 border-4 border-secondary text-secondary font-bold text-2xl px-4 py-2 rounded-lg pointer-events-none bg-background/80"
           style={{ opacity: superLikeOpacity }}
           aria-hidden="true"
         >
-          SUPER ⭐
+          סופר ⭐
         </div>
 
         {/* Image */}
@@ -248,25 +248,25 @@ const SwipeCard = ({
           {allImages.length > 1 && (
             <>
               <button 
-                className="absolute left-2 top-1/2 -translate-y-1/2 p-2 glass-effect rounded-full opacity-50 hover:opacity-100 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary z-10"
+                className="absolute left-2 top-1/2 -translate-y-1/2 min-w-[44px] min-h-[44px] flex items-center justify-center glass-effect rounded-full opacity-70 hover:opacity-100 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background z-10"
                 onClick={(e) => {
                   e.stopPropagation();
                   setImageIndex(Math.max(0, imageIndex - 1));
                 }}
                 aria-label="תמונה קודמת"
               >
-                <ChevronRight className="w-6 h-6 text-foreground" />
+                <ChevronRight className="w-6 h-6 text-foreground" aria-hidden="true" />
               </button>
               
               <button 
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 glass-effect rounded-full opacity-50 hover:opacity-100 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary z-10"
+                className="absolute right-2 top-1/2 -translate-y-1/2 min-w-[44px] min-h-[44px] flex items-center justify-center glass-effect rounded-full opacity-70 hover:opacity-100 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background z-10"
                 onClick={(e) => {
                   e.stopPropagation();
                   setImageIndex(Math.min(allImages.length - 1, imageIndex + 1));
                 }}
                 aria-label="תמונה הבאה"
               >
-                <ChevronLeft className="w-6 h-6 text-foreground" />
+                <ChevronLeft className="w-6 h-6 text-foreground" aria-hidden="true" />
               </button>
             </>
           )}

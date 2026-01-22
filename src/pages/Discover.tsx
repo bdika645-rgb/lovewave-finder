@@ -415,7 +415,7 @@ const Discover = () => {
         </div>
       )}
       
-      {/* Match Animation Overlay */}
+      {/* Match Animation Overlay with Focus Trap */}
       {showMatchAnimation && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-background/95 backdrop-blur-md animate-fade-in"
@@ -423,6 +423,32 @@ const Discover = () => {
           aria-modal="true"
           aria-labelledby="match-title"
           aria-describedby="match-description"
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') setShowMatchAnimation(false);
+            // Focus trap: prevent tabbing outside
+            if (e.key === 'Tab') {
+              const focusableElements = e.currentTarget.querySelectorAll<HTMLElement>(
+                'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+              );
+              const firstElement = focusableElements[0];
+              const lastElement = focusableElements[focusableElements.length - 1];
+              
+              if (e.shiftKey && document.activeElement === firstElement) {
+                e.preventDefault();
+                lastElement?.focus();
+              } else if (!e.shiftKey && document.activeElement === lastElement) {
+                e.preventDefault();
+                firstElement?.focus();
+              }
+            }
+          }}
+          ref={(el) => {
+            // Auto-focus first button when overlay opens
+            if (el) {
+              const firstButton = el.querySelector<HTMLElement>('button, [href]');
+              setTimeout(() => firstButton?.focus(), 100);
+            }
+          }}
         >
           <div className="sr-only" role="status" aria-live="assertive">
             יש התאמה עם {matchedName}
@@ -438,9 +464,9 @@ const Discover = () => {
                   />
                 </div>
               </div>
-              <Heart className="w-16 h-16 text-primary mx-auto mt-4 fill-current animate-heart-beat" />
-              <Sparkles className="w-8 h-8 text-secondary absolute -top-4 -right-4 animate-float" />
-              <Sparkles className="w-6 h-6 text-primary absolute -bottom-2 -left-6 animate-float" style={{ animationDelay: "0.5s" }} />
+              <Heart className="w-16 h-16 text-primary mx-auto mt-4 fill-current animate-heart-beat" aria-hidden="true" />
+              <Sparkles className="w-8 h-8 text-secondary absolute -top-4 -right-4 animate-float" aria-hidden="true" />
+              <Sparkles className="w-6 h-6 text-primary absolute -bottom-2 -left-6 animate-float" style={{ animationDelay: "0.5s" }} aria-hidden="true" />
             </div>
             <h1 id="match-title" className="font-display text-5xl font-bold text-gradient mb-4">
               יש התאמה! 🎉

@@ -59,7 +59,7 @@ const OnboardingTooltip = ({
   return (
     <aside 
       className={cn(
-        "fixed bottom-4 left-4 right-4 md:left-auto md:right-8 md:bottom-8 md:w-96",
+        "fixed bottom-20 left-4 right-4 sm:bottom-4 md:left-auto md:right-8 md:bottom-8 md:w-96",
         "bg-card border border-border rounded-2xl shadow-elevated p-6 z-50",
         "animate-slide-up",
         className

@@ -240,10 +240,12 @@ const Profile = () => {
               </h3>
               {isEditing ? (
                 <Textarea 
+                  id="profile-bio"
                   value={editedProfile.bio}
                   onChange={(e) => setEditedProfile({...editedProfile, bio: e.target.value})}
                   className="min-h-[120px]"
                   placeholder="ספר/י קצת על עצמך..."
+                  aria-label="קצת עליי"
                 />
               ) : (
                 <p className="text-muted-foreground leading-relaxed">
@@ -309,36 +311,42 @@ const Profile = () => {
               </h3>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm text-muted-foreground">שם</label>
+                  <label htmlFor="profile-name" className="text-sm text-muted-foreground block mb-1">שם</label>
                   {isEditing ? (
                     <Input 
+                      id="profile-name"
                       value={editedProfile.name}
                       onChange={(e) => setEditedProfile({...editedProfile, name: e.target.value})}
+                      aria-required="true"
                     />
                   ) : (
                     <p className="font-medium text-foreground">{displayProfile.name}</p>
                   )}
                 </div>
                 <div>
-                  <label className="text-sm text-muted-foreground">גיל</label>
+                  <label htmlFor="profile-age" className="text-sm text-muted-foreground block mb-1">גיל</label>
                   {isEditing ? (
                     <Input 
+                      id="profile-age"
                       type="number"
                       value={editedProfile.age}
                       onChange={(e) => setEditedProfile({...editedProfile, age: parseInt(e.target.value) || 0})}
+                      aria-required="true"
+                      min={18}
+                      max={120}
                     />
                   ) : (
                     <p className="font-medium text-foreground">{displayProfile.age}</p>
                   )}
                 </div>
                 <div>
-                  <label className="text-sm text-muted-foreground">עיר</label>
+                  <label htmlFor="profile-city" className="text-sm text-muted-foreground block mb-1">עיר</label>
                   {isEditing ? (
                     <Select
                       value={editedProfile.city}
                       onValueChange={(value) => setEditedProfile({...editedProfile, city: value})}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger id="profile-city">
                         <SelectValue placeholder="בחר עיר" />
                       </SelectTrigger>
                       <SelectContent>
@@ -352,9 +360,9 @@ const Profile = () => {
                   )}
                 </div>
                 <div>
-                  <label className="text-sm text-muted-foreground">הצטרפתי</label>
+                  <span className="text-sm text-muted-foreground block mb-1">הצטרפתי</span>
                   <p className="font-medium text-foreground flex items-center gap-1">
-                    <Calendar className="w-4 h-4" />
+                    <Calendar className="w-4 h-4" aria-hidden="true" />
                     {joinedDate}
                   </p>
                 </div>

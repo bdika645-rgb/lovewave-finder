@@ -101,24 +101,28 @@ const Matches = () => {
             </h2>
             <p className="text-muted-foreground mb-6 leading-relaxed">
               {filter === "new"
-                ? "לא היו התאמות חדשות בשבוע האחרון. המשיכו לגלות פרופילים חדשים!"
-                : "כשמישהו שעשיתם לו לייק יעשה לכם לייק בחזרה, תראו את ההתאמה כאן. בינתיים, המשיכו לגלות!"}
+                ? "לא היו התאמות חדשות בשבוע האחרון."
+                : "כשמישהו שעשיתם לו לייק יעשה לכם לייק בחזרה, תראו את ההתאמה כאן."}
             </p>
-            <div className="bg-muted/50 rounded-xl p-4 mb-6 text-right" dir="rtl">
-              <p className="text-sm font-medium text-foreground mb-2">💡 טיפים לקבלת התאמות:</p>
-              <ul className="text-sm text-muted-foreground space-y-1">
-                <li>• שלחו לייקים לאנשים שבאמת מעניינים אתכם</li>
-                <li>• סופר לייק בולט יותר ומגדיל סיכויים</li>
-                <li>• פרופיל מלא מושך יותר התאמות</li>
-              </ul>
+            
+            {/* Numbered Steps for Empty State */}
+            <div className="bg-muted/50 rounded-xl p-5 mb-6 text-right w-full" dir="rtl">
+              <p className="text-sm font-medium text-foreground mb-3">🎯 איך לקבל התאמות?</p>
+              <ol className="text-sm text-muted-foreground space-y-2 list-decimal list-inside">
+                <li>גלו פרופילים שמעניינים אתכם</li>
+                <li>שלחו לייקים — סופר לייק בולט יותר!</li>
+                <li>שפרו את הפרופיל שלכם עם תמונות וביו</li>
+                <li>חכו להתאמה הדדית</li>
+              </ol>
             </div>
+            
             <Link to="/discover">
               <Button variant="hero" size="lg" className="gap-2">
-              <Sparkles className="w-5 h-5" aria-hidden="true" />
-              גלו פרופילים חדשים
-            </Button>
-          </Link>
-        </section>
+                <Sparkles className="w-5 h-5" aria-hidden="true" />
+                גלו פרופילים חדשים
+              </Button>
+            </Link>
+          </section>
         ) : (
           <section id="matches-list" className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" role="list" aria-label="רשימת התאמות">
             {displayedMatches.map((match) => {
