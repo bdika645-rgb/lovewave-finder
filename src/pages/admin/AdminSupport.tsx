@@ -11,6 +11,16 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { 
   Dialog,
   DialogContent,
@@ -45,15 +55,16 @@ export default function AdminSupport() {
   const [selectedTicket, setSelectedTicket] = useState<typeof tickets[0] | null>(null);
   const [adminNote, setAdminNote] = useState("");
   const [newStatus, setNewStatus] = useState<string>("");
+  const [deleteTicketId, setDeleteTicketId] = useState<string | null>(null);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'open':
-        return <Badge variant="outline" className="bg-yellow-500/10 text-yellow-600 border-yellow-500/20">פתוח</Badge>;
+        return <Badge variant="secondary">פתוח</Badge>;
       case 'in_progress':
-        return <Badge variant="outline" className="bg-blue-500/10 text-blue-600 border-blue-500/20">בטיפול</Badge>;
+        return <Badge variant="outline">בטיפול</Badge>;
       case 'resolved':
-        return <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-500/20">נפתר</Badge>;
+        return <Badge variant="default">נפתר</Badge>;
       case 'closed':
         return <Badge variant="outline" className="bg-muted text-muted-foreground">נסגר</Badge>;
       default:
@@ -76,16 +87,18 @@ export default function AdminSupport() {
     }
   };
 
-  const handleDelete = async (ticketId: string) => {
-    if (!confirm("האם למחוק את הפנייה?")) return;
-    
-    const { error } = await deleteTicket(ticketId);
-    
+  const handleDelete = async () => {
+    if (!deleteTicketId) return;
+
+    const { error } = await deleteTicket(deleteTicketId);
+
     if (error) {
       toast.error("שגיאה במחיקת הפנייה");
     } else {
       toast.success("הפנייה נמחקה");
     }
+
+    setDeleteTicketId(null);
   };
 
   if (loading) {
@@ -113,11 +126,11 @@ export default function AdminSupport() {
           </div>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <Clock className="w-5 h-5 text-yellow-500" />
+              <Clock className="w-5 h-5 text-muted-foreground" />
               <span className="text-sm text-muted-foreground">{openCount} פתוחות</span>
             </div>
             <div className="flex items-center gap-2">
-              <MessageSquare className="w-5 h-5 text-blue-500" />
+              <MessageSquare className="w-5 h-5 text-muted-foreground" />
               <span className="text-sm text-muted-foreground">{inProgressCount} בטיפול</span>
             </div>
           </div>
@@ -245,7 +258,7 @@ export default function AdminSupport() {
                         <Button 
                           variant="ghost" 
                           size="sm"
-                          onClick={() => handleDelete(ticket.id)}
+                          onClick={() => setDeleteTicketId(ticket.id)}
                           className="text-destructive hover:text-destructive"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -258,6 +271,26 @@ export default function AdminSupport() {
             </Table>
           </div>
         )}
+
+        <AlertDialog open={!!deleteTicketId} onOpenChange={(open) => !open && setDeleteTicketId(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>האם למחוק את הפנייה?</AlertDialogTitle>
+              <AlertDialogDescription>
+                פעולה זו תמחק את הפנייה לצמיתות. לא ניתן לבטל פעולה זו.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>ביטול</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleDelete}
+                className="bg-destructive hover:bg-destructive/90"
+              >
+                מחק
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </AdminLayout>
   );

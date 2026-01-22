@@ -49,22 +49,30 @@ export default function AdminMatches() {
   const [stats, setStats] = useState({ matches: 0, likes: 0, conversionRate: 0 });
   const [deleteMatchId, setDeleteMatchId] = useState<string | null>(null);
   const [deleteLikeId, setDeleteLikeId] = useState<string | null>(null);
+  const [matchesPage, setMatchesPage] = useState(1);
+  const [likesPage, setLikesPage] = useState(1);
+  const pageSize = 10;
 
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
+
+      const matchFrom = (matchesPage - 1) * pageSize;
+      const matchTo = matchFrom + pageSize - 1;
+      const likeFrom = (likesPage - 1) * pageSize;
+      const likeTo = likeFrom + pageSize - 1;
       
       const { data: matchesData } = await supabase
         .from("matches")
         .select(`id, created_at, profile1_id, profile2_id`)
         .order("created_at", { ascending: false })
-        .limit(50);
+        .range(matchFrom, matchTo);
 
       const { data: likesData } = await supabase
         .from("likes")
         .select(`id, created_at, liker_id, liked_id`)
         .order("created_at", { ascending: false })
-        .limit(50);
+        .range(likeFrom, likeTo);
 
       const { count: matchCount } = await supabase
         .from("matches")
@@ -121,7 +129,7 @@ export default function AdminMatches() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [likesPage, matchesPage]);
 
   useEffect(() => {
     fetchData();
@@ -141,6 +149,10 @@ export default function AdminMatches() {
       toast.success("המאץ' נמחק בהצלחה");
       setMatches(prev => prev.filter(m => m.id !== deleteMatchId));
       setStats(prev => ({ ...prev, matches: prev.matches - 1 }));
+
+      if (matches.length === 1 && matchesPage > 1) {
+        setMatchesPage(p => p - 1);
+      }
     } catch {
       toast.error("שגיאה במחיקת המאץ'");
     } finally {
@@ -162,12 +174,19 @@ export default function AdminMatches() {
       toast.success("הלייק נמחק בהצלחה");
       setLikes(prev => prev.filter(l => l.id !== deleteLikeId));
       setStats(prev => ({ ...prev, likes: prev.likes - 1 }));
+
+      if (likes.length === 1 && likesPage > 1) {
+        setLikesPage(p => p - 1);
+      }
     } catch {
       toast.error("שגיאה במחיקת הלייק");
     } finally {
       setDeleteLikeId(null);
     }
   };
+
+  const matchesTotalPages = Math.max(1, Math.ceil(stats.matches / pageSize));
+  const likesTotalPages = Math.max(1, Math.ceil(stats.likes / pageSize));
 
   if (loading) {
     return (
@@ -266,6 +285,31 @@ export default function AdminMatches() {
               </TableBody>
             </Table>
           </div>
+
+          {/* Matches Pagination */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 border-t border-border">
+            <p className="text-sm text-muted-foreground">
+              מאצ'ים: עמוד {matchesPage} מתוך {matchesTotalPages}
+            </p>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setMatchesPage(p => Math.max(1, p - 1))}
+                disabled={matchesPage <= 1}
+              >
+                הקודם
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setMatchesPage(p => Math.min(matchesTotalPages, p + 1))}
+                disabled={matchesPage >= matchesTotalPages}
+              >
+                הבא
+              </Button>
+            </div>
+          </div>
         </div>
 
         <div className="bg-card rounded-xl border border-border overflow-hidden">
@@ -329,6 +373,31 @@ export default function AdminMatches() {
                 )}
               </TableBody>
             </Table>
+          </div>
+
+          {/* Likes Pagination */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 border-t border-border">
+            <p className="text-sm text-muted-foreground">
+              לייקים: עמוד {likesPage} מתוך {likesTotalPages}
+            </p>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setLikesPage(p => Math.max(1, p - 1))}
+                disabled={likesPage <= 1}
+              >
+                הקודם
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setLikesPage(p => Math.min(likesTotalPages, p + 1))}
+                disabled={likesPage >= likesTotalPages}
+              >
+                הבא
+              </Button>
+            </div>
           </div>
         </div>
 

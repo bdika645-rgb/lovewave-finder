@@ -51,6 +51,8 @@ export default function AdminMessages() {
     totalConversations: 0,
     unreadMessages: 0 
   });
+  const [page, setPage] = useState(1);
+  const pageSize = 25;
   const [deleteMessageId, setDeleteMessageId] = useState<string | null>(null);
   const [viewMessage, setViewMessage] = useState<MessageData | null>(null);
 
@@ -71,11 +73,14 @@ export default function AdminMessages() {
         .select("*", { count: "exact", head: true })
         .eq("is_read", false);
 
+      const rangeFrom = (page - 1) * pageSize;
+      const rangeTo = rangeFrom + pageSize - 1;
+
       const { data: messagesData } = await supabase
         .from("messages")
         .select(`id, content, created_at, is_read, sender_id`)
         .order("created_at", { ascending: false })
-        .limit(50);
+        .range(rangeFrom, rangeTo);
 
       const senderIds = [...new Set(messagesData?.map(m => m.sender_id) || [])];
       
@@ -102,7 +107,7 @@ export default function AdminMessages() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [page]);
 
   useEffect(() => {
     fetchData();
@@ -122,12 +127,19 @@ export default function AdminMessages() {
       toast.success("ההודעה נמחקה בהצלחה");
       setMessages(prev => prev.filter(m => m.id !== deleteMessageId));
       setStats(prev => ({ ...prev, totalMessages: prev.totalMessages - 1 }));
+
+      // If we deleted the last row on the page, go back a page (when possible)
+      if (messages.length === 1 && page > 1) {
+        setPage(p => p - 1);
+      }
     } catch {
       toast.error("שגיאה במחיקת ההודעה");
     } finally {
       setDeleteMessageId(null);
     }
   };
+
+  const totalPages = Math.max(1, Math.ceil(stats.totalMessages / pageSize));
 
   if (loading) {
     return (
@@ -232,6 +244,31 @@ export default function AdminMessages() {
                 )}
               </TableBody>
             </Table>
+          </div>
+
+          {/* Pagination */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 border-t border-border">
+            <p className="text-sm text-muted-foreground">
+              עמוד {page} מתוך {totalPages}
+            </p>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                disabled={page <= 1}
+              >
+                הקודם
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                disabled={page >= totalPages}
+              >
+                הבא
+              </Button>
+            </div>
           </div>
         </div>
 
