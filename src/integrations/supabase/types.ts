@@ -622,6 +622,7 @@ export type Database = {
           age: number
           avatar_url: string | null
           city: string
+          gender: string | null
           id: string
           interests: string[]
           is_online: boolean
@@ -633,6 +634,7 @@ export type Database = {
           age: number
           avatar_url?: string | null
           city: string
+          gender?: string | null
           id: string
           interests?: string[]
           is_online?: boolean
@@ -644,6 +646,7 @@ export type Database = {
           age?: number
           avatar_url?: string | null
           city?: string
+          gender?: string | null
           id?: string
           interests?: string[]
           is_online?: boolean

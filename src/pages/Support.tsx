@@ -13,6 +13,10 @@ import {
 import { useState } from "react";
 import { toast } from "sonner";
 import { useSupportTickets } from "@/hooks/useSupportTickets";
+import { useAuth } from "@/hooks/useAuth";
+import EmptyState from "@/components/EmptyState";
+import { Link } from "react-router-dom";
+import { Heart } from "lucide-react";
 
 const Support = () => {
   const [name, setName] = useState("");
@@ -21,6 +25,7 @@ const Support = () => {
   const [message, setMessage] = useState("");
   const [sent, setSent] = useState(false);
   const { submitTicket, sending } = useSupportTickets();
+  const { user } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -120,9 +125,27 @@ const Support = () => {
             {/* Contact Form */}
             <div className="lg:col-span-2">
               <div className="bg-card rounded-3xl p-8 shadow-card">
-                {sent ? (
+                {!user ? (
+                  <div className="py-10">
+                    <EmptyState
+                      icon={<Heart className="w-10 h-10" />}
+                      title="כדי לפנות לתמיכה צריך להתחבר"
+                      description="אנחנו שומרים על הפרטיות שלך — פניות תמיכה זמינות למשתמשים מחוברים בלבד."
+                      actionLabel="התחברות"
+                      actionLink="/login"
+                      secondaryActionLabel="הרשמה"
+                      secondaryActionLink="/register"
+                    />
+
+                    <div className="text-center mt-6 text-sm text-muted-foreground">
+                      או שלחו אימייל ישירות ל-
+                      <a href="mailto:support@spark.co.il" className="text-primary hover:underline">support@spark.co.il</a>
+                    </div>
+                  </div>
+                ) : (
+                  sent ? (
                   <div className="text-center py-12">
-                    <CheckCircle className="w-20 h-20 text-green-500 mx-auto mb-6" />
+                    <CheckCircle className="w-20 h-20 text-success mx-auto mb-6" />
                     <h2 className="font-display text-2xl font-bold text-foreground mb-2">
                       ההודעה נשלחה!
                     </h2>
@@ -133,7 +156,7 @@ const Support = () => {
                       שליחת הודעה נוספת
                     </Button>
                   </div>
-                ) : (
+                  ) : (
                   <form onSubmit={handleSubmit} className="space-y-6">
                     <h2 className="font-display text-2xl font-bold text-foreground mb-4">
                       צור קשר
@@ -206,7 +229,7 @@ const Support = () => {
                       )}
                     </Button>
                   </form>
-                )}
+                ))}
               </div>
             </div>
           </div>

@@ -14,10 +14,25 @@ export function useSupportTickets() {
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
 
+  const getMyProfileId = async (): Promise<string | null> => {
+    const { data, error } = await supabase.rpc('get_my_profile_id');
+    if (error) throw error;
+    return data ?? null;
+  };
+
   const submitTicket = async (ticket: SupportTicket): Promise<{ success: boolean; error: Error | null }> => {
     try {
       setSending(true);
       setError(null);
+
+       if (!user) {
+         throw new Error('יש להתחבר כדי לשלוח פנייה לתמיכה');
+       }
+
+       const profileId = await getMyProfileId();
+       if (!profileId) {
+         throw new Error('לא נמצא פרופיל משתמש. נסו להתנתק ולהתחבר מחדש.');
+       }
 
       const { error: insertError } = await supabase
         .from('support_tickets')
@@ -27,7 +42,8 @@ export function useSupportTickets() {
           subject: ticket.subject?.trim() || null,
           message: ticket.message.trim(),
           status: 'open',
-          user_id: user?.id || null,
+          profile_id: profileId,
+          user_id: user.id,
         });
 
       if (insertError) throw insertError;

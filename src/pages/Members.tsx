@@ -377,11 +377,11 @@ const Members = () => {
                           name: profile.name,
                           age: profile.age,
                           city: profile.city,
-                          bio: profile.bio || "",
+                          bio: "",
                           image: profile.avatar_url || "/profiles/profile1.jpg",
                           interests: profile.interests || [],
                           isOnline: profile.is_online || false,
-                          lastActive: profile.last_seen ? new Date(profile.last_seen).toLocaleString('he-IL') : undefined,
+                          lastActive: undefined,
                         }}
                         onLike={() => handleLike(profile.id, profile.name)}
                         onPass={() => handlePass(profile.name)}
@@ -408,9 +408,7 @@ const Members = () => {
                             )}
                           </div>
                           <p className="text-sm text-muted-foreground truncate">{profile.city}</p>
-                          {profile.bio && (
-                            <p className="text-sm text-muted-foreground line-clamp-1 mt-1">{profile.bio}</p>
-                          )}
+                          {/* bio intentionally not exposed in public profiles */}
                         </div>
                         <div className="flex items-center gap-2">
                           {(profile.interests || []).slice(0, 2).map((interest) => (

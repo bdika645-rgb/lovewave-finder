@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import type { Tables } from '@/integrations/supabase/types';
 
-type Profile = Tables<'profiles'>;
+type Profile = Tables<'profiles_public'>;
 
 interface UseProfilesOptions {
   search?: string;
@@ -53,13 +53,16 @@ export function useProfiles(options: UseProfilesOptions = {}) {
     try {
       setLoading(true);
       let query = supabase
-        .from('profiles')
-        .select('*')
-        .order('created_at', { ascending: false });
+        .from('profiles_public')
+        .select('id, name, age, city, avatar_url, interests, is_visible, is_online, updated_at, gender')
+        .eq('is_visible', true)
+        .order('updated_at', { ascending: false });
 
       // Exclude current user's profile if logged in AND explicitly requested
       if (user && options.excludeCurrentUser === true) {
-        query = query.neq('user_id', user.id);
+        // profiles_public is keyed by profile id, so we exclude via RPC lookup
+        const { data: myProfileId } = await supabase.rpc('get_my_profile_id');
+        if (myProfileId) query = query.neq('id', myProfileId);
       }
 
       // Filter by opposite gender only if explicitly set to true
@@ -111,8 +114,8 @@ export function useProfileById(id: string) {
     try {
       setLoading(true);
       const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
+        .from('profiles_public')
+        .select('id, name, age, city, avatar_url, interests, is_visible, is_online, updated_at, gender')
         .eq('id', id)
         .single();
 
