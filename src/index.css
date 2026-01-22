@@ -370,4 +370,27 @@
     background-size: 200% 100%;
     animation: shimmer 2s infinite;
   }
+
+  @keyframes wiggle {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-10deg); }
+    50% { transform: rotate(10deg); }
+    75% { transform: rotate(-5deg); }
+  }
+
+  .animate-wiggle {
+    animation: wiggle 0.5s ease-in-out;
+  }
+
+  /* Admin panel specific styles */
+  .admin-grid-layout {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 1024px) {
+    .admin-grid-layout {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
 }

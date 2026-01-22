@@ -12,6 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,10 +36,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { MoreHorizontal, Eye, Trash2, Shield, ShieldCheck, User, UserX, Edit2 } from "lucide-react";
+import { MoreHorizontal, Eye, Trash2, Shield, ShieldCheck, User, UserX, Edit2, Bell, X } from "lucide-react";
 import { AdminUser } from "@/hooks/useAdminUsers";
 import { formatDistanceToNow } from "date-fns";
 import { he } from "date-fns/locale";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface UsersTableProps {
   users: AdminUser[];
@@ -47,13 +49,36 @@ interface UsersTableProps {
   onView: (user: AdminUser) => void;
   onBlock?: (profileId: string, reason: string) => Promise<void>;
   onEdit?: (user: AdminUser) => void;
+  // Bulk action handlers
+  onBulkDelete?: (profileIds: string[]) => Promise<void>;
+  onBulkBlock?: (profileIds: string[], reason: string) => Promise<void>;
+  onBulkUpdateRole?: (userIds: string[], role: "admin" | "moderator" | "user") => Promise<void>;
+  onBulkNotify?: (profileIds: string[], message: string) => Promise<void>;
 }
 
-export default function UsersTable({ users, onUpdateRole, onDelete, onView, onBlock, onEdit }: UsersTableProps) {
+export default function UsersTable({ 
+  users, 
+  onUpdateRole, 
+  onDelete, 
+  onView, 
+  onBlock, 
+  onEdit,
+  onBulkDelete,
+  onBulkBlock,
+  onBulkUpdateRole,
+  onBulkNotify
+}: UsersTableProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [blockDialogOpen, setBlockDialogOpen] = useState(false);
+  const [bulkBlockDialogOpen, setBulkBlockDialogOpen] = useState(false);
+  const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
+  const [bulkNotifyDialogOpen, setBulkNotifyDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
   const [blockReason, setBlockReason] = useState("");
+  const [notifyMessage, setNotifyMessage] = useState("");
+  
+  // Bulk selection state
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   const handleDeleteClick = (user: AdminUser) => {
     setSelectedUser(user);
@@ -83,6 +108,67 @@ export default function UsersTable({ users, onUpdateRole, onDelete, onView, onBl
     setBlockReason("");
   };
 
+  // Bulk selection handlers
+  const toggleSelectAll = () => {
+    if (selectedIds.size === users.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(users.map(u => u.id)));
+    }
+  };
+
+  const toggleSelect = (id: string) => {
+    const newSelection = new Set(selectedIds);
+    if (newSelection.has(id)) {
+      newSelection.delete(id);
+    } else {
+      newSelection.add(id);
+    }
+    setSelectedIds(newSelection);
+  };
+
+  const clearSelection = () => {
+    setSelectedIds(new Set());
+  };
+
+  // Bulk action handlers
+  const handleBulkDelete = async () => {
+    if (onBulkDelete && selectedIds.size > 0) {
+      await onBulkDelete(Array.from(selectedIds));
+      clearSelection();
+    }
+    setBulkDeleteDialogOpen(false);
+  };
+
+  const handleBulkBlock = async () => {
+    if (onBulkBlock && selectedIds.size > 0 && blockReason.trim()) {
+      await onBulkBlock(Array.from(selectedIds), blockReason);
+      clearSelection();
+      setBlockReason("");
+    }
+    setBulkBlockDialogOpen(false);
+  };
+
+  const handleBulkNotify = async () => {
+    if (onBulkNotify && selectedIds.size > 0 && notifyMessage.trim()) {
+      await onBulkNotify(Array.from(selectedIds), notifyMessage);
+      clearSelection();
+      setNotifyMessage("");
+    }
+    setBulkNotifyDialogOpen(false);
+  };
+
+  const handleBulkRoleChange = async (role: "admin" | "moderator" | "user") => {
+    if (onBulkUpdateRole && selectedIds.size > 0) {
+      const selectedUsers = users.filter(u => selectedIds.has(u.id) && u.user_id);
+      const userIds = selectedUsers.map(u => u.user_id!);
+      if (userIds.length > 0) {
+        await onBulkUpdateRole(userIds, role);
+        clearSelection();
+      }
+    }
+  };
+
   const getRoleBadge = (role?: string) => {
     switch (role) {
       case "admin":
@@ -100,25 +186,129 @@ export default function UsersTable({ users, onUpdateRole, onDelete, onView, onBl
     return gender || "לא צוין";
   };
 
+  const isAllSelected = users.length > 0 && selectedIds.size === users.length;
+  const isSomeSelected = selectedIds.size > 0;
+
   return (
     <>
+      {/* Bulk Actions Bar */}
+      <AnimatePresence>
+        {isSomeSelected && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="mb-4 p-3 bg-primary/10 border border-primary/20 rounded-lg flex flex-wrap items-center gap-2 sm:gap-4"
+          >
+            <div className="flex items-center gap-2">
+              <Badge variant="default" className="text-sm">
+                {selectedIds.size} נבחרו
+              </Badge>
+              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={clearSelection}>
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+            
+            <div className="flex flex-wrap items-center gap-2 mr-auto">
+              {onBulkNotify && (
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setBulkNotifyDialogOpen(true)}
+                  className="gap-1"
+                >
+                  <Bell className="w-4 h-4" />
+                  <span className="hidden sm:inline">שלח התראה</span>
+                </Button>
+              )}
+              
+              {onBulkUpdateRole && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm" className="gap-1">
+                      <Shield className="w-4 h-4" />
+                      <span className="hidden sm:inline">שנה תפקיד</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem onClick={() => handleBulkRoleChange("admin")}>
+                      <ShieldCheck className="w-4 h-4 ml-2" />
+                      מנהל
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleBulkRoleChange("moderator")}>
+                      <Shield className="w-4 h-4 ml-2" />
+                      מנחה
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleBulkRoleChange("user")}>
+                      <User className="w-4 h-4 ml-2" />
+                      משתמש רגיל
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+              
+              {onBulkBlock && (
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setBulkBlockDialogOpen(true)}
+                  className="gap-1 text-orange-600 border-orange-200 hover:bg-orange-50 hover:text-orange-700"
+                >
+                  <UserX className="w-4 h-4" />
+                  <span className="hidden sm:inline">חסום</span>
+                </Button>
+              )}
+              
+              {onBulkDelete && (
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setBulkDeleteDialogOpen(true)}
+                  className="gap-1 text-destructive border-destructive/20 hover:bg-destructive/10"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  <span className="hidden sm:inline">מחק</span>
+                </Button>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="rounded-xl border border-border overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50">
+              <TableHead className="w-12">
+                <Checkbox 
+                  checked={isAllSelected}
+                  onCheckedChange={toggleSelectAll}
+                  aria-label="בחר הכל"
+                />
+              </TableHead>
               <TableHead className="text-right">משתמש</TableHead>
               <TableHead className="text-right">גיל</TableHead>
-              <TableHead className="text-right">מגדר</TableHead>
+              <TableHead className="text-right hidden sm:table-cell">מגדר</TableHead>
               <TableHead className="text-right">עיר</TableHead>
-              <TableHead className="text-right">סטטוס</TableHead>
-              <TableHead className="text-right">תפקיד</TableHead>
-              <TableHead className="text-right">הצטרף</TableHead>
+              <TableHead className="text-right hidden md:table-cell">סטטוס</TableHead>
+              <TableHead className="text-right hidden lg:table-cell">תפקיד</TableHead>
+              <TableHead className="text-right hidden lg:table-cell">הצטרף</TableHead>
               <TableHead className="text-right">פעולות</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {users.map((user) => (
-              <TableRow key={user.id} className="hover:bg-muted/30">
+              <TableRow 
+                key={user.id} 
+                className={`hover:bg-muted/30 ${selectedIds.has(user.id) ? 'bg-primary/5' : ''}`}
+              >
+                <TableCell>
+                  <Checkbox 
+                    checked={selectedIds.has(user.id)}
+                    onCheckedChange={() => toggleSelect(user.id)}
+                    aria-label={`בחר ${user.name}`}
+                  />
+                </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-3">
                     <Avatar className="w-10 h-10">
@@ -136,15 +326,15 @@ export default function UsersTable({ users, onUpdateRole, onDelete, onView, onBl
                   </div>
                 </TableCell>
                 <TableCell className="text-muted-foreground">{user.age}</TableCell>
-                <TableCell className="text-muted-foreground">{getGenderDisplay(user.gender)}</TableCell>
+                <TableCell className="text-muted-foreground hidden sm:table-cell">{getGenderDisplay(user.gender)}</TableCell>
                 <TableCell className="text-muted-foreground">{user.city}</TableCell>
-                <TableCell>
+                <TableCell className="hidden md:table-cell">
                   <Badge variant={user.is_online ? "default" : "secondary"}>
                     {user.is_online ? "מחובר" : "לא מחובר"}
                   </Badge>
                 </TableCell>
-                <TableCell>{getRoleBadge(user.role)}</TableCell>
-                <TableCell className="text-muted-foreground text-sm">
+                <TableCell className="hidden lg:table-cell">{getRoleBadge(user.role)}</TableCell>
+                <TableCell className="text-muted-foreground text-sm hidden lg:table-cell">
                   {formatDistanceToNow(new Date(user.created_at), { 
                     addSuffix: true, 
                     locale: he 
@@ -211,6 +401,7 @@ export default function UsersTable({ users, onUpdateRole, onDelete, onView, onBl
         </Table>
       </div>
 
+      {/* Single Delete Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -228,7 +419,7 @@ export default function UsersTable({ users, onUpdateRole, onDelete, onView, onBl
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Block User Dialog */}
+      {/* Single Block Dialog */}
       <Dialog open={blockDialogOpen} onOpenChange={setBlockDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -256,6 +447,91 @@ export default function UsersTable({ users, onUpdateRole, onDelete, onView, onBl
               >
                 <UserX className="w-4 h-4 ml-2" />
                 חסום משתמש
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Bulk Delete Dialog */}
+      <AlertDialog open={bulkDeleteDialogOpen} onOpenChange={setBulkDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>מחיקת {selectedIds.size} משתמשים</AlertDialogTitle>
+            <AlertDialogDescription>
+              פעולה זו תמחק את כל המשתמשים שנבחרו לצמיתות. לא ניתן לבטל פעולה זו.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-row-reverse gap-2">
+            <AlertDialogCancel>ביטול</AlertDialogCancel>
+            <AlertDialogAction onClick={handleBulkDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              מחק {selectedIds.size} משתמשים
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Bulk Block Dialog */}
+      <Dialog open={bulkBlockDialogOpen} onOpenChange={setBulkBlockDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>חסימת {selectedIds.size} משתמשים</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <div>
+              <Label htmlFor="bulkBlockReason">סיבת החסימה</Label>
+              <Textarea
+                id="bulkBlockReason"
+                placeholder="נא לציין את סיבת החסימה..."
+                value={blockReason}
+                onChange={(e) => setBlockReason(e.target.value)}
+                rows={3}
+              />
+            </div>
+            <div className="flex gap-2 justify-end">
+              <Button variant="outline" onClick={() => setBulkBlockDialogOpen(false)}>
+                ביטול
+              </Button>
+              <Button 
+                variant="destructive" 
+                onClick={handleBulkBlock}
+                disabled={!blockReason.trim()}
+              >
+                <UserX className="w-4 h-4 ml-2" />
+                חסום {selectedIds.size} משתמשים
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Bulk Notify Dialog */}
+      <Dialog open={bulkNotifyDialogOpen} onOpenChange={setBulkNotifyDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>שליחת התראה ל-{selectedIds.size} משתמשים</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <div>
+              <Label htmlFor="notifyMessage">תוכן ההתראה</Label>
+              <Textarea
+                id="notifyMessage"
+                placeholder="כתוב את ההודעה שתישלח למשתמשים..."
+                value={notifyMessage}
+                onChange={(e) => setNotifyMessage(e.target.value)}
+                rows={4}
+              />
+            </div>
+            <div className="flex gap-2 justify-end">
+              <Button variant="outline" onClick={() => setBulkNotifyDialogOpen(false)}>
+                ביטול
+              </Button>
+              <Button 
+                onClick={handleBulkNotify}
+                disabled={!notifyMessage.trim()}
+              >
+                <Bell className="w-4 h-4 ml-2" />
+                שלח התראה
               </Button>
             </div>
           </div>

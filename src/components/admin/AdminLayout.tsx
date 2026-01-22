@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import AdminSidebar from "./AdminSidebar";
+import AdminHeader from "./AdminHeader";
 import { Navigate } from "react-router-dom";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { Loader2 } from "lucide-react";
@@ -51,11 +52,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   return (
     <div className="min-h-screen bg-muted/30" dir="rtl">
       <AdminSidebar />
-      <main className="lg:mr-64 min-h-screen transition-all">
-        <div className="p-3 pt-20 sm:p-4 sm:pt-20 lg:pt-8 lg:p-8">
+      <div className="lg:mr-64 min-h-screen transition-all">
+        <AdminHeader />
+        <main className="p-3 sm:p-4 lg:p-8">
           {children}
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
   );
 }
