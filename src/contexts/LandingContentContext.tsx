@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { safeJsonParse } from "@/lib/utils";
 
 // ============ TYPES ============
 export interface HeroContent {
@@ -215,6 +216,43 @@ export const defaultLandingContent: LandingContent = {
 // ============ STORAGE KEY ============
 const STORAGE_KEY = "spark_landing_content";
 
+const isRecord = (v: unknown): v is Record<string, unknown> =>
+  typeof v === "object" && v !== null && !Array.isArray(v);
+
+function mergeLandingContent(saved: unknown): LandingContent {
+  if (!isRecord(saved)) return defaultLandingContent;
+
+  const s = saved as Partial<Record<keyof LandingContent, unknown>>;
+
+  return {
+    nav: { ...defaultLandingContent.nav, ...(isRecord(s.nav) ? (s.nav as Partial<NavContent>) : {}) },
+    hero: { ...defaultLandingContent.hero, ...(isRecord(s.hero) ? (s.hero as Partial<HeroContent>) : {}) },
+    features: {
+      ...defaultLandingContent.features,
+      ...(isRecord(s.features) ? (s.features as Partial<FeaturesContent>) : {}),
+    },
+    featuredMembers: {
+      ...defaultLandingContent.featuredMembers,
+      ...(isRecord(s.featuredMembers) ? (s.featuredMembers as Partial<FeaturedMembersContent>) : {}),
+    },
+    stats: { ...defaultLandingContent.stats, ...(isRecord(s.stats) ? (s.stats as Partial<StatsContent>) : {}) },
+    successStories: {
+      ...defaultLandingContent.successStories,
+      ...(isRecord(s.successStories) ? (s.successStories as Partial<SuccessStoriesContent>) : {}),
+    },
+    datingTips: {
+      ...defaultLandingContent.datingTips,
+      ...(isRecord(s.datingTips) ? (s.datingTips as Partial<DatingTipsContent>) : {}),
+    },
+    faq: { ...defaultLandingContent.faq, ...(isRecord(s.faq) ? (s.faq as Partial<FAQContent>) : {}) },
+    cta: { ...defaultLandingContent.cta, ...(isRecord(s.cta) ? (s.cta as Partial<CTAContent>) : {}) },
+    footer: {
+      ...defaultLandingContent.footer,
+      ...(isRecord(s.footer) ? (s.footer as Partial<FooterContent>) : {}),
+    },
+  };
+}
+
 // ============ CONTEXT ============
 interface LandingContentContextType {
   content: LandingContent;
@@ -239,13 +277,8 @@ export function LandingContentProvider({ children }: { children: ReactNode }) {
     // Load from localStorage on init
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        try {
-          return { ...defaultLandingContent, ...JSON.parse(saved) };
-        } catch {
-          return defaultLandingContent;
-        }
-      }
+      const parsed = safeJsonParse<unknown>(saved, null);
+      if (parsed) return mergeLandingContent(parsed);
     }
     return defaultLandingContent;
   });

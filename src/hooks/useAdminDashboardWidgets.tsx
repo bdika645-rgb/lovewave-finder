@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { safeJsonParse } from "@/lib/utils";
 
 export interface DashboardWidget {
   id: string;
@@ -23,6 +24,20 @@ const DEFAULT_WIDGETS: DashboardWidget[] = [
 
 const STORAGE_KEY = "admin-dashboard-widgets";
 
+const isRecord = (v: unknown): v is Record<string, unknown> =>
+  typeof v === "object" && v !== null && !Array.isArray(v);
+
+const isDashboardWidgetArray = (v: unknown): v is DashboardWidget[] => {
+  if (!Array.isArray(v)) return false;
+  return v.every((item) =>
+    isRecord(item) &&
+    typeof item.id === "string" &&
+    typeof item.enabled === "boolean" &&
+    typeof item.order === "number" &&
+    (item.size === "small" || item.size === "medium" || item.size === "large")
+  );
+};
+
 export function useAdminDashboardWidgets() {
   const [widgets, setWidgets] = useState<DashboardWidget[]>([]);
   const [loaded, setLoaded] = useState(false);
@@ -30,21 +45,15 @@ export function useAdminDashboardWidgets() {
   // Load from localStorage
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        // Merge with defaults to handle new widgets
-        const merged = DEFAULT_WIDGETS.map((defaultWidget) => {
-          const savedWidget = parsed.find((w: DashboardWidget) => w.id === defaultWidget.id);
-          return savedWidget ? { ...defaultWidget, ...savedWidget } : defaultWidget;
-        });
-        setWidgets(merged);
-      } catch {
-        setWidgets(DEFAULT_WIDGETS);
-      }
-    } else {
-      setWidgets(DEFAULT_WIDGETS);
-    }
+    const parsed = safeJsonParse<DashboardWidget[]>(saved, DEFAULT_WIDGETS, isDashboardWidgetArray);
+
+    // Merge with defaults to handle new widgets (and ignore unknown ids)
+    const merged = DEFAULT_WIDGETS.map((defaultWidget) => {
+      const savedWidget = parsed.find((w) => w.id === defaultWidget.id);
+      return savedWidget ? { ...defaultWidget, ...savedWidget } : defaultWidget;
+    });
+
+    setWidgets(merged);
     setLoaded(true);
   }, []);
 
