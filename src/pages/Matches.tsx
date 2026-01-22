@@ -45,11 +45,11 @@ const Matches = () => {
   return (
     <div className="min-h-screen bg-background" dir="rtl">
       <Navbar />
-      <div className="pt-24 pb-12 px-4 max-w-6xl mx-auto">
+      <main className="pt-24 pb-24 sm:pb-12 px-4 max-w-6xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-8">
+        <header className="text-center mb-8">
           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full mb-4">
-            <Heart className="w-5 h-5 fill-current" />
+            <Heart className="w-5 h-5 fill-current" aria-hidden="true" />
             <span className="font-medium">{matches.length} התאמות</span>
           </div>
           <h1 className="font-display text-4xl font-bold text-foreground mb-2">
@@ -58,38 +58,45 @@ const Matches = () => {
           <p className="text-muted-foreground">
             אלה האנשים שגם הם עשו לכם לייק! התחילו שיחה
           </p>
-        </div>
+        </header>
 
         {/* Filter Tabs */}
-        <div className="flex justify-center gap-2 mb-8">
+        <nav className="flex justify-center gap-2 mb-8" role="tablist" aria-label="סינון התאמות">
           <Button
             variant={filter === "all" ? "default" : "outline"}
             onClick={() => setFilter("all")}
             className="gap-2"
+            role="tab"
+            aria-selected={filter === "all"}
+            aria-controls="matches-list"
           >
-            <Users className="w-4 h-4" />
+            <Users className="w-4 h-4" aria-hidden="true" />
             כל ההתאמות ({matches.length})
           </Button>
           <Button
             variant={filter === "new" ? "default" : "outline"}
             onClick={() => setFilter("new")}
             className="gap-2"
+            role="tab"
+            aria-selected={filter === "new"}
+            aria-controls="matches-list"
           >
-            <Sparkles className="w-4 h-4" />
+            <Sparkles className="w-4 h-4" aria-hidden="true" />
             חדשות ({newMatches.length})
           </Button>
-        </div>
+        </nav>
 
         {loading ? (
-          <div className="flex justify-center py-20">
-            <Loader2 className="w-12 h-12 text-primary animate-spin" />
+          <div className="flex justify-center py-20" role="status" aria-label="טוען התאמות">
+            <Loader2 className="w-12 h-12 text-primary animate-spin" aria-hidden="true" />
+            <span className="sr-only">טוען התאמות...</span>
           </div>
         ) : displayedMatches.length === 0 ? (
-          <div className="text-center py-20 max-w-md mx-auto">
-            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center mx-auto mb-6 animate-pulse-soft">
+          <section className="text-center py-20 max-w-md mx-auto" aria-labelledby="empty-matches-heading">
+            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center mx-auto mb-6 animate-pulse-soft" aria-hidden="true">
               <Heart className="w-12 h-12 text-primary" />
             </div>
-            <h2 className="font-display text-2xl font-bold text-foreground mb-3">
+            <h2 id="empty-matches-heading" className="font-display text-2xl font-bold text-foreground mb-3">
               {filter === "new" ? "אין התאמות חדשות" : "עדיין אין התאמות"}
             </h2>
             <p className="text-muted-foreground mb-6 leading-relaxed">
@@ -107,13 +114,13 @@ const Matches = () => {
             </div>
             <Link to="/discover">
               <Button variant="hero" size="lg" className="gap-2">
-                <Sparkles className="w-5 h-5" />
-                גלו פרופילים חדשים
-              </Button>
-            </Link>
-          </div>
+              <Sparkles className="w-5 h-5" aria-hidden="true" />
+              גלו פרופילים חדשים
+            </Button>
+          </Link>
+        </section>
         ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <section id="matches-list" className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" role="list" aria-label="רשימת התאמות">
             {displayedMatches.map((match) => {
               const profile = match.matchedProfile;
               const isNew =
@@ -121,9 +128,11 @@ const Matches = () => {
                 new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
               return (
-                <div
+                <article
                   key={match.id}
                   className="bg-card rounded-3xl overflow-hidden shadow-card card-hover relative group"
+                  role="listitem"
+                  aria-label={`התאמה עם ${profile.name}`}
                 >
                   {isNew && (
                     <Badge className="absolute top-3 right-3 z-10 bg-primary text-primary-foreground">
@@ -131,14 +140,14 @@ const Matches = () => {
                     </Badge>
                   )}
 
-                  <Link to={`/member/${profile.id}`}>
+                  <Link to={`/member/${profile.id}`} aria-label={`צפה בפרופיל של ${profile.name}`}>
                     <div className="aspect-[4/5] relative overflow-hidden">
                       <img
                         src={profile.avatar_url || "/profiles/profile1.jpg"}
-                        alt={profile.name}
+                        alt={`תמונת פרופיל של ${profile.name}`}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" aria-hidden="true" />
                       <div className="absolute bottom-4 right-4 left-4 text-white">
                         <h3 className="font-display text-xl font-bold">
                           {profile.name}, {profile.age}
@@ -156,6 +165,7 @@ const Matches = () => {
                       variant="hero"
                       className="w-full gap-2"
                       disabled={loadingMessage === profile.id}
+                      aria-label={loadingMessage === profile.id ? "שולח..." : `שלח הודעה ל${profile.name}`}
                       onClick={async () => {
                         setLoadingMessage(profile.id);
                         try {
@@ -173,19 +183,19 @@ const Matches = () => {
                       }}
                     >
                       {loadingMessage === profile.id ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
                       ) : (
-                        <MessageCircle className="w-4 h-4" />
+                        <MessageCircle className="w-4 h-4" aria-hidden="true" />
                       )}
                       שלחו הודעה
                     </Button>
                   </div>
-                </div>
+                </article>
               );
             })}
-          </div>
+          </section>
         )}
-      </div>
+      </main>
     </div>
   );
 };

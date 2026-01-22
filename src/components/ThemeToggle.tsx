@@ -24,15 +24,16 @@ export function ThemeToggle() {
     <Button
       variant="ghost"
       size="icon"
-      className="w-9 h-9"
+      className="w-9 h-9 focus-visible:ring-2 focus-visible:ring-primary"
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+      aria-label={theme === "dark" ? "עבור למצב בהיר" : "עבור למצב כהה"}
+      aria-pressed={theme === "dark"}
     >
       {theme === "dark" ? (
-        <Sun className="h-4 w-4 text-foreground" />
+        <Sun className="h-4 w-4 text-foreground" aria-hidden="true" />
       ) : (
-        <Moon className="h-4 w-4 text-foreground" />
+        <Moon className="h-4 w-4 text-foreground" aria-hidden="true" />
       )}
-      <span className="sr-only">Toggle theme</span>
     </Button>
   );
 }

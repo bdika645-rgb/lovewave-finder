@@ -57,7 +57,7 @@ const OnboardingTooltip = ({
   const step = steps[currentStep];
 
   return (
-    <div 
+    <aside 
       className={cn(
         "fixed bottom-4 left-4 right-4 md:left-auto md:right-8 md:bottom-8 md:w-96",
         "bg-card border border-border rounded-2xl shadow-elevated p-6 z-50",
@@ -65,13 +65,17 @@ const OnboardingTooltip = ({
         className
       )}
       dir="rtl"
+      role="dialog"
+      aria-modal="false"
+      aria-label={`הדרכה: ${step.title}`}
+      aria-describedby="onboarding-description"
     >
       <button
         onClick={handleClose}
-        className="absolute top-4 left-4 p-1 rounded-full hover:bg-muted transition-colors"
-        aria-label="סגור"
+        className="absolute top-4 left-4 p-1 rounded-full hover:bg-muted transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        aria-label="סגור הדרכה"
       >
-        <X className="w-4 h-4 text-muted-foreground" />
+        <X className="w-4 h-4 text-muted-foreground" aria-hidden="true" />
       </button>
 
       {step.icon && (
@@ -80,28 +84,30 @@ const OnboardingTooltip = ({
         </div>
       )}
 
-      <h4 className="font-display text-lg font-bold text-foreground mb-2">
+      <h4 className="font-display text-lg font-bold text-foreground mb-2" id="onboarding-title">
         {step.title}
       </h4>
       
-      <p className="text-muted-foreground text-sm mb-6">
+      <p className="text-muted-foreground text-sm mb-6" id="onboarding-description">
         {step.description}
       </p>
 
       {/* Progress dots */}
       <div className="flex items-center justify-between">
-        <div className="flex gap-1.5">
-          {steps.map((_, index) => (
+        <div className="flex gap-1.5" role="tablist" aria-label="שלבי הדרכה">
+          {steps.map((s, index) => (
             <button
               key={index}
               onClick={() => setCurrentStep(index)}
               className={cn(
-                "w-2 h-2 rounded-full transition-all",
+                "w-2 h-2 rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
                 index === currentStep 
                   ? "bg-primary w-6" 
                   : "bg-muted hover:bg-muted-foreground/30"
               )}
-              aria-label={`שלב ${index + 1}`}
+              role="tab"
+              aria-selected={index === currentStep}
+              aria-label={`שלב ${index + 1}: ${s.title}`}
             />
           ))}
         </div>
@@ -129,7 +135,7 @@ const OnboardingTooltip = ({
           </Button>
         </div>
       </div>
-    </div>
+    </aside>
   );
 };
 

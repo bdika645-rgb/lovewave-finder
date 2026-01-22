@@ -68,11 +68,19 @@ export function DiscoverFilters({ filters, onFiltersChange, activeFilterCount }:
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
-        <Button variant="outline" className="relative">
-          <Filter className="w-4 h-4 ml-2" />
+        <Button 
+          variant="outline" 
+          className="relative focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+          aria-label={activeFilterCount > 0 ? `סינון - ${activeFilterCount} פילטרים פעילים` : "סינון פרופילים"}
+          aria-expanded={isOpen}
+        >
+          <Filter className="w-4 h-4 ml-2" aria-hidden="true" />
           סינון
           {activeFilterCount > 0 && (
-            <span className="absolute -top-1 -left-1 w-5 h-5 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center">
+            <span 
+              className="absolute -top-1 -left-1 w-5 h-5 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center"
+              aria-hidden="true"
+            >
               {activeFilterCount}
             </span>
           )}
@@ -86,10 +94,10 @@ export function DiscoverFilters({ filters, onFiltersChange, activeFilterCount }:
           </SheetDescription>
         </SheetHeader>
 
-        <div className="space-y-6 mt-6">
+        <div className="space-y-6 mt-6" role="form" aria-label="טופס סינון פרופילים">
           {/* Age Range */}
-          <div className="space-y-2">
-            <Label>טווח גילאים</Label>
+          <fieldset className="space-y-2">
+            <legend className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">טווח גילאים</legend>
             <div className="flex items-center gap-3">
               <Input
                 type="number"
@@ -102,8 +110,9 @@ export function DiscoverFilters({ filters, onFiltersChange, activeFilterCount }:
                 min={18}
                 max={120}
                 className="w-24"
+                aria-label="גיל מינימלי"
               />
-              <span className="text-muted-foreground">עד</span>
+              <span className="text-muted-foreground" aria-hidden="true">עד</span>
               <Input
                 type="number"
                 placeholder="עד-"
@@ -115,9 +124,10 @@ export function DiscoverFilters({ filters, onFiltersChange, activeFilterCount }:
                 min={18}
                 max={120}
                 className="w-24"
+                aria-label="גיל מקסימלי"
               />
             </div>
-          </div>
+          </fieldset>
 
           {/* City */}
           <div className="space-y-2">
@@ -158,31 +168,37 @@ export function DiscoverFilters({ filters, onFiltersChange, activeFilterCount }:
           </div>
 
           {/* Interests */}
-          <div className="space-y-2">
-            <Label>תחומי עניין</Label>
-            <p className="text-xs text-muted-foreground mb-2">
+          <fieldset className="space-y-2">
+            <legend className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">תחומי עניין</legend>
+            <p className="text-xs text-muted-foreground mb-2" id="interests-description">
               בחרו תחומי עניין שחשובים לכם
             </p>
-            <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto">
+            <div 
+              className="flex flex-wrap gap-2 max-h-48 overflow-y-auto" 
+              role="group" 
+              aria-describedby="interests-description"
+              aria-label="בחירת תחומי עניין"
+            >
               {allInterests.map(interest => (
-                <Badge
+                <button
                   key={interest}
-                  variant={localFilters.interests.includes(interest) ? "default" : "outline"}
-                  className={`cursor-pointer transition-all ${
-                    localFilters.interests.includes(interest) 
-                      ? "bg-primary text-primary-foreground" 
-                      : "hover:bg-primary/10"
-                  }`}
+                  type="button"
                   onClick={() => toggleInterest(interest)}
+                  aria-pressed={localFilters.interests.includes(interest)}
+                  className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
+                    localFilters.interests.includes(interest) 
+                      ? "bg-primary text-primary-foreground border-transparent" 
+                      : "border-input hover:bg-primary/10"
+                  }`}
                 >
                   {interest}
                   {localFilters.interests.includes(interest) && (
-                    <X className="w-3 h-3 mr-1" />
+                    <X className="w-3 h-3 mr-1" aria-hidden="true" />
                   )}
-                </Badge>
+                </button>
               ))}
             </div>
-          </div>
+          </fieldset>
 
           {/* Action Buttons */}
           <div className="flex gap-3 pt-4 border-t">
