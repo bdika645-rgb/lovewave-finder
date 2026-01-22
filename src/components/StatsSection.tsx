@@ -62,7 +62,7 @@ const StatsSection = () => {
   ];
 
   return (
-    <section className="py-16 gradient-primary" aria-labelledby="stats-heading">
+    <section id="stats" className="py-16 gradient-primary" aria-labelledby="stats-heading">
       <h2 id="stats-heading" className="sr-only">סטטיסטיקות האתר</h2>
       <div className="container mx-auto px-6">
         <dl className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
