@@ -149,6 +149,27 @@ const SwipeCard = ({
     }, 300);
   };
 
+  const handleCardKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    // Only handle keys when the card itself is focused (not when clicking buttons inside)
+    if (e.defaultPrevented) return;
+
+    if (e.key === "ArrowRight") {
+      e.preventDefault();
+      handleLike();
+    }
+
+    if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      handlePass();
+    }
+
+    if (e.key === "ArrowUp") {
+      if (!onSuperLike) return;
+      e.preventDefault();
+      handleSuperLike();
+    }
+  };
+
   // Calculate transform based on drag or swipe animation
   const getCardTransform = () => {
     if (swipeDirection === "right") return "translateX(150%) rotate(30deg)";
@@ -181,10 +202,10 @@ const SwipeCard = ({
 
       <div 
         ref={cardRef}
-        className={`relative bg-card rounded-3xl overflow-hidden shadow-elevated cursor-grab active:cursor-grabbing transition-transform ${
+        className={`relative bg-card rounded-3xl overflow-hidden shadow-elevated cursor-grab active:cursor-grabbing transition-transform focus-ring ${
           isDragging ? '' : 'duration-300'
         }`}
-        style={{ transform: getCardTransform() }}
+        style={{ transform: getCardTransform(), touchAction: "pan-y" }}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
@@ -192,7 +213,15 @@ const SwipeCard = ({
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
+        tabIndex={0}
+        role="group"
+        aria-label={`כרטיס פרופיל של ${member.name}`}
+        onKeyDown={handleCardKeyDown}
       >
+        <p className="sr-only">
+          ניווט מקלדת: חץ ימינה ללייק, חץ שמאלה לדלג, חץ למעלה לסופר לייק.
+        </p>
+
         {/* Like Indicator */}
         <div 
           className="absolute top-8 right-8 z-20 border-4 border-success text-success font-bold text-2xl px-4 py-2 rounded-lg rotate-[-20deg] pointer-events-none bg-background/80"
