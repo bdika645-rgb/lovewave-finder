@@ -13,7 +13,7 @@ const FAQSection = () => {
   const { faq } = content;
 
   return (
-    <section className="py-24" aria-labelledby="faq-heading">
+    <section id="faq" className="py-24" aria-labelledby="faq-heading">
       <div className="container mx-auto px-6">
         <div className="text-center mb-16">
           <div className="inline-flex items-center justify-center w-16 h-16 gradient-primary rounded-2xl mb-6" aria-hidden="true">
@@ -33,10 +33,10 @@ const FAQSection = () => {
               <AccordionItem
                 key={faqItem.id}
                 value={faqItem.id}
-                className="bg-card rounded-2xl border border-gold/10 px-6 overflow-hidden"
+                className="bg-card rounded-2xl border border-border px-6 overflow-hidden"
               >
                 <AccordionTrigger 
-                  className="text-right font-display text-lg hover:text-primary py-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                  className="text-right font-display text-lg hover:text-primary py-6 focus-ring"
                   aria-controls={`faq-content-${index}`}
                 >
                   {faqItem.question}

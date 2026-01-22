@@ -75,6 +75,7 @@ const Navbar = () => {
               className={`font-body font-medium transition-colors hover:text-primary flex items-center gap-1 ${
                 isHome && !isScrolled ? "text-primary-foreground/80 hover:text-primary-foreground" : "text-muted-foreground"
               } ${location.pathname === '/discover' ? 'text-primary' : ''}`}
+              aria-current={location.pathname === "/discover" ? "page" : undefined}
             >
               <Sparkles className="w-4 h-4" />
               Swipe
@@ -84,6 +85,7 @@ const Navbar = () => {
               className={`font-body font-medium transition-colors hover:text-primary flex items-center gap-1 ${
                 isHome && !isScrolled ? "text-primary-foreground/80 hover:text-primary-foreground" : "text-muted-foreground"
               } ${location.pathname === '/members' ? 'text-primary' : ''}`}
+              aria-current={location.pathname === "/members" ? "page" : undefined}
             >
               <Search className="w-4 h-4" />
               חפש
@@ -93,6 +95,7 @@ const Navbar = () => {
               className={`font-body font-medium transition-colors hover:text-primary flex items-center gap-1 ${
                 isHome && !isScrolled ? "text-primary-foreground/80 hover:text-primary-foreground" : "text-muted-foreground"
               } ${location.pathname === '/matches' ? 'text-primary' : ''}`}
+              aria-current={location.pathname === "/matches" ? "page" : undefined}
             >
               <Heart className="w-4 h-4" />
               התאמות
@@ -102,6 +105,7 @@ const Navbar = () => {
               className={`font-body font-medium transition-colors hover:text-primary flex items-center gap-1 relative ${
                 isHome && !isScrolled ? "text-primary-foreground/80 hover:text-primary-foreground" : "text-muted-foreground"
               } ${location.pathname === '/messages' ? 'text-primary' : ''}`}
+              aria-current={location.pathname === "/messages" ? "page" : undefined}
             >
               <MessageCircle className="w-4 h-4" />
               הודעות
@@ -119,6 +123,7 @@ const Navbar = () => {
               className={`font-body font-medium transition-colors hover:text-primary flex items-center gap-1 ${
                 isHome && !isScrolled ? "text-primary-foreground/80 hover:text-primary-foreground" : "text-muted-foreground"
               } ${location.pathname === '/who-viewed-me' ? 'text-primary' : ''}`}
+              aria-current={location.pathname === "/who-viewed-me" ? "page" : undefined}
             >
               <Eye className="w-4 h-4" />
               צפו בי
@@ -128,6 +133,7 @@ const Navbar = () => {
               className={`font-body font-medium transition-colors hover:text-primary flex items-center gap-1 ${
                 isHome && !isScrolled ? "text-primary-foreground/80 hover:text-primary-foreground" : "text-muted-foreground"
               } ${location.pathname === '/who-liked-me' ? 'text-primary' : ''}`}
+              aria-current={location.pathname === "/who-liked-me" ? "page" : undefined}
             >
               <Heart className="w-4 h-4 fill-current" />
               לייקים
@@ -144,7 +150,7 @@ const Navbar = () => {
                   <DropdownMenuTrigger asChild>
                     <Button 
                       variant={isHome && !isScrolled ? "hero-outline" : "outline"} 
-                      className="gap-2"
+                      className="gap-2 focus-ring"
                     >
                       <Avatar className="h-6 w-6">
                         <AvatarImage src={profile?.avatar_url || undefined} alt={profile?.name} />
@@ -239,6 +245,7 @@ const Navbar = () => {
               <Link 
                 to="/discover" 
                 className="font-body text-foreground py-3 px-4 rounded-lg hover:bg-accent transition-colors flex items-center gap-3"
+                 aria-current={location.pathname === "/discover" ? "page" : undefined}
               >
                 <Sparkles className="w-5 h-5 text-primary" />
                 Swipe
@@ -248,6 +255,7 @@ const Navbar = () => {
               <Link 
                 to="/members" 
                 className="font-body text-foreground py-3 px-4 rounded-lg hover:bg-accent transition-colors flex items-center gap-3"
+                 aria-current={location.pathname === "/members" ? "page" : undefined}
               >
                 <Search className="w-5 h-5 text-primary" />
                 חפש פרופילים
@@ -257,6 +265,7 @@ const Navbar = () => {
               <Link 
                 to="/matches" 
                 className="font-body text-foreground py-3 px-4 rounded-lg hover:bg-accent transition-colors flex items-center gap-3"
+                 aria-current={location.pathname === "/matches" ? "page" : undefined}
               >
                 <Heart className="w-5 h-5 text-primary" />
                 התאמות
@@ -266,6 +275,7 @@ const Navbar = () => {
               <Link 
                 to="/messages" 
                 className="font-body text-foreground py-3 px-4 rounded-lg hover:bg-accent transition-colors flex items-center gap-3"
+                 aria-current={location.pathname === "/messages" ? "page" : undefined}
               >
                 <MessageCircle className="w-5 h-5 text-primary" />
                 הודעות
@@ -280,6 +290,7 @@ const Navbar = () => {
               <Link 
                 to="/who-liked-me" 
                 className="font-body text-foreground py-3 px-4 rounded-lg hover:bg-accent transition-colors flex items-center gap-3"
+                 aria-current={location.pathname === "/who-liked-me" ? "page" : undefined}
               >
                 <Heart className="w-5 h-5 text-primary fill-primary" />
                 מי לייק אותי
@@ -289,6 +300,7 @@ const Navbar = () => {
               <Link 
                 to="/who-viewed-me" 
                 className="font-body text-foreground py-3 px-4 rounded-lg hover:bg-accent transition-colors flex items-center gap-3"
+                 aria-current={location.pathname === "/who-viewed-me" ? "page" : undefined}
               >
                 <Eye className="w-5 h-5 text-primary" />
                 מי צפה בי
@@ -298,13 +310,14 @@ const Navbar = () => {
               <Link 
                 to="/profile" 
                 className="font-body text-foreground py-3 px-4 rounded-lg hover:bg-accent transition-colors flex items-center gap-3"
+                 aria-current={location.pathname === "/profile" ? "page" : undefined}
               >
                 <User className="w-5 h-5 text-primary" />
                 הפרופיל שלי
               </Link>
                </li>
               
-              <hr className="border-border my-2" />
+              <li role="separator" aria-hidden="true" className="my-2 border-t border-border" />
               
               {user ? (
                  <li>
