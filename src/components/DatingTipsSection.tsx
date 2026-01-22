@@ -23,7 +23,7 @@ const DatingTipsSection = () => {
   const { datingTips: tipsContent } = content;
 
   return (
-    <section className="py-24 bg-muted/30" aria-labelledby="dating-tips-heading">
+    <section id="dating-tips" className="py-24 bg-muted/30" aria-labelledby="dating-tips-heading">
       <div className="container mx-auto px-6">
         <div className="text-center mb-16">
           <div className="inline-flex items-center justify-center w-16 h-16 gradient-primary rounded-2xl mb-6" aria-hidden="true">

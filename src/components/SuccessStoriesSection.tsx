@@ -59,7 +59,7 @@ const SuccessStoriesSection = () => {
   };
 
   return (
-    <section className="py-24 bg-muted/30 overflow-hidden" aria-labelledby="success-stories-heading">
+    <section id="success-stories" className="py-24 bg-muted/30 overflow-hidden" aria-labelledby="success-stories-heading">
       <div className="container mx-auto px-6">
         <AnimatedSection className="text-center mb-16">
           <h2 id="success-stories-heading" className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">

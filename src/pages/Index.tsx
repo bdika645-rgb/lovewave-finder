@@ -75,6 +75,38 @@ const demoProfiles = [
 
 const featureIcons = [Sparkles, Shield, Users];
 
+const QuickSectionNav = () => {
+  const items = [
+    { href: "#features", label: "מה תקבלו" },
+    { href: "#featured-members", label: "חברים מומלצים" },
+    { href: "#stats", label: "סטטיסטיקות" },
+    { href: "#success-stories", label: "סיפורי הצלחה" },
+    { href: "#dating-tips", label: "טיפים" },
+    { href: "#faq", label: "שאלות" },
+  ];
+
+  return (
+    <nav
+      aria-label="ניווט מהיר בעמוד"
+      className="border-y border-border bg-background/70 backdrop-blur-sm"
+    >
+      <div className="container mx-auto px-6 py-3">
+        <h2 className="sr-only">ניווט מהיר</h2>
+        <div
+          className="flex gap-2 overflow-x-auto pb-1 scroll-smooth-ios"
+          style={{ WebkitOverflowScrolling: "touch" }}
+        >
+          {items.map((item) => (
+            <Button key={item.href} asChild variant="outline" size="sm" className="shrink-0">
+              <a href={item.href}>{item.label}</a>
+            </Button>
+          ))}
+        </div>
+      </div>
+    </nav>
+  );
+};
+
 const Index = () => {
   // Fetch featured profiles from database (limit to 4)
   const { profiles, loading } = useProfiles({});
@@ -92,8 +124,10 @@ const Index = () => {
       <main id="main-content">
         <HeroSection />
 
+        <QuickSectionNav />
+
         {/* Features Section */}
-        <section className="py-24 bg-muted/30" aria-labelledby="features-title">
+        <section id="features" className="py-24 bg-muted/30" aria-labelledby="features-title">
           <div className="container mx-auto px-6">
             <AnimatedSection className="text-center mb-16">
               <h2 id="features-title" className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
@@ -128,7 +162,7 @@ const Index = () => {
         </section>
 
         {/* Featured Members - Always show with demo or real profiles */}
-        <section className="py-24" aria-labelledby="featured-title">
+        <section id="featured-members" className="py-24" aria-labelledby="featured-title">
           <div className="container mx-auto px-6">
             <AnimatedSection className="text-center mb-16">
               <h2 id="featured-title" className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
