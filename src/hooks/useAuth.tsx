@@ -52,22 +52,50 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (error) throw error;
 
+      // If the auth system requires email confirmation, session may be null.
+      // Our app depends on having a profile row; fail fast with a clear error.
+      if (!data.session) {
+        return {
+          error: new Error(
+            "ההרשמה נוצרה אבל ההתחברות לא הושלמה. אם נדרש אישור אימייל, אשרו את ההודעה בתיבת הדואר ואז התחברו מחדש."
+          ),
+        };
+      }
+
       // Create profile after signup
       if (data.user) {
-        const { error: profileError } = await supabase
+        // Ensure we don't create duplicate profiles if the user retries.
+        const { data: existingProfile, error: existingErr } = await supabase
           .from('profiles')
-          .insert({
-            user_id: data.user.id,
-            name,
-            city,
-            age,
-            gender,
-            bio: '',
-            interests: [],
-          });
+          .select('id')
+          .eq('user_id', data.user.id)
+          .maybeSingle();
 
-        if (profileError) {
-          console.error('Error creating profile:', profileError);
+        if (existingErr) {
+          console.error('Error checking existing profile:', existingErr);
+        }
+
+        if (!existingProfile) {
+          const { error: profileError } = await supabase
+            .from('profiles')
+            .insert({
+              user_id: data.user.id,
+              name,
+              city,
+              age,
+              gender,
+              bio: '',
+              interests: [],
+            });
+
+          if (profileError) {
+            console.error('Error creating profile:', profileError);
+            return {
+              error: new Error(
+                "ההרשמה הצליחה אבל יצירת הפרופיל נכשלה. נסו להתחבר מחדש, ואם זה לא מסתדר פנו לתמיכה."
+              ),
+            };
+          }
         }
         
         return { error: null, userId: data.user.id };
