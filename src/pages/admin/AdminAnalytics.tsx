@@ -13,7 +13,7 @@ import {
   AreaChart,
   Area
 } from "recharts";
-import { format, subDays, startOfDay } from "date-fns";
+import { format, subDays, startOfDay, addDays } from "date-fns";
 import { he } from "date-fns/locale";
 
 interface DailyStats {
@@ -31,36 +31,59 @@ export default function AdminAnalytics() {
     async function fetchAnalytics() {
       try {
         const days = 30;
+        const start = startOfDay(subDays(new Date(), days - 1));
+        const end = addDays(startOfDay(new Date()), 1);
+
+        // Fetch once per table (instead of 30x3 queries), then aggregate client-side.
+        const [usersRes, matchesRes, messagesRes] = await Promise.all([
+          supabase
+            .from("profiles")
+            .select("created_at")
+            .gte("created_at", start.toISOString())
+            .lt("created_at", end.toISOString())
+            .eq("is_demo", false),
+          supabase
+            .from("matches")
+            .select("created_at")
+            .gte("created_at", start.toISOString())
+            .lt("created_at", end.toISOString()),
+          supabase
+            .from("messages")
+            .select("created_at")
+            .gte("created_at", start.toISOString())
+            .lt("created_at", end.toISOString()),
+        ]);
+
+        if (usersRes.error) throw usersRes.error;
+        if (matchesRes.error) throw matchesRes.error;
+        if (messagesRes.error) throw messagesRes.error;
+
+        const usersByDay = new Map<string, number>();
+        const matchesByDay = new Map<string, number>();
+        const messagesByDay = new Map<string, number>();
+
+        for (const row of usersRes.data || []) {
+          const key = startOfDay(new Date(row.created_at)).toISOString();
+          usersByDay.set(key, (usersByDay.get(key) || 0) + 1);
+        }
+        for (const row of matchesRes.data || []) {
+          const key = startOfDay(new Date(row.created_at)).toISOString();
+          matchesByDay.set(key, (matchesByDay.get(key) || 0) + 1);
+        }
+        for (const row of messagesRes.data || []) {
+          const key = startOfDay(new Date(row.created_at)).toISOString();
+          messagesByDay.set(key, (messagesByDay.get(key) || 0) + 1);
+        }
+
         const stats: DailyStats[] = [];
-
-        for (let i = days - 1; i >= 0; i--) {
-          const date = startOfDay(subDays(new Date(), i));
-          const nextDate = startOfDay(subDays(new Date(), i - 1));
-
-          const [usersResult, matchesResult, messagesResult] = await Promise.all([
-            supabase
-              .from("profiles")
-              .select("id", { count: "exact", head: true })
-              .gte("created_at", date.toISOString())
-              .lt("created_at", nextDate.toISOString())
-              .eq("is_demo", false),
-            supabase
-              .from("matches")
-              .select("id", { count: "exact", head: true })
-              .gte("created_at", date.toISOString())
-              .lt("created_at", nextDate.toISOString()),
-            supabase
-              .from("messages")
-              .select("id", { count: "exact", head: true })
-              .gte("created_at", date.toISOString())
-              .lt("created_at", nextDate.toISOString())
-          ]);
-
+        for (let i = 0; i < days; i++) {
+          const day = startOfDay(addDays(start, i));
+          const key = day.toISOString();
           stats.push({
-            date: format(date, "dd/MM", { locale: he }),
-            newUsers: usersResult.count || 0,
-            newMatches: matchesResult.count || 0,
-            messages: messagesResult.count || 0
+            date: format(day, "dd/MM", { locale: he }),
+            newUsers: usersByDay.get(key) || 0,
+            newMatches: matchesByDay.get(key) || 0,
+            messages: messagesByDay.get(key) || 0,
           });
         }
 
@@ -140,9 +163,9 @@ export default function AdminAnalytics() {
                 type="monotone"
                 dataKey="newMatches"
                 name="מאצ'ים"
-                stroke="#ec4899"
+                  stroke="hsl(var(--primary))"
                 strokeWidth={2}
-                dot={{ fill: "#ec4899" }}
+                  dot={{ fill: "hsl(var(--primary))" }}
               />
             </LineChart>
           </ResponsiveContainer>
@@ -167,8 +190,8 @@ export default function AdminAnalytics() {
                 type="monotone"
                 dataKey="messages"
                 name="הודעות"
-                stroke="#8b5cf6"
-                fill="hsl(280 70% 60% / 0.2)"
+                stroke="hsl(var(--primary))"
+                fill="hsl(var(--primary) / 0.2)"
                 strokeWidth={2}
               />
             </AreaChart>
