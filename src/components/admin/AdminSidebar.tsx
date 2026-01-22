@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
-import { useState, createContext, useContext } from "react";
+import { useEffect, useRef, useState, createContext, useContext } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -110,6 +110,7 @@ export default function AdminSidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openGroups, setOpenGroups] = useState<string[]>(["ראשי", "ניהול משתמשים"]);
+  const firstNavLinkRef = useRef<HTMLAnchorElement | null>(null);
 
   const toggleGroup = (title: string) => {
     setOpenGroups(prev => 
@@ -120,6 +121,27 @@ export default function AdminSidebar() {
   };
 
   const closeMobileMenu = () => setMobileOpen(false);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+
+    const t = window.setTimeout(() => {
+      firstNavLinkRef.current?.focus();
+    }, 0);
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        closeMobileMenu();
+      }
+    };
+
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.clearTimeout(t);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [mobileOpen]);
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
@@ -149,7 +171,7 @@ export default function AdminSidebar() {
                   open={openGroups.includes(group.title)} 
                   onOpenChange={() => toggleGroup(group.title)}
                 >
-                  <CollapsibleTrigger className="flex items-center justify-between w-full px-3 py-1.5 text-xs font-semibold text-sidebar-foreground/50 uppercase tracking-wider hover:text-sidebar-foreground/70 transition-colors">
+                    <CollapsibleTrigger className="flex items-center justify-between w-full px-3 py-1.5 text-xs font-semibold text-sidebar-foreground/50 uppercase tracking-wider hover:text-sidebar-foreground/70 transition-colors focus-ring rounded-md">
                     <span>{group.title}</span>
                     <ChevronDown className={cn(
                       "w-3 h-3 transition-transform",
@@ -165,17 +187,20 @@ export default function AdminSidebar() {
                           to={item.path}
                           onClick={closeMobileMenu}
                           className={cn(
-                            "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group",
+                              "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group focus-ring",
                             isActive
                               ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-md shadow-primary/20"
                               : "text-sidebar-foreground/70 hover:bg-sidebar-hover hover:text-sidebar-foreground"
                           )}
+                            aria-current={isActive ? "page" : undefined}
+                            ref={group.title === menuGroups[0].title && item.path === menuGroups[0].items[0].path ? firstNavLinkRef : undefined}
                         >
                           <item.icon className={cn(
                             "w-5 h-5 shrink-0 transition-transform group-hover:scale-110",
                             isActive ? "text-sidebar-primary-foreground" : ""
                           )} />
                           <span className="font-medium text-sm">{item.label}</span>
+                            {isActive && <span className="sr-only">(נוכחי)</span>}
                         </Link>
                       );
                     })}
@@ -194,13 +219,16 @@ export default function AdminSidebar() {
                             to={item.path}
                             onClick={closeMobileMenu}
                             className={cn(
-                              "flex items-center justify-center p-3 rounded-lg transition-all duration-200",
+                              "flex items-center justify-center p-3 rounded-lg transition-all duration-200 focus-ring",
                               isActive
                                 ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-md shadow-primary/20"
                                 : "text-sidebar-foreground/70 hover:bg-sidebar-hover hover:text-sidebar-foreground"
                             )}
+                            aria-current={isActive ? "page" : undefined}
+                            aria-label={item.label}
                           >
                             <item.icon className="w-5 h-5" />
+                            {isActive && <span className="sr-only">(נוכחי)</span>}
                           </Link>
                         </TooltipTrigger>
                         <TooltipContent side="left" className="font-medium">
@@ -228,7 +256,8 @@ export default function AdminSidebar() {
                 <TooltipTrigger asChild>
                   <Link
                     to="/"
-                    className="flex items-center justify-center p-3 rounded-lg text-sidebar-foreground/70 hover:bg-sidebar-hover hover:text-sidebar-foreground transition-all"
+                    className="flex items-center justify-center p-3 rounded-lg text-sidebar-foreground/70 hover:bg-sidebar-hover hover:text-sidebar-foreground transition-all focus-ring"
+                    aria-label="חזרה לאתר"
                   >
                     <Home className="w-5 h-5" />
                   </Link>
@@ -239,7 +268,8 @@ export default function AdminSidebar() {
                 <TooltipTrigger asChild>
                   <button
                     onClick={signOut}
-                    className="w-full flex items-center justify-center p-3 rounded-lg text-destructive hover:bg-destructive/10 transition-all"
+                    className="w-full flex items-center justify-center p-3 rounded-lg text-destructive hover:bg-destructive/10 transition-all focus-ring"
+                    aria-label="התנתקות"
                   >
                     <LogOut className="w-5 h-5" />
                   </button>
@@ -252,7 +282,7 @@ export default function AdminSidebar() {
               <Link
                 to="/"
                 onClick={closeMobileMenu}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-foreground/70 hover:bg-sidebar-hover hover:text-sidebar-foreground transition-all"
+                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-foreground/70 hover:bg-sidebar-hover hover:text-sidebar-foreground transition-all focus-ring"
               >
                 <Home className="w-5 h-5" />
                 <span className="font-medium text-sm">חזרה לאתר</span>
@@ -262,7 +292,7 @@ export default function AdminSidebar() {
                   signOut();
                   closeMobileMenu();
                 }}
-                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-destructive hover:bg-destructive/10 transition-all"
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-destructive hover:bg-destructive/10 transition-all focus-ring"
               >
                 <LogOut className="w-5 h-5" />
                 <span className="font-medium text-sm">התנתקות</span>
@@ -278,9 +308,15 @@ export default function AdminSidebar() {
           variant="ghost"
           size="sm"
           onClick={() => setCollapsed(!collapsed)}
-          className="w-full justify-center text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-hover"
+          className="w-full justify-center text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-hover focus-ring"
+          aria-label={collapsed ? "הרחב תפריט" : "כווץ תפריט"}
         >
-          {collapsed ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+          {/* In RTL, "expand" points inward (right) and "collapse" points outward (left) */}
+          {collapsed ? (
+            <ChevronRight className="w-4 h-4" />
+          ) : (
+            <ChevronLeft className="w-4 h-4" />
+          )}
         </Button>
       </div>
     </div>

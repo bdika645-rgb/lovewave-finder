@@ -137,14 +137,15 @@ export default function AdminSupport() {
         </div>
 
         {tickets.length === 0 ? (
-          <div className="text-center py-16 bg-card rounded-xl border">
-            <MessageSquare className="w-12 h-12 text-muted-foreground/50 mx-auto mb-4" />
+          <div className="text-center py-16 bg-card rounded-xl border" role="status" aria-live="polite">
+            <MessageSquare className="w-12 h-12 text-muted-foreground/50 mx-auto mb-4" aria-hidden="true" />
             <h3 className="text-lg font-semibold text-foreground mb-2">אין פניות תמיכה</h3>
             <p className="text-muted-foreground">טרם התקבלו פניות תמיכה</p>
           </div>
         ) : (
           <div className="bg-card rounded-xl border overflow-hidden">
             <Table>
+              <caption className="sr-only">טבלת פניות תמיכה</caption>
               <TableHeader>
                 <TableRow>
                   <TableHead className="text-right">שם</TableHead>
@@ -183,6 +184,8 @@ export default function AdminSupport() {
                             <Button 
                               variant="ghost" 
                               size="sm"
+                              className="focus-ring"
+                              aria-label="צפה בפרטי הפנייה"
                               onClick={() => {
                                 setSelectedTicket(ticket);
                                 setNewStatus(ticket.status);
@@ -260,6 +263,7 @@ export default function AdminSupport() {
                           size="sm"
                           onClick={() => setDeleteTicketId(ticket.id)}
                           className="text-destructive hover:text-destructive"
+                          aria-label="מחק פנייה"
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>

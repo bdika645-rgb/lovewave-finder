@@ -182,6 +182,7 @@ export default function AdminMessages() {
           </div>
           <div className="overflow-x-auto">
             <Table>
+              <caption className="sr-only">טבלת הודעות אחרונות</caption>
               <TableHeader>
                 <TableRow>
                   <TableHead className="text-right">שולח</TableHead>
@@ -220,6 +221,8 @@ export default function AdminMessages() {
                           variant="ghost"
                           size="sm"
                           onClick={() => setViewMessage(message)}
+                          className="focus-ring"
+                          aria-label="צפה בהודעה"
                         >
                           <Eye className="w-4 h-4" />
                         </Button>
@@ -228,6 +231,7 @@ export default function AdminMessages() {
                           size="sm"
                           className="text-destructive hover:text-destructive"
                           onClick={() => setDeleteMessageId(message.id)}
+                          aria-label="מחק הודעה"
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
@@ -257,6 +261,7 @@ export default function AdminMessages() {
                 size="sm"
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page <= 1}
+                aria-label="לעמוד הקודם"
               >
                 הקודם
               </Button>
@@ -265,6 +270,7 @@ export default function AdminMessages() {
                 size="sm"
                 onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                 disabled={page >= totalPages}
+                aria-label="לעמוד הבא"
               >
                 הבא
               </Button>

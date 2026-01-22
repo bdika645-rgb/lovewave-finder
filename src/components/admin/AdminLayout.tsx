@@ -65,7 +65,7 @@ function AdminLayoutContent({ children }: { children: ReactNode }) {
   return (
     <div className="lg:mr-[280px] min-h-screen transition-all duration-300">
       <AdminHeader />
-      <main className="p-4 lg:p-6">
+      <main id="admin-main" tabIndex={-1} className="p-4 lg:p-6">
         {children}
       </main>
     </div>

@@ -155,6 +155,7 @@ export default function AdminReports() {
           </div>
           <div className="overflow-x-auto">
           <Table>
+            <caption className="sr-only">טבלת דיווחים (ניתן לגלול אופקית במסכים קטנים)</caption>
             <TableHeader>
               <TableRow>
                 <TableHead className="text-right">מדווח</TableHead>
@@ -199,6 +200,7 @@ export default function AdminReports() {
                         variant="ghost" 
                         size="sm"
                         onClick={() => handleViewReport(report)}
+                        className="focus-ring"
                       >
                         <Eye className="w-4 h-4 ml-1" />
                         צפה
@@ -208,6 +210,7 @@ export default function AdminReports() {
                         size="sm"
                         className="text-destructive hover:text-destructive"
                         onClick={() => deleteReport(report.id)}
+                        aria-label="מחק דיווח"
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>

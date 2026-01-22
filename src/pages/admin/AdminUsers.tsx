@@ -233,6 +233,9 @@ export default function AdminUsers() {
         ) : (
           <>
             <div className="overflow-x-auto -mx-4 sm:mx-0">
+              <p className="sr-only" id="adminUsersTableScrollHint">
+                הטבלה ניתנת לגלילה אופקית במסכים קטנים.
+              </p>
               <div className="min-w-[700px] px-4 sm:px-0">
                 <UsersTable
                   users={users}
@@ -256,6 +259,7 @@ export default function AdminUsers() {
                   size="sm"
                   onClick={() => setPage(p => p - 1)}
                   disabled={page === 1}
+                  aria-label="לעמוד הקודם"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </Button>
@@ -267,6 +271,7 @@ export default function AdminUsers() {
                   size="sm"
                   onClick={() => setPage(p => p + 1)}
                   disabled={page >= totalPages}
+                  aria-label="לעמוד הבא"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </Button>

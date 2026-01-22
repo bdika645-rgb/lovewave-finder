@@ -114,6 +114,8 @@ export default function AdminContent() {
               variant={viewMode === "grid" ? "default" : "ghost"}
               size="sm"
               onClick={() => setViewMode("grid")}
+              className="focus-ring"
+              aria-label="תצוגת רשת"
             >
               <Grid className="w-4 h-4" />
             </Button>
@@ -121,6 +123,8 @@ export default function AdminContent() {
               variant={viewMode === "list" ? "default" : "ghost"}
               size="sm"
               onClick={() => setViewMode("list")}
+              className="focus-ring"
+              aria-label="תצוגת רשימה"
             >
               <List className="w-4 h-4" />
             </Button>
@@ -137,7 +141,7 @@ export default function AdminContent() {
               >
                 <img
                   src={photo.url}
-                  alt=""
+                  alt={photo.profile?.name ? `תמונה שהועלתה על ידי ${photo.profile.name}` : "תמונה שהועלתה"}
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
@@ -145,6 +149,8 @@ export default function AdminContent() {
                     variant="secondary"
                     size="sm"
                     onClick={() => setPreviewUrl(photo.url)}
+                    className="focus-ring"
+                    aria-label="צפה בתמונה"
                   >
                     <Eye className="w-4 h-4 ml-1" />
                     צפה
@@ -153,6 +159,8 @@ export default function AdminContent() {
                     variant="destructive"
                     size="sm"
                     onClick={() => handleDelete(photo.id)}
+                    className="focus-ring"
+                    aria-label="מחק תמונה"
                   >
                     <Trash2 className="w-4 h-4 ml-1" />
                     מחק
@@ -181,7 +189,7 @@ export default function AdminContent() {
                 <div key={photo.id} className="p-4 flex items-center gap-4 hover:bg-muted/50 transition-colors">
                   <img
                     src={photo.url}
-                    alt=""
+                    alt={photo.profile?.name ? `תמונה של ${photo.profile.name}` : "תמונה"}
                     className="w-16 h-16 rounded-lg object-cover"
                   />
                   <div className="flex-1 min-w-0">
@@ -203,6 +211,8 @@ export default function AdminContent() {
                       variant="ghost"
                       size="sm"
                       onClick={() => setPreviewUrl(photo.url)}
+                      className="focus-ring"
+                      aria-label="צפה בתמונה"
                     >
                       <Eye className="w-4 h-4" />
                     </Button>
@@ -211,6 +221,7 @@ export default function AdminContent() {
                       size="sm"
                       className="text-destructive hover:text-destructive"
                       onClick={() => handleDelete(photo.id)}
+                      aria-label="מחק תמונה"
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
@@ -222,7 +233,7 @@ export default function AdminContent() {
         )}
 
         {filteredPhotos.length === 0 && (
-          <div className="text-center py-12 text-muted-foreground">
+          <div className="text-center py-12 text-muted-foreground" role="status" aria-live="polite">
             {searchQuery ? "לא נמצאו תמונות התואמות לחיפוש" : "אין תמונות להצגה"}
           </div>
         )}
