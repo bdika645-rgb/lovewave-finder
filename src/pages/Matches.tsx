@@ -122,6 +122,12 @@ const Matches = () => {
                 גלו פרופילים חדשים
               </Button>
             </Link>
+
+            <div className="mt-3">
+              <Link to="/profile">
+                <Button variant="outline" size="lg">שפרו את הפרופיל</Button>
+              </Link>
+            </div>
           </section>
         ) : (
           <section id="matches-list" className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" role="list" aria-label="רשימת התאמות">
