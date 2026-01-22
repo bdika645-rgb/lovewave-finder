@@ -6,7 +6,7 @@ import AnimatedSection from "@/components/AnimatedSection";
 import AnimatedCard from "@/components/AnimatedCard";
 import SkipToContent from "@/components/SkipToContent";
 import { SkeletonGrid } from "@/components/ui/skeleton-card";
-import ContentEditorPanel from "@/components/admin/ContentEditorPanel";
+import { VisualEditor } from "@/components/VisualEditor";
 import { useLandingContent } from "@/contexts/LandingContentContext";
 
 import { useProfiles } from "@/hooks/useProfiles";
@@ -312,8 +312,8 @@ const Index = () => {
         </div>
       </footer>
 
-      {/* Content Editor Panel */}
-      <ContentEditorPanel />
+      {/* Visual Editor */}
+      <VisualEditor />
     </div>
   );
 };
