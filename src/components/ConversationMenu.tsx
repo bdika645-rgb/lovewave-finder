@@ -44,35 +44,18 @@ const ConversationMenu = ({
   const handleDeleteConversation = async () => {
     setLoading(true);
     try {
-      // Delete all messages in the conversation
-      const { error: messagesError } = await supabase
-        .from('messages')
-        .delete()
-        .eq('conversation_id', conversationId);
+      const { data, error } = await supabase.functions.invoke('delete-conversation', {
+        body: { conversationId },
+      });
 
-      if (messagesError) throw messagesError;
-
-      // Delete conversation participants
-      const { error: participantsError } = await supabase
-        .from('conversation_participants')
-        .delete()
-        .eq('conversation_id', conversationId);
-
-      if (participantsError) throw participantsError;
-
-      // Delete the conversation itself
-      const { error: convError } = await supabase
-        .from('conversations')
-        .delete()
-        .eq('id', conversationId);
-
-      if (convError) throw convError;
+      if (error) throw error;
+      if (!data?.success) throw new Error('Delete failed');
 
       toast.success('השיחה נמחקה בהצלחה');
       onConversationDeleted?.();
     } catch (err) {
       console.error('Error deleting conversation:', err);
-      toast.error('שגיאה במחיקת השיחה');
+      toast.error('שגיאה במחיקת השיחה. נסה שוב בעוד רגע.');
     } finally {
       setLoading(false);
       setShowDeleteDialog(false);
