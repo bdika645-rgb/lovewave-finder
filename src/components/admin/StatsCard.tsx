@@ -1,4 +1,4 @@
-import { LucideIcon } from "lucide-react";
+import { LucideIcon, TrendingUp, TrendingDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface StatsCardProps {
@@ -10,33 +10,57 @@ interface StatsCardProps {
     isPositive: boolean;
   };
   className?: string;
+  variant?: "default" | "gradient" | "outlined";
 }
 
-export default function StatsCard({ title, value, icon: Icon, trend, className }: StatsCardProps) {
+export default function StatsCard({ 
+  title, 
+  value, 
+  icon: Icon, 
+  trend, 
+  className,
+  variant = "default" 
+}: StatsCardProps) {
   return (
     <div className={cn(
-      "bg-card rounded-xl p-4 sm:p-6 border border-border shadow-sm hover:shadow-md transition-shadow",
+      "relative overflow-hidden rounded-xl p-5 transition-all duration-300 hover:shadow-lg group",
+      variant === "default" && "bg-card border border-border",
+      variant === "gradient" && "bg-gradient-to-br from-primary/10 via-card to-secondary/10 border border-primary/20",
+      variant === "outlined" && "bg-transparent border-2 border-dashed border-border hover:border-primary/50",
       className
     )}>
-      <div className="flex items-start justify-between">
+      {/* Background Pattern */}
+      <div className="absolute top-0 left-0 w-full h-full opacity-[0.02] pointer-events-none">
+        <div className="absolute -top-4 -left-4 w-24 h-24 rounded-full bg-primary" />
+        <div className="absolute -bottom-4 -right-4 w-32 h-32 rounded-full bg-secondary" />
+      </div>
+
+      <div className="relative flex items-start justify-between">
         <div className="min-w-0 flex-1">
-          <p className="text-muted-foreground text-xs sm:text-sm font-medium truncate">{title}</p>
-          <p className="text-xl sm:text-3xl font-bold text-foreground mt-1 sm:mt-2">
-            {typeof value === 'number' ? value.toLocaleString() : value}
+          <p className="text-muted-foreground text-sm font-medium truncate">{title}</p>
+          <p className="text-3xl font-bold text-foreground mt-2 tabular-nums">
+            {typeof value === 'number' ? value.toLocaleString('he-IL') : value}
           </p>
           {trend && (
-            <p className={cn(
-              "text-xs sm:text-sm mt-1 sm:mt-2 flex items-center gap-1",
-              trend.isPositive ? "text-green-600" : "text-red-600"
+            <div className={cn(
+              "flex items-center gap-1.5 mt-2 text-sm font-medium",
+              trend.isPositive ? "text-success" : "text-destructive"
             )}>
-              <span>{trend.isPositive ? "↑" : "↓"}</span>
+              {trend.isPositive ? (
+                <TrendingUp className="w-4 h-4" />
+              ) : (
+                <TrendingDown className="w-4 h-4" />
+              )}
               <span>{Math.abs(trend.value)}%</span>
-              <span className="text-muted-foreground hidden sm:inline">מהחודש שעבר</span>
-            </p>
+              <span className="text-muted-foreground font-normal text-xs">מהחודש שעבר</span>
+            </div>
           )}
         </div>
-        <div className="p-2 sm:p-3 bg-primary/10 rounded-lg shrink-0 mr-2">
-          <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+        <div className={cn(
+          "p-3 rounded-xl shrink-0 transition-transform group-hover:scale-110",
+          "bg-gradient-to-br from-primary/20 to-primary/5"
+        )}>
+          <Icon className="w-6 h-6 text-primary" />
         </div>
       </div>
     </div>
