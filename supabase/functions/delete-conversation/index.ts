@@ -20,7 +20,9 @@ Deno.serve(async (req) => {
 
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
-    const anonKey = Deno.env.get("SUPABASE_PUBLISHABLE_KEY");
+    // IMPORTANT: use the anon key for user-scoped auth calls.
+    // Some environments expose both "publishable" and "anon"; anon is the canonical key.
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY") ?? Deno.env.get("SUPABASE_PUBLISHABLE_KEY");
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
     if (!supabaseUrl || !anonKey || !serviceRoleKey) {
       console.error("Missing required environment variables");
