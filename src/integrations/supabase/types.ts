@@ -617,6 +617,50 @@ export type Database = {
           },
         ]
       }
+      profiles_public: {
+        Row: {
+          age: number
+          avatar_url: string | null
+          city: string
+          id: string
+          interests: string[]
+          is_online: boolean
+          is_visible: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          age: number
+          avatar_url?: string | null
+          city: string
+          id: string
+          interests?: string[]
+          is_online?: boolean
+          is_visible?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          age?: number
+          avatar_url?: string | null
+          city?: string
+          id?: string
+          interests?: string[]
+          is_online?: boolean
+          is_visible?: boolean
+          name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_public_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       public_settings: {
         Row: {
           id: string
@@ -865,6 +909,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_view_private_profile: {
+        Args: { _target_profile_id: string; _viewer_profile_id: string }
+        Returns: boolean
+      }
       get_my_profile_id: { Args: never; Returns: string }
       get_random_icebreaker: {
         Args: { category_filter?: string }
