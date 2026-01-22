@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { CurrentProfileProvider } from "@/hooks/useCurrentProfile";
+import { LandingContentProvider } from "@/contexts/LandingContentContext";
 import { ThemeProvider } from "next-themes";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import PageErrorBoundary from "@/components/PageErrorBoundary";
@@ -66,6 +67,7 @@ const App = () => (
       <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
         <AuthProvider>
           <CurrentProfileProvider>
+            <LandingContentProvider>
             <TooltipProvider>
               <SkipToContent />
               <Toaster />
@@ -215,6 +217,7 @@ const App = () => (
               </main>
             </BrowserRouter>
           </TooltipProvider>
+          </LandingContentProvider>
         </CurrentProfileProvider>
       </AuthProvider>
     </ThemeProvider>
