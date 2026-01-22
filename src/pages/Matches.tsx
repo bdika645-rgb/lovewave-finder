@@ -85,20 +85,30 @@ const Matches = () => {
             <Loader2 className="w-12 h-12 text-primary animate-spin" />
           </div>
         ) : displayedMatches.length === 0 ? (
-          <div className="text-center py-20">
-            <Heart className="w-20 h-20 text-muted-foreground/30 mx-auto mb-4" />
-            <h2 className="text-xl font-display font-semibold text-foreground mb-2">
+          <div className="text-center py-20 max-w-md mx-auto">
+            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center mx-auto mb-6 animate-pulse-soft">
+              <Heart className="w-12 h-12 text-primary" />
+            </div>
+            <h2 className="font-display text-2xl font-bold text-foreground mb-3">
               {filter === "new" ? "אין התאמות חדשות" : "עדיין אין התאמות"}
             </h2>
-            <p className="text-muted-foreground mb-6">
+            <p className="text-muted-foreground mb-6 leading-relaxed">
               {filter === "new"
-                ? "לא היו התאמות חדשות בשבוע האחרון"
-                : "המשיכו לעשות לייקים ובקרוב תקבלו התאמות!"}
+                ? "לא היו התאמות חדשות בשבוע האחרון. המשיכו לגלות פרופילים חדשים!"
+                : "כשמישהו שעשיתם לו לייק יעשה לכם לייק בחזרה, תראו את ההתאמה כאן. בינתיים, המשיכו לגלות!"}
             </p>
+            <div className="bg-muted/50 rounded-xl p-4 mb-6 text-right" dir="rtl">
+              <p className="text-sm font-medium text-foreground mb-2">💡 טיפים לקבלת התאמות:</p>
+              <ul className="text-sm text-muted-foreground space-y-1">
+                <li>• שלחו לייקים לאנשים שבאמת מעניינים אתכם</li>
+                <li>• סופר לייק בולט יותר ומגדיל סיכויים</li>
+                <li>• פרופיל מלא מושך יותר התאמות</li>
+              </ul>
+            </div>
             <Link to="/discover">
-              <Button variant="hero" size="lg">
-                <Sparkles className="w-5 h-5 ml-2" />
-                Swipe עכשיו
+              <Button variant="hero" size="lg" className="gap-2">
+                <Sparkles className="w-5 h-5" />
+                גלו פרופילים חדשים
               </Button>
             </Link>
           </div>
