@@ -100,6 +100,8 @@ const Messages = () => {
     conv.lastMessage?.content?.includes(searchQuery)
   );
 
+  const hasActiveSearch = searchQuery.trim().length > 0;
+
   // Filter matches that don't have a conversation yet
   const matchesWithoutConversation = matches.filter(match => 
     !conversations.some(conv => conv.otherProfile?.id === match.matchedProfile?.id)
@@ -231,8 +233,19 @@ const Messages = () => {
                       <p>לחצו על התאמה כדי להתחיל שיחה!</p>
                     </div>
                   ) : filteredConversations.length === 0 ? (
-                    <div className="p-8 text-center text-muted-foreground">
-                      לא נמצאו שיחות
+                    <div className="p-8 text-center text-muted-foreground" role="status" aria-live="polite">
+                      <p className="mb-3">לא נמצאו שיחות</p>
+                      {hasActiveSearch && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setSearchQuery("")}
+                          className="mx-auto"
+                          aria-label="נקה חיפוש"
+                        >
+                          נקה חיפוש
+                        </Button>
+                      )}
                     </div>
                   ) : (
                     filteredConversations.map((conv) => (
@@ -430,7 +443,19 @@ const Messages = () => {
                 <div className="flex items-center justify-center h-full">
                   <div className="text-center">
                     <MessageCircle className="w-16 h-16 text-muted-foreground/50 mx-auto mb-4" aria-hidden="true" />
-                    <p className="text-muted-foreground">בחרו שיחה להתחיל</p>
+                    <p className="text-muted-foreground mb-4">בחרו שיחה כדי להתחיל</p>
+                    {matchesWithoutConversation.length > 0 ? (
+                      <p className="text-sm text-muted-foreground">
+                        טיפ: תוכלו להתחיל משיחה דרך <span className="font-medium">"התאמות חדשות"</span>.
+                      </p>
+                    ) : (
+                      <Link to="/discover">
+                        <Button variant="hero" size="sm" className="gap-2">
+                          <Search className="w-4 h-4" aria-hidden="true" />
+                          מצאו התאמות
+                        </Button>
+                      </Link>
+                    )}
                   </div>
                 </div>
               )}
