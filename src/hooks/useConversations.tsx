@@ -97,25 +97,28 @@ export function useConversations() {
       if (profilesError) throw profilesError;
 
       // Build conversation details
-      const conversationsWithDetails: ConversationWithDetails[] = conversationsData?.map(conv => {
-        const otherParticipant = allParticipants?.find(
-          p => p.conversation_id === conv.id && p.profile_id !== myProfileId
-        );
-        const otherProfile = profiles?.find(p => p.id === otherParticipant?.profile_id);
-        
-        const conversationMessages = messages?.filter(m => m.conversation_id === conv.id) || [];
-        const lastMessage = conversationMessages[0];
-        const unreadCount = conversationMessages.filter(
-          m => !m.is_read && m.sender_id !== myProfileId
-        ).length;
+      const conversationsWithDetails = (conversationsData ?? [])
+        .map((conv) => {
+          const otherParticipant = allParticipants?.find(
+            (p) => p.conversation_id === conv.id && p.profile_id !== myProfileId
+          );
+          const otherProfile = profiles?.find((p) => p.id === otherParticipant?.profile_id);
+          if (!otherProfile) return null;
 
-        return {
-          ...conv,
-          otherProfile: otherProfile!,
-          lastMessage,
-          unreadCount,
-        };
-      }).filter(c => c.otherProfile) || [];
+          const conversationMessages = messages?.filter((m) => m.conversation_id === conv.id) || [];
+          const lastMessage = conversationMessages[0];
+          const unreadCount = conversationMessages.filter(
+            (m) => !m.is_read && m.sender_id !== myProfileId
+          ).length;
+
+          return {
+            ...conv,
+            otherProfile,
+            lastMessage,
+            unreadCount,
+          };
+        })
+        .filter(Boolean) as ConversationWithDetails[];
 
       setConversations(conversationsWithDetails);
     } catch (err) {

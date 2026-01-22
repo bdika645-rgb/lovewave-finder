@@ -64,15 +64,18 @@ export function useMatches() {
       if (profileError) throw profileError;
 
       // Combine matches with profiles
-      const matchesWithProfiles: MatchWithProfile[] = matchData.map(match => {
-        const matchedProfileId = match.profile1_id === myProfileId ? match.profile2_id : match.profile1_id;
-        const matchedProfile = profileData?.find(p => p.id === matchedProfileId);
-        
-        return {
-          ...match,
-          matchedProfile: matchedProfile!,
-        };
-      }).filter(m => m.matchedProfile); // Filter out any that don't have a profile
+       const matchesWithProfiles: MatchWithProfile[] = matchData
+         .map((match) => {
+           const matchedProfileId = match.profile1_id === myProfileId ? match.profile2_id : match.profile1_id;
+           const matchedProfile = profileData?.find((p) => p.id === matchedProfileId);
+           if (!matchedProfile) return null;
+
+           return {
+             ...match,
+             matchedProfile,
+           };
+         })
+         .filter(Boolean) as MatchWithProfile[];
 
       setMatches(matchesWithProfiles);
     } catch (err) {

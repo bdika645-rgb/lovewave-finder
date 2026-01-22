@@ -14,63 +14,12 @@ export function useDeleteAccount() {
     try {
       setLoading(true);
 
-      if (profileId) {
-        // Delete all photos from storage
-        const { data: photos } = await supabase
-          .from('photos')
-          .select('url')
-          .eq('profile_id', profileId);
+      // Server-side deletion handles permissions and full cleanup.
+      const { data, error } = await supabase.functions.invoke('delete-account');
+      if (error) throw error;
+      if (!data?.success) throw new Error('Delete failed');
 
-        if (photos) {
-          const filePaths = photos
-            .map(p => {
-              const parts = p.url.split('/avatars/');
-              return parts.length > 1 ? parts[1] : null;
-            })
-            .filter(Boolean) as string[];
-
-          if (filePaths.length > 0) {
-            await supabase.storage.from('avatars').remove(filePaths);
-          }
-        }
-
-        // Delete photos records
-        await supabase.from('photos').delete().eq('profile_id', profileId);
-
-        // Delete action history
-        await supabase.from('action_history').delete().eq('profile_id', profileId);
-        await supabase.from('action_history').delete().eq('target_profile_id', profileId);
-
-        // Delete likes
-        await supabase.from('likes').delete().eq('liker_id', profileId);
-        await supabase.from('likes').delete().eq('liked_id', profileId);
-
-        // Delete matches
-        await supabase.from('matches').delete().eq('profile1_id', profileId);
-        await supabase.from('matches').delete().eq('profile2_id', profileId);
-
-        // Delete messages
-        await supabase.from('messages').delete().eq('sender_id', profileId);
-
-        // Delete conversation participants
-        await supabase.from('conversation_participants').delete().eq('profile_id', profileId);
-
-        // Delete reports
-        await supabase.from('reports').delete().eq('reporter_id', profileId);
-        await supabase.from('reports').delete().eq('reported_id', profileId);
-
-        // Delete blocked users
-        await supabase.from('blocked_users').delete().eq('blocker_id', profileId);
-        await supabase.from('blocked_users').delete().eq('blocked_id', profileId);
-
-        // Delete profile
-        await supabase.from('profiles').delete().eq('id', profileId);
-      }
-
-      // Delete user settings
-      await supabase.from('user_settings').delete().eq('user_id', user.id);
-
-      // Sign out
+      // Sign out locally (server deletion revokes sessions, but this keeps UI consistent)
       await signOut();
 
       return { error: null };
