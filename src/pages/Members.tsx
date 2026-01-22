@@ -312,7 +312,9 @@ const Members = () => {
 
         {/* Loading State */}
         {loading && (
-          <SkeletonGrid count={8} />
+          <section role="status" aria-live="polite" aria-busy="true" aria-label="טוען פרופילים">
+            <SkeletonGrid count={8} />
+          </section>
         )}
 
         {/* Error State */}

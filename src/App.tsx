@@ -2,6 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Suspense, lazy } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { CurrentProfileProvider } from "@/hooks/useCurrentProfile";
@@ -13,43 +14,50 @@ import PageErrorBoundary from "@/components/PageErrorBoundary";
 import AdminProtectedRoute from "@/components/AdminProtectedRoute";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import SkipToContent from "@/components/SkipToContent";
+import FullPageLoader from "@/components/FullPageLoader";
 
-// Pages
+// Pages (lazy to improve TTI on first load)
 import Index from "./pages/Index";
-import Members from "./pages/Members";
-import MemberProfile from "./pages/MemberProfile";
-import Messages from "./pages/Messages";
-import Profile from "./pages/Profile";
-import Settings from "./pages/Settings";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import Discover from "./pages/Discover";
-import Matches from "./pages/Matches";
-import WhoLikedMe from "./pages/WhoLikedMe";
-import WhoViewedMe from "./pages/WhoViewedMe";
-import Support from "./pages/Support";
-import Terms from "./pages/Terms";
-import Privacy from "./pages/Privacy";
-import NotFound from "./pages/NotFound";
-import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
+
+const Members = lazy(() => import("./pages/Members"));
+const MemberProfile = lazy(() => import("./pages/MemberProfile"));
+const Messages = lazy(() => import("./pages/Messages"));
+const Profile = lazy(() => import("./pages/Profile"));
+const Settings = lazy(() => import("./pages/Settings"));
+const Login = lazy(() => import("./pages/Login"));
+const Register = lazy(() => import("./pages/Register"));
+const Discover = lazy(() => import("./pages/Discover"));
+const Matches = lazy(() => import("./pages/Matches"));
+const WhoLikedMe = lazy(() => import("./pages/WhoLikedMe"));
+const WhoViewedMe = lazy(() => import("./pages/WhoViewedMe"));
+const Support = lazy(() => import("./pages/Support"));
+const Terms = lazy(() => import("./pages/Terms"));
+const Privacy = lazy(() => import("./pages/Privacy"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+
 import BottomNavigation from "./components/BottomNavigation";
 
-// Admin Pages
-import AdminDashboard from "./pages/admin/AdminDashboard";
-import AdminUsers from "./pages/admin/AdminUsers";
-import AdminMatches from "./pages/admin/AdminMatches";
-import AdminMessages from "./pages/admin/AdminMessages";
-import AdminAnalytics from "./pages/admin/AdminAnalytics";
-import AdminRoles from "./pages/admin/AdminRoles";
-import AdminSettings from "./pages/admin/AdminSettings";
-import AdminReports from "./pages/admin/AdminReports";
-import AdminActivityLog from "./pages/admin/AdminActivityLog";
-import AdminBlockedUsers from "./pages/admin/AdminBlockedUsers";
-import AdminContent from "./pages/admin/AdminContent";
-import AdminNotifications from "./pages/admin/AdminNotifications";
-import AdminTips from "./pages/admin/AdminTips";
-import AdminSupport from "./pages/admin/AdminSupport";
+// Admin Pages (also lazy)
+const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
+const AdminUsers = lazy(() => import("./pages/admin/AdminUsers"));
+const AdminMatches = lazy(() => import("./pages/admin/AdminMatches"));
+const AdminMessages = lazy(() => import("./pages/admin/AdminMessages"));
+const AdminAnalytics = lazy(() => import("./pages/admin/AdminAnalytics"));
+const AdminRoles = lazy(() => import("./pages/admin/AdminRoles"));
+const AdminSettings = lazy(() => import("./pages/admin/AdminSettings"));
+const AdminReports = lazy(() => import("./pages/admin/AdminReports"));
+const AdminActivityLog = lazy(() => import("./pages/admin/AdminActivityLog"));
+const AdminBlockedUsers = lazy(() => import("./pages/admin/AdminBlockedUsers"));
+const AdminContent = lazy(() => import("./pages/admin/AdminContent"));
+const AdminNotifications = lazy(() => import("./pages/admin/AdminNotifications"));
+const AdminTips = lazy(() => import("./pages/admin/AdminTips"));
+const AdminSupport = lazy(() => import("./pages/admin/AdminSupport"));
+
+const RouteLoader = ({ label }: { label?: string }) => (
+  <FullPageLoader label={label ?? "טוען..."} className="min-h-screen bg-background flex items-center justify-center" />
+);
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -79,63 +87,113 @@ const App = () => (
               <Routes>
                 {/* Public Routes */}
                 <Route path="/" element={<Index />} />
-                <Route path="/members" element={<Members />} />
-                <Route path="/member/:id" element={<MemberProfile />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/forgot-password" element={<ForgotPassword />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
-                <Route path="/support" element={<Support />} />
-                <Route path="/terms" element={<Terms />} />
-                <Route path="/privacy" element={<Privacy />} />
+                <Route path="/members" element={
+                  <Suspense fallback={<RouteLoader label="טוען פרופילים..." />}>
+                    <Members />
+                  </Suspense>
+                } />
+                <Route path="/member/:id" element={
+                  <Suspense fallback={<RouteLoader label="טוען פרופיל..." />}>
+                    <MemberProfile />
+                  </Suspense>
+                } />
+                <Route path="/login" element={
+                  <Suspense fallback={<RouteLoader label="טוען התחברות..." />}>
+                    <Login />
+                  </Suspense>
+                } />
+                <Route path="/register" element={
+                  <Suspense fallback={<RouteLoader label="טוען הרשמה..." />}>
+                    <Register />
+                  </Suspense>
+                } />
+                <Route path="/forgot-password" element={
+                  <Suspense fallback={<RouteLoader label="טוען..." />}>
+                    <ForgotPassword />
+                  </Suspense>
+                } />
+                <Route path="/reset-password" element={
+                  <Suspense fallback={<RouteLoader label="טוען..." />}>
+                    <ResetPassword />
+                  </Suspense>
+                } />
+                <Route path="/support" element={
+                  <Suspense fallback={<RouteLoader label="טוען תמיכה..." />}>
+                    <Support />
+                  </Suspense>
+                } />
+                <Route path="/terms" element={
+                  <Suspense fallback={<RouteLoader label="טוען..." />}>
+                    <Terms />
+                  </Suspense>
+                } />
+                <Route path="/privacy" element={
+                  <Suspense fallback={<RouteLoader label="טוען..." />}>
+                    <Privacy />
+                  </Suspense>
+                } />
 
                 {/* Protected Routes */}
                 <Route path="/discover" element={
                   <ProtectedRoute>
                     <PageErrorBoundary pageName="Discover">
-                      <Discover />
+                      <Suspense fallback={<RouteLoader label="טוען גילוי..." />}>
+                        <Discover />
+                      </Suspense>
                     </PageErrorBoundary>
                   </ProtectedRoute>
                 } />
                 <Route path="/messages" element={
                   <ProtectedRoute>
                     <PageErrorBoundary pageName="Messages">
-                      <Messages />
+                      <Suspense fallback={<RouteLoader label="טוען הודעות..." />}>
+                        <Messages />
+                      </Suspense>
                     </PageErrorBoundary>
                   </ProtectedRoute>
                 } />
                 <Route path="/matches" element={
                   <ProtectedRoute>
                     <PageErrorBoundary pageName="Matches">
-                      <Matches />
+                      <Suspense fallback={<RouteLoader label="טוען התאמות..." />}>
+                        <Matches />
+                      </Suspense>
                     </PageErrorBoundary>
                   </ProtectedRoute>
                 } />
                 <Route path="/who-liked-me" element={
                   <ProtectedRoute>
                     <PageErrorBoundary pageName="WhoLikedMe">
-                      <WhoLikedMe />
+                      <Suspense fallback={<RouteLoader label="טוען..." />}>
+                        <WhoLikedMe />
+                      </Suspense>
                     </PageErrorBoundary>
                   </ProtectedRoute>
                 } />
                 <Route path="/who-viewed-me" element={
                   <ProtectedRoute>
                     <PageErrorBoundary pageName="WhoViewedMe">
-                      <WhoViewedMe />
+                      <Suspense fallback={<RouteLoader label="טוען..." />}>
+                        <WhoViewedMe />
+                      </Suspense>
                     </PageErrorBoundary>
                   </ProtectedRoute>
                 } />
                 <Route path="/profile" element={
                   <ProtectedRoute>
                     <PageErrorBoundary pageName="Profile">
-                      <Profile />
+                      <Suspense fallback={<RouteLoader label="טוען פרופיל..." />}>
+                        <Profile />
+                      </Suspense>
                     </PageErrorBoundary>
                   </ProtectedRoute>
                 } />
                 <Route path="/settings" element={
                   <ProtectedRoute>
                     <PageErrorBoundary pageName="Settings">
-                      <Settings />
+                      <Suspense fallback={<RouteLoader label="טוען הגדרות..." />}>
+                        <Settings />
+                      </Suspense>
                     </PageErrorBoundary>
                   </ProtectedRoute>
                 } />
@@ -143,77 +201,109 @@ const App = () => (
                 {/* Admin Routes - Protected with Admin check */}
                 <Route path="/admin" element={
                   <AdminProtectedRoute>
-                    <AdminDashboard />
+                    <Suspense fallback={<RouteLoader label="טוען ניהול..." />}>
+                      <AdminDashboard />
+                    </Suspense>
                   </AdminProtectedRoute>
                 } />
                 <Route path="/admin/users" element={
                   <AdminProtectedRoute>
-                    <AdminUsers />
+                    <Suspense fallback={<RouteLoader label="טוען משתמשים..." />}>
+                      <AdminUsers />
+                    </Suspense>
                   </AdminProtectedRoute>
                 } />
                 <Route path="/admin/matches" element={
                   <AdminProtectedRoute>
-                    <AdminMatches />
+                    <Suspense fallback={<RouteLoader label="טוען..." />}>
+                      <AdminMatches />
+                    </Suspense>
                   </AdminProtectedRoute>
                 } />
                 <Route path="/admin/messages" element={
                   <AdminProtectedRoute>
-                    <AdminMessages />
+                    <Suspense fallback={<RouteLoader label="טוען..." />}>
+                      <AdminMessages />
+                    </Suspense>
                   </AdminProtectedRoute>
                 } />
                 <Route path="/admin/analytics" element={
                   <AdminProtectedRoute>
-                    <AdminAnalytics />
+                    <Suspense fallback={<RouteLoader label="טוען אנליטיקה..." />}>
+                      <AdminAnalytics />
+                    </Suspense>
                   </AdminProtectedRoute>
                 } />
                 <Route path="/admin/roles" element={
                   <AdminProtectedRoute>
-                    <AdminRoles />
+                    <Suspense fallback={<RouteLoader label="טוען הרשאות..." />}>
+                      <AdminRoles />
+                    </Suspense>
                   </AdminProtectedRoute>
                 } />
                 <Route path="/admin/settings" element={
                   <AdminProtectedRoute>
-                    <AdminSettings />
+                    <Suspense fallback={<RouteLoader label="טוען הגדרות..." />}>
+                      <AdminSettings />
+                    </Suspense>
                   </AdminProtectedRoute>
                 } />
                 <Route path="/admin/reports" element={
                   <AdminProtectedRoute>
-                    <AdminReports />
+                    <Suspense fallback={<RouteLoader label="טוען דיווחים..." />}>
+                      <AdminReports />
+                    </Suspense>
                   </AdminProtectedRoute>
                 } />
                 <Route path="/admin/activity" element={
                   <AdminProtectedRoute>
-                    <AdminActivityLog />
+                    <Suspense fallback={<RouteLoader label="טוען פעילות..." />}>
+                      <AdminActivityLog />
+                    </Suspense>
                   </AdminProtectedRoute>
                 } />
                 <Route path="/admin/blocked" element={
                   <AdminProtectedRoute>
-                    <AdminBlockedUsers />
+                    <Suspense fallback={<RouteLoader label="טוען..." />}>
+                      <AdminBlockedUsers />
+                    </Suspense>
                   </AdminProtectedRoute>
                 } />
                 <Route path="/admin/content" element={
                   <AdminProtectedRoute>
-                    <AdminContent />
+                    <Suspense fallback={<RouteLoader label="טוען תוכן..." />}>
+                      <AdminContent />
+                    </Suspense>
                   </AdminProtectedRoute>
                 } />
                 <Route path="/admin/notifications" element={
                   <AdminProtectedRoute>
-                    <AdminNotifications />
+                    <Suspense fallback={<RouteLoader label="טוען התראות..." />}>
+                      <AdminNotifications />
+                    </Suspense>
                   </AdminProtectedRoute>
                 } />
                 <Route path="/admin/tips" element={
                   <AdminProtectedRoute>
-                    <AdminTips />
+                    <Suspense fallback={<RouteLoader label="טוען טיפים..." />}>
+                      <AdminTips />
+                    </Suspense>
                   </AdminProtectedRoute>
                 } />
                 <Route path="/admin/support" element={
                   <AdminProtectedRoute>
-                    <AdminSupport />
+                    <Suspense fallback={<RouteLoader label="טוען פניות..." />}>
+                      <AdminSupport />
+                    </Suspense>
                   </AdminProtectedRoute>
                 } />
 
                 {/* 404 */}
-                <Route path="*" element={<NotFound />} />
+                <Route path="*" element={
+                  <Suspense fallback={<RouteLoader label="טוען..." />}>
+                    <NotFound />
+                  </Suspense>
+                } />
               </Routes>
               <BottomNavigation />
               </main>

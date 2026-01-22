@@ -5,6 +5,7 @@ import IcebreakerButton from "@/components/IcebreakerButton";
 import ReadReceipt from "@/components/ReadReceipt";
 import ConversationMenu from "@/components/ConversationMenu";
 import FullPageLoader from "@/components/FullPageLoader";
+import EmptyState from "@/components/EmptyState";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Send, Search, Loader2, MessageCircle, Heart, ChevronRight } from "lucide-react";
@@ -142,39 +143,22 @@ const Messages = () => {
         <h1 className="sr-only">הודעות</h1>
         <div className="bg-card rounded-3xl shadow-card overflow-hidden h-[calc(100vh-120px)]">
           {hasNoConversationsOrMatches ? (
-            <div className="flex flex-col items-center justify-center h-full p-8 text-center">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center mb-6 animate-pulse-soft" aria-hidden="true">
-                <Heart className="w-10 h-10 text-primary" aria-hidden="true" />
-              </div>
-              <h2 className="font-display text-2xl font-bold text-foreground mb-3">עדיין אין שיחות</h2>
-              <p className="text-muted-foreground mb-6 max-w-md leading-relaxed">
-                כשתקבלו התאמה הדדית עם מישהו, תוכלו להתחיל לשוחח כאן.
-              </p>
-              
-              {/* Numbered Steps */}
-              <div className="bg-muted/50 rounded-xl p-5 mb-6 max-w-sm w-full" dir="rtl">
-                <p className="text-sm font-medium text-foreground mb-3">🚀 איך להתחיל?</p>
-                <ol className="text-sm text-muted-foreground space-y-2 list-decimal list-inside text-right">
-                  <li>גלו פרופילים בעמוד הגילוי</li>
-                  <li>שלחו לייקים לאנשים שמוצאים חן בעיניכם</li>
-                  <li>כשיש לייק הדדי — נוצרת התאמה!</li>
-                  <li>התחילו לשוחח עם ההתאמות שלכם</li>
-                </ol>
-              </div>
-              
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Link to="/discover">
-                  <Button variant="hero" size="lg" className="gap-2 w-full sm:w-auto">
-                    <Search className="w-5 h-5" aria-hidden="true" />
-                    גלו פרופילים
-                  </Button>
-                </Link>
-                <Link to="/profile">
-                  <Button variant="outline" size="lg" className="w-full sm:w-auto">
-                    שפרו את הפרופיל
-                  </Button>
-                </Link>
-              </div>
+            <div className="flex items-center justify-center h-full p-8">
+              <EmptyState
+                icon={<Heart className="w-10 h-10" />}
+                title="עדיין אין שיחות"
+                description="כשתקבלו התאמה הדדית עם מישהו, תוכלו להתחיל לשוחח כאן."
+                actionLabel="גלו פרופילים"
+                actionLink="/discover"
+                secondaryActionLabel="שפרו את הפרופיל"
+                secondaryActionLink="/profile"
+                variant="action"
+                tips={[
+                  "שלחו לייקים בעמוד הגילוי",
+                  "כשיש לייק הדדי — נוצרת התאמה",
+                  "התחילו שיחה מההתאמות שלכם",
+                ]}
+              />
             </div>
           ) : (
             <div className="flex flex-col md:grid md:grid-cols-[320px_1fr] lg:grid-cols-[360px_1fr] h-full">
