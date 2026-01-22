@@ -8,7 +8,7 @@ import { useCompatibility } from "@/hooks/useCompatibility";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Heart, MessageCircle, MapPin, Clock, ArrowRight, Star, Share2, Loader2, GraduationCap, Ruler, Cigarette, Target, Verified } from "lucide-react";
+import { Heart, MessageCircle, MapPin, ArrowRight, Star, Share2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 
@@ -23,7 +23,7 @@ const MemberProfile = () => {
   const [messageLoading, setMessageLoading] = useState(false);
   
   // Calculate compatibility score
-  const compatibility = useCompatibility(currentUserProfile, member);
+  const compatibility = useCompatibility(currentUserProfile as any, member as any);
 
   if (loading) {
     return (
@@ -106,7 +106,6 @@ const MemberProfile = () => {
   };
 
   const imageUrl = member.avatar_url || "/profiles/profile1.jpg";
-  const lastSeen = member.last_seen ? new Date(member.last_seen).toLocaleString('he-IL') : undefined;
 
   return (
     <div className="min-h-screen bg-muted/20" dir="rtl">
@@ -179,12 +178,6 @@ const MemberProfile = () => {
                     {member.city}
                   </p>
                 </div>
-                {!member.is_online && lastSeen && (
-                  <div className="flex items-center gap-2 text-muted-foreground text-sm">
-                    <Clock className="w-4 h-4" />
-                    פעיל/ה {lastSeen}
-                  </div>
-                )}
               </div>
 
               <div className="mb-8">
@@ -192,7 +185,8 @@ const MemberProfile = () => {
                   קצת עליי
                 </h3>
                 <p className="text-muted-foreground leading-relaxed text-lg">
-                  {member.bio || "עדיין לא נכתב תיאור"}
+                  {/* bio intentionally not exposed in public profiles */}
+                  עדיין אין תיאור ציבורי.
                 </p>
               </div>
 
@@ -210,44 +204,6 @@ const MemberProfile = () => {
                         {interest}
                       </Badge>
                     ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Additional Profile Details */}
-              {(member.education || member.height || member.smoking || member.relationship_goal) && (
-                <div className="mb-8">
-                  <h3 className="font-display text-lg font-semibold text-foreground mb-3">
-                    פרטים נוספים
-                  </h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    {member.education && (
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <GraduationCap className="w-4 h-4" />
-                        <span>{member.education}</span>
-                      </div>
-                    )}
-                    {member.height && (
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <Ruler className="w-4 h-4" />
-                        <span>{member.height} ס"מ</span>
-                      </div>
-                    )}
-                    {member.smoking && (
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <Cigarette className="w-4 h-4" />
-                        <span>{member.smoking === 'no' ? 'לא מעשן/ת' : member.smoking === 'yes' ? 'מעשן/ת' : 'לפעמים'}</span>
-                      </div>
-                    )}
-                    {member.relationship_goal && (
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <Target className="w-4 h-4" />
-                        <span>
-                          {member.relationship_goal === 'serious' ? 'קשר רציני' : 
-                           member.relationship_goal === 'casual' ? 'הכרויות' : 'חברות'}
-                        </span>
-                      </div>
-                    )}
                   </div>
                 </div>
               )}
@@ -361,18 +317,6 @@ const MemberProfile = () => {
               </div>
             )}
 
-            {/* Verified Badge Card */}
-            {(member as any).is_verified && (
-              <div className="bg-gradient-to-r from-secondary/20 to-primary/20 rounded-2xl p-4 mt-6 flex items-center gap-3">
-                <div className="p-2 bg-secondary/20 rounded-full">
-                  <Verified className="w-6 h-6 text-secondary" />
-                </div>
-                <div>
-                  <p className="font-semibold text-foreground">פרופיל מאומת</p>
-                  <p className="text-sm text-muted-foreground">הזהות של {member.name} אומתה</p>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>

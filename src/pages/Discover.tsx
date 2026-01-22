@@ -563,11 +563,11 @@ const Discover = () => {
                   name: currentProfile.name,
                   age: currentProfile.age,
                   city: currentProfile.city,
-                  bio: currentProfile.bio || "",
+                  bio: "",
                   image: currentProfile.avatar_url || "/profiles/profile1.jpg",
                   interests: currentProfile.interests || [],
                   isOnline: currentProfile.is_online || false,
-                  isVerified: (currentProfile as any).is_verified || false,
+                  isVerified: false,
                 }}
                 images={currentProfilePhotos}
                 onLike={handleLike}
