@@ -390,7 +390,7 @@ const Members = () => {
                       <Link 
                         key={profile.id} 
                         to={`/member/${profile.id}`}
-                        className="flex items-center gap-4 p-4 bg-card rounded-xl border border-border hover:shadow-card transition-shadow"
+                        className="flex items-center gap-4 p-4 bg-card rounded-xl border border-border hover:shadow-card transition-shadow focus-ring"
                       >
                         <LazyImage 
                           src={profile.avatar_url || "/profiles/profile1.jpg"} 
