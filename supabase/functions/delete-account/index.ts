@@ -15,7 +15,9 @@ Deno.serve(async (req) => {
 
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
-    const anonKey = Deno.env.get("SUPABASE_PUBLISHABLE_KEY");
+    // IMPORTANT: use the anon key for user-scoped auth calls.
+    // Some environments expose both "publishable" and "anon"; anon is the canonical key.
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY") ?? Deno.env.get("SUPABASE_PUBLISHABLE_KEY");
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
     if (!supabaseUrl || !anonKey || !serviceRoleKey) {
       console.error("Missing required environment variables");
@@ -77,18 +79,25 @@ Deno.serve(async (req) => {
         if (convErr) throw convErr;
       }
 
-      // Other related records
-      await admin.from("photos").delete().eq("profile_id", profileId);
-      await admin.from("action_history").delete().eq("profile_id", profileId);
-      await admin.from("action_history").delete().eq("target_profile_id", profileId);
-      await admin.from("likes").delete().eq("liker_id", profileId);
-      await admin.from("likes").delete().eq("liked_id", profileId);
-      await admin.from("matches").delete().eq("profile1_id", profileId);
-      await admin.from("matches").delete().eq("profile2_id", profileId);
-      await admin.from("reports").delete().eq("reporter_id", profileId);
-      await admin.from("reports").delete().eq("reported_id", profileId);
-      await admin.from("blocked_users").delete().eq("blocker_id", profileId);
-      await admin.from("blocked_users").delete().eq("blocked_id", profileId);
+      // Other related records (best-effort, but don't silently ignore failures)
+      const deletions = await Promise.all([
+        admin.from("photos").delete().eq("profile_id", profileId),
+        admin.from("action_history").delete().eq("profile_id", profileId),
+        admin.from("action_history").delete().eq("target_profile_id", profileId),
+        admin.from("likes").delete().eq("liker_id", profileId),
+        admin.from("likes").delete().eq("liked_id", profileId),
+        admin.from("matches").delete().eq("profile1_id", profileId),
+        admin.from("matches").delete().eq("profile2_id", profileId),
+        admin.from("reports").delete().eq("reporter_id", profileId),
+        admin.from("reports").delete().eq("reported_id", profileId),
+        admin.from("blocked_users").delete().eq("blocker_id", profileId),
+        admin.from("blocked_users").delete().eq("blocked_id", profileId),
+      ]);
+
+      const firstErr = deletions.find((r) => (r as { error?: unknown })?.error)?.error as any;
+      if (firstErr) {
+        throw new Error(firstErr.message ?? "Cleanup failed");
+      }
 
       // Finally delete profile
       const { error: profDelErr } = await admin.from("profiles").delete().eq("id", profileId);
@@ -96,7 +105,8 @@ Deno.serve(async (req) => {
     }
 
     // User settings are tied to user_id
-    await admin.from("user_settings").delete().eq("user_id", userId);
+    const { error: settingsErr } = await admin.from("user_settings").delete().eq("user_id", userId);
+    if (settingsErr) throw settingsErr;
 
     // Delete auth user (revokes sessions)
     const { error: delUserErr } = await admin.auth.admin.deleteUser(userId);

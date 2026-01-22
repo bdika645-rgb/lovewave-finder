@@ -8,14 +8,20 @@ export function useAdminAuth() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
+
     async function checkAdminStatus() {
       if (!user) {
-        setIsAdmin(false);
-        setLoading(false);
+        if (!cancelled) {
+          setIsAdmin(false);
+          setLoading(false);
+        }
         return;
       }
 
       try {
+        if (!cancelled) setLoading(true);
+
         const { data, error } = await supabase
           .from("user_roles")
           .select("role")
@@ -25,21 +31,25 @@ export function useAdminAuth() {
 
         if (error) {
           console.error("Error checking admin status:", error);
-          setIsAdmin(false);
+          if (!cancelled) setIsAdmin(false);
         } else {
-          setIsAdmin(!!data);
+          if (!cancelled) setIsAdmin(!!data);
         }
       } catch (err) {
         console.error("Error:", err);
-        setIsAdmin(false);
+        if (!cancelled) setIsAdmin(false);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     }
 
     if (!authLoading) {
       checkAdminStatus();
     }
+
+    return () => {
+      cancelled = true;
+    };
   }, [user, authLoading]);
 
   return { isAdmin, loading: authLoading || loading, user };
