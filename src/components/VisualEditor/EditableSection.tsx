@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import { useVisualEditor } from "./VisualEditorProvider";
+import { useLandingContent } from "@/contexts/LandingContentContext";
 import { Settings } from "lucide-react";
 
 interface EditableSectionProps {
@@ -19,7 +19,7 @@ export default function EditableSection({
   className,
   onOpenSettings,
 }: EditableSectionProps) {
-  const { isEditMode, openSidebar } = useVisualEditor();
+  const { isEditMode } = useLandingContent();
 
   if (!isEditMode) {
     return <>{children}</>;
@@ -41,13 +41,15 @@ export default function EditableSection({
         <span className="bg-primary text-primary-foreground text-xs font-medium px-3 py-1 rounded-full shadow-lg">
           {sectionName}
         </span>
-        <button
-          onClick={onOpenSettings || openSidebar}
-          className="bg-muted hover:bg-muted/80 text-foreground p-1.5 rounded-full shadow-lg transition-colors"
-          aria-label={`הגדרות ${sectionName}`}
-        >
-          <Settings className="w-3.5 h-3.5" />
-        </button>
+        {onOpenSettings && (
+          <button
+            onClick={onOpenSettings}
+            className="bg-muted hover:bg-muted/80 text-foreground p-1.5 rounded-full shadow-lg transition-colors"
+            aria-label={`הגדרות ${sectionName}`}
+          >
+            <Settings className="w-3.5 h-3.5" />
+          </button>
+        )}
       </div>
       
       {children}
