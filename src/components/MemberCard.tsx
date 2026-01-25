@@ -15,7 +15,7 @@ interface MemberCardProps {
 const MemberCard = memo(({ member, onLike, onPass }: MemberCardProps) => {
   return (
     <article 
-      className="group relative bg-card rounded-3xl overflow-hidden border border-border shadow-lg hover:shadow-xl transition-all duration-300"
+      className="group relative bg-card rounded-2xl overflow-hidden border border-border shadow-md hover:shadow-lg transition-shadow duration-300"
       aria-label={`פרופיל של ${member.name}`}
     >
       {/* Image */}
@@ -27,18 +27,17 @@ const MemberCard = memo(({ member, onLike, onPass }: MemberCardProps) => {
           <LazyImage
             src={member.image}
             alt={`תמונת פרופיל של ${member.name}`}
-            className="w-full h-full transition-transform duration-500 group-hover:scale-105"
+            className="w-full h-full transition-transform duration-300 group-hover:scale-102"
             aspectRatio="portrait"
             priority
           />
-          {/* Enhanced gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-transparent" />
+          {/* Gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
           
           {/* Online Status */}
           {member.isOnline && (
             <div 
-              className="absolute top-4 right-4 flex items-center gap-2 glass-effect px-3 py-1.5 rounded-full shadow-lg"
+              className="absolute top-3 right-3 flex items-center gap-1.5 bg-card/90 backdrop-blur-sm px-2.5 py-1 rounded-full shadow-md"
               role="status"
               aria-label="מחובר כעת"
             >
@@ -48,14 +47,14 @@ const MemberCard = memo(({ member, onLike, onPass }: MemberCardProps) => {
           )}
 
           {/* Info Overlay */}
-          <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 backdrop-blur-[2px]">
+          <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4">
             <div className="flex items-end justify-between">
               <div>
-                <h3 className="font-display text-xl sm:text-2xl font-bold text-white drop-shadow-lg tracking-tight">
+                <h3 className="font-display text-lg sm:text-xl font-bold text-white drop-shadow-md tracking-tight">
                   {member.name}, {member.age}
                 </h3>
-                <p className="flex items-center gap-1 text-white/90 text-sm mt-1 drop-shadow-md">
-                  <MapPin className="w-4 h-4 text-white" aria-hidden="true" />
+                <p className="flex items-center gap-1 text-white/90 text-xs sm:text-sm mt-0.5 drop-shadow-md">
+                  <MapPin className="w-3.5 h-3.5 text-white" aria-hidden="true" />
                   <span>{member.city}</span>
                 </p>
               </div>
@@ -65,18 +64,18 @@ const MemberCard = memo(({ member, onLike, onPass }: MemberCardProps) => {
       </Link>
 
       {/* Content */}
-      <div className="p-5 bg-card/50 backdrop-blur-sm">
-        <p className="text-muted-foreground text-sm line-clamp-2 mb-4">
+      <div className="p-3 sm:p-4 bg-card">
+        <p className="text-muted-foreground text-xs sm:text-sm line-clamp-2 mb-3">
           {member.bio}
         </p>
 
         {/* Interests */}
-        <div className="flex flex-wrap gap-2 mb-5" role="list" aria-label="תחומי עניין">
+        <div className="flex flex-wrap gap-1.5 mb-3" role="list" aria-label="תחומי עניין">
           {member.interests.slice(0, 3).map((interest) => (
             <Badge 
               key={interest} 
               variant="secondary" 
-              className="bg-accent/50 text-accent-foreground text-xs"
+              className="bg-accent text-accent-foreground text-[10px] sm:text-xs px-2 py-0.5"
               role="listitem"
             >
               {interest}
@@ -85,24 +84,24 @@ const MemberCard = memo(({ member, onLike, onPass }: MemberCardProps) => {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-3" role="group" aria-label="פעולות">
+        <div className="flex gap-2" role="group" aria-label="פעולות">
           <Button
             variant="pass"
-            size="icon-lg"
+            size="sm"
             onClick={onPass}
-            className="flex-1 focus:ring-2 focus:ring-offset-2 focus:ring-destructive focus:outline-none"
+            className="flex-1 h-9"
             aria-label={`דלג על ${member.name}`}
           >
-            <X className="w-5 h-5" aria-hidden="true" />
+            <X className="w-4 h-4" aria-hidden="true" />
           </Button>
           <Button
             variant="like"
-            size="icon-lg"
+            size="sm"
             onClick={onLike}
-            className="flex-1 focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:outline-none"
+            className="flex-1 h-9"
             aria-label={`שלח לייק ל${member.name}`}
           >
-            <Heart className="w-5 h-5" aria-hidden="true" />
+            <Heart className="w-4 h-4" aria-hidden="true" />
           </Button>
         </div>
       </div>

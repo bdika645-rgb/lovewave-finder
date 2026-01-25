@@ -219,19 +219,19 @@ const Index = () => {
                 />
               </AnimatedSection>
 
-              <div className="grid md:grid-cols-3 gap-8 lg:gap-10">
+              <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
                 {features.items.map((item, index) => {
                   const Icon = featureIcons[index] || Sparkles;
                   return (
                     <AnimatedCard key={item.id} index={index}>
-                      <div className="glass-effect p-10 rounded-3xl text-center h-full border border-white/30 dark:border-white/10 hover:border-primary/30 transition-all duration-500 tilt-card bg-noise group">
-                        <div className="w-20 h-20 gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-xl group-hover:scale-110 transition-transform duration-500">
-                          <Icon className="w-10 h-10 text-primary-foreground" />
+                      <div className="bg-card p-8 rounded-2xl text-center h-full border border-border shadow-lg hover:shadow-xl hover:border-primary/20 transition-all duration-300 group">
+                        <div className="w-16 h-16 gradient-primary rounded-xl flex items-center justify-center mx-auto mb-6 shadow-md group-hover:scale-105 transition-transform duration-300">
+                          <Icon className="w-8 h-8 text-primary-foreground" />
                         </div>
-                        <h3 className="font-display text-2xl font-bold text-foreground mb-4 tracking-tight">
+                        <h3 className="font-display text-xl font-bold text-foreground mb-3 tracking-tight">
                           {item.title}
                         </h3>
-                        <p className="text-muted-foreground leading-relaxed text-lg">
+                        <p className="text-muted-foreground leading-relaxed">
                           {item.description}
                         </p>
                       </div>
@@ -287,7 +287,7 @@ const Index = () => {
               {loading ? (
                 <SkeletonGrid count={4} />
               ) : filteredProfiles.length > 0 ? (
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
                   {filteredProfiles.map((profile, index) => (
                     <AnimatedCard key={profile.id} index={index}>
                       <MemberCard 
