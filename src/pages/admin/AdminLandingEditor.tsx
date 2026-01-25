@@ -1,305 +1,112 @@
-import { useState } from "react";
-import AdminLayout from "@/components/admin/AdminLayout";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useEffect } from "react";
+import { useLandingContent } from "@/contexts/LandingContentContext";
+import { VisualEditorProvider, useVisualEditor } from "@/components/VisualEditor";
+import Navbar from "@/components/Navbar";
+import HeroSection from "@/components/HeroSection";
+import SkipToContent from "@/components/SkipToContent";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import {
-  MousePointer2,
-  Code2,
-  Eye,
-  Save,
-  RotateCcw,
-  Download,
-  Upload,
-  ChevronDown,
-  ChevronLeft,
-  Navigation,
-  Sparkles,
-  Users,
-  BarChart3,
-  Heart,
-  Lightbulb,
-  HelpCircle,
-  Megaphone,
-  FileText,
-  ExternalLink,
+import { 
+  Eye, 
+  Save, 
+  RotateCcw, 
+  Download, 
+  Upload, 
+  X,
+  Pencil,
+  Undo2,
+  Redo2,
   Check,
-  AlertCircle,
 } from "lucide-react";
-import { useLandingContent, LandingContent } from "@/contexts/LandingContentContext";
 import { toast } from "sonner";
+import { Link } from "react-router-dom";
+import { lazy, Suspense } from "react";
 
-// Section configuration with icons and fields
-const SECTIONS_CONFIG = [
+// Import all landing page sections
+import AnimatedSection from "@/components/AnimatedSection";
+import AnimatedCard from "@/components/AnimatedCard";
+import MemberCard from "@/components/MemberCard";
+import FeaturedMembersFilter from "@/components/FeaturedMembersFilter";
+import { InlineEditable, EditableSection } from "@/components/VisualEditor";
+import { Heart, Shield, Sparkles, Users } from "lucide-react";
+
+// Lazy load sections
+const StatsSection = lazy(() => import("@/components/StatsSection"));
+const SuccessStoriesSection = lazy(() => import("@/components/SuccessStoriesSection"));
+const FAQSection = lazy(() => import("@/components/FAQSection"));
+const DatingTipsSection = lazy(() => import("@/components/DatingTipsSection"));
+
+const SectionLoader = () => (
+  <div className="py-24 flex justify-center">
+    <div className="animate-pulse w-full max-w-4xl mx-auto px-6">
+      <div className="h-8 bg-muted rounded w-1/3 mx-auto mb-4" />
+      <div className="h-4 bg-muted rounded w-1/2 mx-auto" />
+    </div>
+  </div>
+);
+
+// Demo profiles
+const demoProfiles = [
   {
-    key: "nav" as keyof LandingContent,
-    title: "ניווט",
-    icon: Navigation,
-    fields: [
-      { key: "brand", label: "שם המותג", multiline: false },
-      { key: "members", label: "טקסט כפתור חברים", multiline: false },
-      { key: "login", label: "טקסט כניסה", multiline: false },
-      { key: "register", label: "טקסט הרשמה", multiline: false },
-    ],
+    id: "demo-1",
+    name: "מיכל",
+    age: 28,
+    city: "תל אביב",
+    bio: "אוהבת טיולים, קפה טוב ושיחות עמוקות 🌸",
+    image: "/profiles/profile1.jpg",
+    interests: ["טיולים", "קפה", "מוזיקה"],
+    isOnline: true,
   },
   {
-    key: "hero" as keyof LandingContent,
-    title: "באנר ראשי",
-    icon: Sparkles,
-    fields: [
-      { key: "title", label: "כותרת ראשית", multiline: false },
-      { key: "subtitle", label: "כותרת משנה", multiline: true },
-      { key: "cta", label: "טקסט כפתור CTA", multiline: false },
-      { key: "secondaryCta", label: "טקסט כפתור משני", multiline: false },
-    ],
+    id: "demo-2",
+    name: "דניאל",
+    age: 32,
+    city: "הרצליה",
+    bio: "יזם, ספורטאי חובב, מחפש את זו שתצחיק אותי 😊",
+    image: "/profiles/profile2.jpg",
+    interests: ["ספורט", "יזמות", "בישול"],
+    isOnline: false,
   },
   {
-    key: "features" as keyof LandingContent,
-    title: "תכונות",
-    icon: Lightbulb,
-    fields: [
-      { key: "title", label: "כותרת הסקשן", multiline: false },
-      { key: "subtitle", label: "תיאור הסקשן", multiline: true },
-    ],
+    id: "demo-3",
+    name: "נועה",
+    age: 26,
+    city: "ירושלים",
+    bio: "סטודנטית לפסיכולוגיה, אוהבת תיאטרון ואמנות",
+    image: "/profiles/profile3.jpg",
+    interests: ["תיאטרון", "אמנות", "יוגה"],
+    isOnline: true,
   },
   {
-    key: "featuredMembers" as keyof LandingContent,
-    title: "חברים מובילים",
-    icon: Users,
-    fields: [
-      { key: "title", label: "כותרת", multiline: false },
-      { key: "subtitle", label: "תיאור", multiline: true },
-    ],
-  },
-  {
-    key: "stats" as keyof LandingContent,
-    title: "סטטיסטיקות",
-    icon: BarChart3,
-    fields: [
-      { key: "title", label: "כותרת", multiline: false },
-      { key: "subtitle", label: "תיאור", multiline: true },
-    ],
-  },
-  {
-    key: "successStories" as keyof LandingContent,
-    title: "סיפורי הצלחה",
-    icon: Heart,
-    fields: [
-      { key: "title", label: "כותרת", multiline: false },
-      { key: "subtitle", label: "תיאור", multiline: true },
-    ],
-  },
-  {
-    key: "datingTips" as keyof LandingContent,
-    title: "טיפים להיכרויות",
-    icon: Lightbulb,
-    fields: [
-      { key: "title", label: "כותרת", multiline: false },
-      { key: "subtitle", label: "תיאור", multiline: true },
-    ],
-  },
-  {
-    key: "faq" as keyof LandingContent,
-    title: "שאלות נפוצות",
-    icon: HelpCircle,
-    fields: [
-      { key: "title", label: "כותרת", multiline: false },
-      { key: "subtitle", label: "תיאור", multiline: true },
-    ],
-  },
-  {
-    key: "cta" as keyof LandingContent,
-    title: "קריאה לפעולה",
-    icon: Megaphone,
-    fields: [
-      { key: "title", label: "כותרת", multiline: false },
-      { key: "subtitle", label: "תיאור", multiline: true },
-      { key: "buttonText", label: "טקסט כפתור", multiline: false },
-    ],
-  },
-  {
-    key: "footer" as keyof LandingContent,
-    title: "פוטר",
-    icon: FileText,
-    fields: [
-      { key: "brand", label: "שם המותג", multiline: false },
-      { key: "description", label: "תיאור", multiline: true },
-      { key: "copyright", label: "זכויות יוצרים", multiline: false },
-    ],
+    id: "demo-4",
+    name: "אורי",
+    age: 30,
+    city: "חיפה",
+    bio: "מהנדס תוכנה, מטייל בזמני הפנוי, אוהב ים 🌊",
+    image: "/profiles/profile4.jpg",
+    interests: ["טכנולוגיה", "טיולים", "שחייה"],
+    isOnline: false,
   },
 ];
 
-// Section Editor Component
-function SectionEditor({
-  section,
-  content,
-  onUpdateContent,
-  defaultOpen = false,
-}: {
-  section: typeof SECTIONS_CONFIG[0];
-  content: LandingContent;
-  onUpdateContent: <K extends keyof LandingContent>(section: K, data: Partial<LandingContent[K]>) => void;
-  defaultOpen?: boolean;
-}) {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
-  const Icon = section.icon;
-  const sectionContent = content[section.key] as unknown as Record<string, unknown>;
+const featureIcons = [Sparkles, Shield, Users];
 
-  return (
-    <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-      <CollapsibleTrigger asChild>
-        <button
-          className="w-full flex items-center justify-between p-4 bg-muted/50 hover:bg-muted rounded-lg transition-colors focus-ring"
-          aria-expanded={isOpen}
-        >
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-primary/10">
-              <Icon className="w-4 h-4 text-primary" />
-            </div>
-            <span className="font-medium">{section.title}</span>
-          </div>
-          <ChevronDown
-            className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${
-              isOpen ? "rotate-180" : ""
-            }`}
-          />
-        </button>
-      </CollapsibleTrigger>
-      <CollapsibleContent className="mt-2 space-y-4 p-4 bg-card rounded-lg border border-border">
-        {section.fields.map((field) => (
-          <div key={field.key} className="space-y-2">
-            <Label htmlFor={`${section.key}-${field.key}`}>{field.label}</Label>
-            {field.multiline ? (
-              <Textarea
-                id={`${section.key}-${field.key}`}
-                value={(sectionContent[field.key] as string) || ""}
-                onChange={(e) =>
-                  onUpdateContent(section.key, { [field.key]: e.target.value } as Partial<LandingContent[typeof section.key]>)
-                }
-                rows={3}
-                dir="rtl"
-                className="resize-none"
-              />
-            ) : (
-              <Input
-                id={`${section.key}-${field.key}`}
-                value={(sectionContent[field.key] as string) || ""}
-                onChange={(e) =>
-                  onUpdateContent(section.key, { [field.key]: e.target.value } as Partial<LandingContent[typeof section.key]>)
-                }
-                dir="rtl"
-              />
-            )}
-          </div>
-        ))}
-      </CollapsibleContent>
-    </Collapsible>
-  );
-}
-
-// Raw JSON Editor Component
-function RawEditor({
-  content,
-  onImport,
-}: {
-  content: LandingContent;
-  onImport: (content: LandingContent) => void;
-}) {
-  const [jsonText, setJsonText] = useState(() => JSON.stringify(content, null, 2));
-  const [error, setError] = useState<string | null>(null);
-  const [isValid, setIsValid] = useState(true);
-
-  const handleTextChange = (text: string) => {
-    setJsonText(text);
-    try {
-      JSON.parse(text);
-      setError(null);
-      setIsValid(true);
-    } catch (e) {
-      setError((e as Error).message);
-      setIsValid(false);
-    }
-  };
-
-  const handleApply = () => {
-    try {
-      const parsed = JSON.parse(jsonText);
-      onImport(parsed);
-      toast.success("התוכן עודכן בהצלחה");
-    } catch (e) {
-      toast.error("שגיאה בפורמט JSON");
-    }
-  };
-
-  const handleFormat = () => {
-    try {
-      const parsed = JSON.parse(jsonText);
-      setJsonText(JSON.stringify(parsed, null, 2));
-      setError(null);
-      setIsValid(true);
-    } catch (e) {
-      toast.error("לא ניתן לפרמט - JSON לא תקין");
-    }
-  };
-
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          {isValid ? (
-            <Badge variant="outline" className="gap-1 text-green-600 border-green-600">
-              <Check className="w-3 h-3" />
-              תקין
-            </Badge>
-          ) : (
-            <Badge variant="outline" className="gap-1 text-destructive border-destructive">
-              <AlertCircle className="w-3 h-3" />
-              שגיאה
-            </Badge>
-          )}
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={handleFormat} disabled={!isValid}>
-            <Code2 className="w-4 h-4 ml-2" />
-            פרמט
-          </Button>
-          <Button size="sm" onClick={handleApply} disabled={!isValid}>
-            <Save className="w-4 h-4 ml-2" />
-            החל שינויים
-          </Button>
-        </div>
-      </div>
-
-      {error && (
-        <div className="p-3 bg-destructive/10 border border-destructive/30 rounded-lg text-sm text-destructive">
-          {error}
-        </div>
-      )}
-
-      <Textarea
-        value={jsonText}
-        onChange={(e) => handleTextChange(e.target.value)}
-        className="font-mono text-sm min-h-[500px] resize-none"
-        dir="ltr"
-        spellCheck={false}
-      />
-    </div>
-  );
-}
-
-export default function AdminLandingEditor() {
+// The actual WYSIWYG editor content
+function WYSIWYGEditorContent() {
   const { content, updateContent, resetContent } = useLandingContent();
-  const [activeTab, setActiveTab] = useState<"visual" | "raw">("visual");
+  const { isEditMode, setIsEditMode } = useLandingContent();
+  const { features, featuredMembers, cta, footer, nav } = content;
+
+  const updateFeatures = (key: keyof typeof features, value: string) => {
+    updateContent("features", { [key]: value });
+  };
+
+  const updateFeaturedMembers = (key: keyof typeof featuredMembers, value: string) => {
+    updateContent("featuredMembers", { [key]: value });
+  };
+
+  const updateCta = (key: keyof typeof cta, value: string) => {
+    updateContent("cta", { [key]: value });
+  };
 
   const handleExport = () => {
     const dataStr = JSON.stringify(content, null, 2);
@@ -324,9 +131,8 @@ export default function AdminLandingEditor() {
         reader.onload = (event) => {
           try {
             const imported = JSON.parse(event.target?.result as string);
-            // Update each section
             Object.keys(imported).forEach((key) => {
-              updateContent(key as keyof LandingContent, imported[key]);
+              updateContent(key as keyof typeof content, imported[key]);
             });
             toast.success("התוכן יובא בהצלחה");
           } catch {
@@ -346,126 +152,293 @@ export default function AdminLandingEditor() {
     }
   };
 
-  const handleRawImport = (newContent: LandingContent) => {
-    Object.keys(newContent).forEach((key) => {
-      updateContent(key as keyof LandingContent, newContent[key as keyof LandingContent]);
-    });
-  };
+  // Enable edit mode on mount
+  useEffect(() => {
+    setIsEditMode(true);
+    return () => setIsEditMode(false);
+  }, [setIsEditMode]);
 
   return (
-    <AdminLayout>
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">עורך דף נחיתה</h1>
-            <p className="text-muted-foreground mt-1">ערוך את תוכן דף הבית של האתר</p>
-          </div>
-          <div className="flex items-center gap-2 flex-wrap">
-            <Button variant="outline" size="sm" asChild>
-              <a href="/" target="_blank" rel="noopener noreferrer">
-                <Eye className="w-4 h-4 ml-2" />
-                צפה באתר
-                <ExternalLink className="w-3 h-3 mr-1" />
-              </a>
-            </Button>
-            <Button variant="outline" size="sm" onClick={handleExport}>
-              <Download className="w-4 h-4 ml-2" />
-              ייצוא
-            </Button>
-            <Button variant="outline" size="sm" onClick={handleImport}>
-              <Upload className="w-4 h-4 ml-2" />
-              יבוא
-            </Button>
-            <Button variant="outline" size="sm" onClick={handleReset}>
-              <RotateCcw className="w-4 h-4 ml-2" />
-              איפוס
-            </Button>
-          </div>
-        </div>
-
-        {/* Editor Tabs */}
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "visual" | "raw")}>
-          <TabsList className="grid w-full max-w-md grid-cols-2">
-            <TabsTrigger value="visual" className="gap-2">
-              <MousePointer2 className="w-4 h-4" />
-              עורך ויזואלי
-            </TabsTrigger>
-            <TabsTrigger value="raw" className="gap-2">
-              <Code2 className="w-4 h-4" />
-              עורך קוד
-            </TabsTrigger>
-          </TabsList>
-
-          {/* Visual Editor */}
-          <TabsContent value="visual" className="mt-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MousePointer2 className="w-5 h-5 text-primary" />
-                  עריכה ויזואלית
-                </CardTitle>
-                <CardDescription>
-                  ערוך את תוכן הסקשנים השונים בדף הנחיתה בקלות
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ScrollArea className="h-[600px] pr-4">
-                  <div className="space-y-3">
-                    {SECTIONS_CONFIG.map((section, index) => (
-                      <SectionEditor
-                        key={section.key}
-                        section={section}
-                        content={content}
-                        onUpdateContent={updateContent}
-                        defaultOpen={index === 0}
-                      />
-                    ))}
-                  </div>
-                </ScrollArea>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Raw JSON Editor */}
-          <TabsContent value="raw" className="mt-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Code2 className="w-5 h-5 text-primary" />
-                  עריכת קוד JSON
-                </CardTitle>
-                <CardDescription>
-                  ערוך את כל התוכן ישירות בפורמט JSON לשליטה מלאה
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <RawEditor content={content} onImport={handleRawImport} />
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-
-        {/* Help Card */}
-        <Card className="bg-muted/30">
-          <CardContent className="pt-6">
-            <div className="flex items-start gap-4">
-              <div className="p-3 rounded-full bg-primary/10">
-                <Lightbulb className="w-5 h-5 text-primary" />
-              </div>
-              <div className="space-y-1">
-                <h3 className="font-medium">טיפים לעריכה</h3>
-                <ul className="text-sm text-muted-foreground space-y-1">
-                  <li>• השינויים נשמרים אוטומטית ב-localStorage</li>
-                  <li>• ניתן לייצא את התוכן לגיבוי או לשיתוף</li>
-                  <li>• השתמש בכפתור "איפוס" לחזרה לברירת המחדל</li>
-                  <li>• בעורך הקוד, ודא שה-JSON תקין לפני החלת השינויים</li>
-                </ul>
+    <div className="min-h-screen relative" dir="rtl">
+      {/* Fixed Editor Toolbar */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border shadow-lg">
+        <div className="container mx-auto px-4 py-3">
+          <div className="flex items-center justify-between gap-4">
+            {/* Left side - Title & Status */}
+            <div className="flex items-center gap-4">
+              <Link to="/admin" className="text-muted-foreground hover:text-foreground transition-colors">
+                <X className="w-5 h-5" />
+              </Link>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                <span className="font-medium text-sm">מצב עריכה פעיל</span>
               </div>
             </div>
-          </CardContent>
-        </Card>
+
+            {/* Center - Edit Mode Indicator */}
+            <div className="hidden md:flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
+              <Pencil className="w-4 h-4 text-primary" />
+              <span className="text-sm font-medium text-primary">לחץ על כל טקסט כדי לערוך</span>
+            </div>
+
+            {/* Right side - Actions */}
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" asChild>
+                <a href="/" target="_blank" rel="noopener noreferrer">
+                  <Eye className="w-4 h-4 ml-2" />
+                  צפייה
+                </a>
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleExport}>
+                <Download className="w-4 h-4 ml-2" />
+                <span className="hidden sm:inline">ייצוא</span>
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleImport}>
+                <Upload className="w-4 h-4 ml-2" />
+                <span className="hidden sm:inline">יבוא</span>
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleReset}>
+                <RotateCcw className="w-4 h-4 ml-2" />
+                <span className="hidden sm:inline">איפוס</span>
+              </Button>
+              <Button size="sm" asChild className="gap-2">
+                <Link to="/admin">
+                  <Check className="w-4 h-4" />
+                  סיום
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </div>
       </div>
-    </AdminLayout>
+
+      {/* Edit mode indicator bar */}
+      <div className="fixed top-[60px] left-0 right-0 h-1 bg-gradient-to-r from-primary via-primary/50 to-primary z-50" />
+
+      {/* Actual Landing Page Content with padding for toolbar */}
+      <div className="pt-[68px]">
+        <SkipToContent />
+        <Navbar />
+        <main id="main-content">
+          <HeroSection />
+
+          {/* Features Section */}
+          <EditableSection sectionName="פיצ'רים">
+            <section id="features" className="py-28 md:py-36 bg-muted/20 relative overflow-hidden">
+              <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+                <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-[120px]" />
+                <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-secondary/5 rounded-full blur-[100px]" />
+              </div>
+
+              <div className="container mx-auto px-6 relative z-10">
+                <AnimatedSection className="text-center mb-20">
+                  <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 tracking-tight">
+                    <InlineEditable
+                      value={features.title}
+                      onChange={(v) => updateFeatures("title", v)}
+                      as="span"
+                    />{" "}
+                    <InlineEditable
+                      value={features.titleHighlight}
+                      onChange={(v) => updateFeatures("titleHighlight", v)}
+                      className="text-gradient-shimmer"
+                      as="span"
+                    />?
+                  </h2>
+                  <InlineEditable
+                    value={features.description}
+                    onChange={(v) => updateFeatures("description", v)}
+                    className="text-muted-foreground text-lg md:text-xl max-w-2xl mx-auto leading-relaxed block"
+                    as="p"
+                    multiline
+                  />
+                </AnimatedSection>
+
+                <div className="grid md:grid-cols-3 gap-8 lg:gap-10">
+                  {features.items.map((item, index) => {
+                    const Icon = featureIcons[index] || Sparkles;
+                    return (
+                      <AnimatedCard key={item.id} index={index}>
+                        <div className="glass-effect p-10 rounded-3xl text-center h-full border border-white/30 dark:border-white/10 hover:border-primary/30 transition-all duration-500 tilt-card bg-noise group">
+                          <div className="w-20 h-20 gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-xl group-hover:scale-110 transition-transform duration-500">
+                            <Icon className="w-10 h-10 text-primary-foreground" />
+                          </div>
+                          <h3 className="font-display text-2xl font-bold text-foreground mb-4 tracking-tight">
+                            {item.title}
+                          </h3>
+                          <p className="text-muted-foreground leading-relaxed text-lg">
+                            {item.description}
+                          </p>
+                        </div>
+                      </AnimatedCard>
+                    );
+                  })}
+                </div>
+              </div>
+            </section>
+          </EditableSection>
+
+          {/* Featured Members */}
+          <EditableSection sectionName="חברים מומלצים">
+            <section id="featured-members" className="py-28 md:py-36 relative overflow-hidden">
+              <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+                <div className="absolute top-1/4 right-0 w-72 h-72 bg-primary/5 rounded-full blur-[100px]" />
+                <div className="absolute bottom-1/4 left-0 w-64 h-64 bg-secondary/5 rounded-full blur-[80px]" />
+              </div>
+
+              <div className="container mx-auto px-6 relative z-10">
+                <AnimatedSection className="text-center mb-20">
+                  <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 tracking-tight">
+                    <InlineEditable
+                      value={featuredMembers.title}
+                      onChange={(v) => updateFeaturedMembers("title", v)}
+                      as="span"
+                    />{" "}
+                    <InlineEditable
+                      value={featuredMembers.titleHighlight}
+                      onChange={(v) => updateFeaturedMembers("titleHighlight", v)}
+                      className="text-gradient-shimmer"
+                      as="span"
+                    />
+                  </h2>
+                  <InlineEditable
+                    value={featuredMembers.description}
+                    onChange={(v) => updateFeaturedMembers("description", v)}
+                    className="text-muted-foreground text-lg md:text-xl max-w-2xl mx-auto leading-relaxed block"
+                    as="p"
+                    multiline
+                  />
+                </AnimatedSection>
+
+                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+                  {demoProfiles.map((profile, index) => (
+                    <AnimatedCard key={profile.id} index={index}>
+                      <MemberCard member={profile} />
+                    </AnimatedCard>
+                  ))}
+                </div>
+
+                <AnimatedSection delay={0.3} className="text-center mt-16">
+                  <Button variant="hero" size="lg" className="btn-lift shadow-xl">
+                    <InlineEditable
+                      value={featuredMembers.ctaButton}
+                      onChange={(v) => updateFeaturedMembers("ctaButton", v)}
+                      as="span"
+                    />
+                  </Button>
+                </AnimatedSection>
+              </div>
+            </section>
+          </EditableSection>
+
+          {/* Lazy loaded sections */}
+          <Suspense fallback={<SectionLoader />}>
+            <StatsSection />
+          </Suspense>
+
+          <Suspense fallback={<SectionLoader />}>
+            <SuccessStoriesSection />
+          </Suspense>
+
+          <Suspense fallback={<SectionLoader />}>
+            <DatingTipsSection />
+          </Suspense>
+
+          <Suspense fallback={<SectionLoader />}>
+            <FAQSection />
+          </Suspense>
+
+          {/* CTA Section */}
+          <EditableSection sectionName="קריאה לפעולה">
+            <section className="py-32 md:py-40 gradient-primary overflow-hidden relative">
+              <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+                <div className="absolute -top-20 -left-20 w-80 h-80 bg-white/10 rounded-full blur-3xl" />
+                <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
+              </div>
+
+              <AnimatedSection className="container mx-auto px-6 text-center relative z-10">
+                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm mb-10 shadow-xl">
+                  <Heart className="w-10 h-10 text-primary-foreground animate-pulse-soft" />
+                </div>
+                <h2 className="font-display text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-primary-foreground mb-8 tracking-tight drop-shadow-lg">
+                  <InlineEditable
+                    value={cta.title}
+                    onChange={(v) => updateCta("title", v)}
+                    className="text-primary-foreground"
+                    as="span"
+                  />
+                </h2>
+                <InlineEditable
+                  value={cta.description}
+                  onChange={(v) => updateCta("description", v)}
+                  className="text-primary-foreground/90 text-lg md:text-xl lg:text-2xl max-w-3xl mx-auto mb-14 leading-relaxed font-medium block"
+                  as="p"
+                  multiline
+                />
+                <Button 
+                  size="xl" 
+                  className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 font-bold shadow-2xl hover:shadow-3xl transition-all btn-lift text-lg px-10"
+                >
+                  <InlineEditable
+                    value={cta.button}
+                    onChange={(v) => updateCta("button", v)}
+                    as="span"
+                  />
+                </Button>
+              </AnimatedSection>
+            </section>
+          </EditableSection>
+        </main>
+
+        {/* Footer */}
+        <footer className="bg-foreground py-16">
+          <div className="container mx-auto px-6">
+            <div className="grid md:grid-cols-4 gap-8 mb-12">
+              <div className="md:col-span-1">
+                <div className="flex items-center gap-2 mb-4">
+                  <Heart className="w-7 h-7 text-primary fill-current" />
+                  <span className="font-display text-2xl font-bold text-primary-foreground">{nav.brandName}</span>
+                </div>
+                <p className="text-primary-foreground/60 text-sm leading-relaxed">
+                  {footer.brandDescription}
+                </p>
+              </div>
+            </div>
+
+            <div className="border-t border-primary-foreground/10 pt-8">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-primary-foreground/50">
+                <p>{footer.copyright.replace("{year}", new Date().getFullYear().toString())}</p>
+                <p>{footer.madeWith}</p>
+              </div>
+            </div>
+          </div>
+        </footer>
+      </div>
+
+      {/* Floating Help Tooltip */}
+      <div className="fixed bottom-6 left-6 z-50">
+        <div className="bg-card border border-border rounded-xl shadow-2xl p-4 max-w-xs animate-fade-in">
+          <div className="flex items-start gap-3">
+            <div className="p-2 rounded-lg bg-primary/10 shrink-0">
+              <Pencil className="w-4 h-4 text-primary" />
+            </div>
+            <div>
+              <h4 className="font-medium text-sm mb-1">עורך WYSIWYG</h4>
+              <p className="text-xs text-muted-foreground">
+                לחץ על כל טקסט באתר כדי לערוך אותו ישירות. השינויים נשמרים אוטומטית.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function AdminLandingEditor() {
+  return (
+    <VisualEditorProvider>
+      <WYSIWYGEditorContent />
+    </VisualEditorProvider>
   );
 }
