@@ -15,7 +15,7 @@ interface MemberCardProps {
 const MemberCard = memo(({ member, onLike, onPass }: MemberCardProps) => {
   return (
     <article 
-      className="group relative bg-card rounded-2xl overflow-hidden shadow-card card-glow border border-border"
+      className="group relative glass-effect rounded-3xl overflow-hidden border border-white/30 dark:border-white/10 hover:border-primary/30 transition-all duration-500 tilt-card"
       aria-label={`פרופיל של ${member.name}`}
     >
       {/* Image */}
@@ -64,7 +64,7 @@ const MemberCard = memo(({ member, onLike, onPass }: MemberCardProps) => {
       </Link>
 
       {/* Content */}
-      <div className="p-5">
+      <div className="p-5 bg-card/50 backdrop-blur-sm">
         <p className="text-muted-foreground text-sm line-clamp-2 mb-4">
           {member.bio}
         </p>
