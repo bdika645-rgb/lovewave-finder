@@ -1,9 +1,11 @@
 import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import AdminLayout from "@/components/admin/AdminLayout";
 import UsersTable from "@/components/admin/UsersTable";
 import UserFilters from "@/components/admin/UserFilters";
 import { useAdminUsers, AdminUser } from "@/hooks/useAdminUsers";
 import { useBlockedUsers } from "@/hooks/useBlockedUsers";
+import { useImpersonation } from "@/contexts/ImpersonationContext";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,6 +34,8 @@ import { toast } from "sonner";
 import { israeliCities } from "@/data/members";
 
 export default function AdminUsers() {
+  const navigate = useNavigate();
+  const { startImpersonation } = useImpersonation();
   const [search, setSearch] = useState("");
   const [gender, setGender] = useState("all");
   const [sortBy, setSortBy] = useState("created_at_desc");
@@ -91,6 +95,13 @@ export default function AdminUsers() {
   const handleBlockUser = async (profileId: string, reason: string) => {
     await blockUser(profileId, reason);
     refetch();
+  };
+
+  const handleImpersonate = async (user: AdminUser) => {
+    const success = await startImpersonation(user.id);
+    if (success) {
+      navigate('/discover');
+    }
   };
 
   const handleCreateUser = async () => {
@@ -244,6 +255,7 @@ export default function AdminUsers() {
                   onView={handleViewUser}
                   onBlock={handleBlockUser}
                   onEdit={handleEditUser}
+                  onImpersonate={handleImpersonate}
                 />
               </div>
             </div>

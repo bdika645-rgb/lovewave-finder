@@ -6,6 +6,7 @@ import { Suspense, lazy } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { CurrentProfileProvider } from "@/hooks/useCurrentProfile";
+import { ImpersonationProvider } from "@/contexts/ImpersonationContext";
 import { LandingContentProvider } from "@/contexts/LandingContentContext";
 
 import { ThemeProvider } from "next-themes";
@@ -15,6 +16,7 @@ import AdminProtectedRoute from "@/components/AdminProtectedRoute";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import SkipToContent from "@/components/SkipToContent";
 import FullPageLoader from "@/components/FullPageLoader";
+import ImpersonationBanner from "@/components/ImpersonationBanner";
 
 // Pages (lazy to improve TTI on first load)
 import Index from "./pages/Index";
@@ -77,13 +79,15 @@ const App = () => (
       <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
         <AuthProvider>
           <CurrentProfileProvider>
-            <LandingContentProvider>
-            <TooltipProvider>
-              <SkipToContent />
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
-              <main id="main-content">
+            <ImpersonationProvider>
+              <LandingContentProvider>
+                <TooltipProvider>
+                  <ImpersonationBanner />
+                  <SkipToContent />
+                  <Toaster />
+                  <Sonner />
+                  <BrowserRouter>
+                  <main id="main-content">
               <Routes>
                 {/* Public Routes */}
                 <Route path="/" element={<Index />} />
@@ -317,10 +321,11 @@ const App = () => (
             </BrowserRouter>
           </TooltipProvider>
           </LandingContentProvider>
-        </CurrentProfileProvider>
-      </AuthProvider>
-    </ThemeProvider>
-  </QueryClientProvider>
+        </ImpersonationProvider>
+      </CurrentProfileProvider>
+    </AuthProvider>
+  </ThemeProvider>
+</QueryClientProvider>
 </ErrorBoundary>
 );
 
