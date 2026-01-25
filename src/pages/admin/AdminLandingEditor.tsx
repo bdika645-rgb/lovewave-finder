@@ -27,6 +27,12 @@ import MemberCard from "@/components/MemberCard";
 import { InlineEditable, EditableSection, EditorToolbar } from "@/components/VisualEditor";
 import { useEditorActions } from "@/hooks/useEditorActions";
 
+// Import demo profile images
+import demoProfile1 from "@/assets/profiles/profile1.jpg";
+import demoProfile2 from "@/assets/profiles/profile2.jpg";
+import demoProfile3 from "@/assets/profiles/profile3.jpg";
+import demoProfile4 from "@/assets/profiles/profile4.jpg";
+
 // Lazy load sections
 const StatsSection = lazy(() => import("@/components/StatsSection"));
 const SuccessStoriesSection = lazy(() => import("@/components/SuccessStoriesSection"));
@@ -50,7 +56,7 @@ const demoProfiles = [
     age: 28,
     city: "תל אביב",
     bio: "אוהבת טיולים, קפה טוב ושיחות עמוקות 🌸",
-    image: "/profiles/profile1.jpg",
+    image: demoProfile1,
     interests: ["טיולים", "קפה", "מוזיקה"],
     isOnline: true,
   },
@@ -60,7 +66,7 @@ const demoProfiles = [
     age: 32,
     city: "הרצליה",
     bio: "יזם, ספורטאי חובב, מחפש את זו שתצחיק אותי 😊",
-    image: "/profiles/profile2.jpg",
+    image: demoProfile2,
     interests: ["ספורט", "יזמות", "בישול"],
     isOnline: false,
   },
@@ -70,7 +76,7 @@ const demoProfiles = [
     age: 26,
     city: "ירושלים",
     bio: "סטודנטית לפסיכולוגיה, אוהבת תיאטרון ואמנות",
-    image: "/profiles/profile3.jpg",
+    image: demoProfile3,
     interests: ["תיאטרון", "אמנות", "יוגה"],
     isOnline: true,
   },
@@ -80,7 +86,7 @@ const demoProfiles = [
     age: 30,
     city: "חיפה",
     bio: "מהנדס תוכנה, מטייל בזמני הפנוי, אוהב ים 🌊",
-    image: "/profiles/profile4.jpg",
+    image: demoProfile4,
     interests: ["טכנולוגיה", "טיולים", "שחייה"],
     isOnline: false,
   },

@@ -30,6 +30,12 @@ const SectionLoader = () => (
   </div>
 );
 
+// Import demo profile images
+import demoProfile1 from "@/assets/profiles/profile1.jpg";
+import demoProfile2 from "@/assets/profiles/profile2.jpg";
+import demoProfile3 from "@/assets/profiles/profile3.jpg";
+import demoProfile4 from "@/assets/profiles/profile4.jpg";
+
 // Demo profiles for unauthenticated users on homepage
 const demoProfiles = [
   {
@@ -38,7 +44,7 @@ const demoProfiles = [
     age: 28,
     city: "תל אביב",
     bio: "אוהבת טיולים, קפה טוב ושיחות עמוקות 🌸",
-    image: "/profiles/profile1.jpg",
+    image: demoProfile1,
     interests: ["טיולים", "קפה", "מוזיקה"],
     isOnline: true,
   },
@@ -48,7 +54,7 @@ const demoProfiles = [
     age: 32,
     city: "הרצליה",
     bio: "יזם, ספורטאי חובב, מחפש את זו שתצחיק אותי 😊",
-    image: "/profiles/profile2.jpg",
+    image: demoProfile2,
     interests: ["ספורט", "יזמות", "בישול"],
     isOnline: false,
   },
@@ -58,7 +64,7 @@ const demoProfiles = [
     age: 26,
     city: "ירושלים",
     bio: "סטודנטית לפסיכולוגיה, אוהבת תיאטרון ואמנות",
-    image: "/profiles/profile3.jpg",
+    image: demoProfile3,
     interests: ["תיאטרון", "אמנות", "יוגה"],
     isOnline: true,
   },
@@ -68,7 +74,7 @@ const demoProfiles = [
     age: 30,
     city: "חיפה",
     bio: "מהנדס תוכנה, מטייל בזמני הפנוי, אוהב ים 🌊",
-    image: "/profiles/profile4.jpg",
+    image: demoProfile4,
     interests: ["טכנולוגיה", "טיולים", "שחייה"],
     isOnline: false,
   },
@@ -296,10 +302,12 @@ const Index = () => {
                           name: profile.name,
                           age: profile.age,
                           city: profile.city,
-                          bio: 'bio' in profile ? profile.bio || "" : (profile as any).bio,
-                          image: 'avatar_url' in profile ? profile.avatar_url || "/profiles/profile1.jpg" : (profile as any).image,
+                          bio: 'bio' in profile ? (profile.bio as string) || "" : "",
+                          image: 'avatar_url' in profile 
+                            ? (profile.avatar_url as string) || demoProfile1 
+                            : (profile as any).image || demoProfile1,
                           interests: profile.interests || [],
-                          isOnline: 'is_online' in profile ? profile.is_online || false : (profile as any).isOnline,
+                          isOnline: 'is_online' in profile ? (profile.is_online as boolean) || false : (profile as any).isOnline || false,
                         }}
                       />
                     </AnimatedCard>
