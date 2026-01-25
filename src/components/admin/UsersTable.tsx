@@ -178,7 +178,7 @@ export default function UsersTable({
       case "admin":
         return <Badge className="bg-destructive/90 hover:bg-destructive text-destructive-foreground">מנהל</Badge>;
       case "moderator":
-        return <Badge className="bg-amber-500/90 hover:bg-amber-500 text-white">מנחה</Badge>;
+        return <Badge className="bg-secondary/90 hover:bg-secondary text-secondary-foreground">מנחה</Badge>;
       default:
         return <Badge variant="outline" className="text-muted-foreground">משתמש</Badge>;
     }
@@ -265,7 +265,7 @@ export default function UsersTable({
                   variant="outline" 
                   size="sm"
                   onClick={() => setBulkBlockDialogOpen(true)}
-                  className="gap-1 text-orange-600 border-orange-200 hover:bg-orange-50 hover:text-orange-700"
+                  className="gap-1 text-secondary border-secondary/30 hover:bg-secondary/10 hover:text-secondary"
                 >
                   <UserX className="w-4 h-4" />
                   <span className="hidden sm:inline">חסום</span>
@@ -335,7 +335,7 @@ export default function UsersTable({
                       {/* Online Status Indicator */}
                       <span 
                         className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-background ${
-                          user.is_online ? 'bg-green-500' : 'bg-muted-foreground/40'
+                          user.is_online ? 'bg-success' : 'bg-muted-foreground/40'
                         }`}
                         aria-hidden="true"
                       />
@@ -360,8 +360,8 @@ export default function UsersTable({
                   <Badge 
                     variant="outline" 
                     className={user.is_online 
-                      ? "bg-green-500/10 text-green-600 border-green-500/30" 
-                      : "bg-orange-500/10 text-orange-600 border-orange-500/30"
+                      ? "bg-success/10 text-success border-success/30" 
+                      : "bg-secondary/10 text-secondary border-secondary/30"
                     }
                   >
                     {user.is_online ? "מחובר" : "לא מחובר"}
@@ -438,7 +438,7 @@ export default function UsersTable({
                       {onBlock && (
                         <DropdownMenuItem 
                           onClick={() => handleBlockClick(user)}
-                          className="text-orange-600 focus:text-orange-600"
+                          className="text-secondary focus:text-secondary"
                         >
                           <UserX className="w-4 h-4 ml-2" />
                           חסום משתמש

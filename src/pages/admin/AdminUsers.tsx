@@ -38,6 +38,8 @@ export default function AdminUsers() {
   const { startImpersonation } = useImpersonation();
   const [search, setSearch] = useState("");
   const [gender, setGender] = useState("all");
+  const [city, setCity] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [sortBy, setSortBy] = useState("created_at_desc");
   const [page, setPage] = useState(1);
   const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
@@ -74,9 +76,15 @@ export default function AdminUsers() {
     };
   }, [sortBy]);
 
+  // Determine filter values
+  const isOnlineFilter = statusFilter === "online" ? true : undefined;
+  const isVerifiedFilter = statusFilter === "verified" ? true : statusFilter === "unverified" ? false : undefined;
+  
   const { users, loading, totalCount, refetch, updateUserRole, deleteUser, verifyUser } = useAdminUsers({
     search,
     gender: gender !== "all" ? gender : undefined,
+    city: city !== "all" ? city : undefined,
+    isOnline: isOnlineFilter,
     sortBy: sortConfig.sortBy,
     sortOrder: sortConfig.sortOrder,
     page,
@@ -286,8 +294,8 @@ export default function AdminUsers() {
           </div>
           <div className="bg-card rounded-xl p-4 border border-border">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-green-500/10 rounded-lg">
-                <span className="w-5 h-5 flex items-center justify-center text-green-500 text-lg">●</span>
+              <div className="p-2 bg-success/10 rounded-lg">
+                <span className="w-5 h-5 flex items-center justify-center text-success text-lg">●</span>
               </div>
               <div>
                 <p className="text-2xl font-bold text-foreground">{onlineCount}</p>
@@ -326,6 +334,10 @@ export default function AdminUsers() {
           onGenderChange={setGender}
           sortBy={sortBy}
           onSortChange={setSortBy}
+          city={city}
+          onCityChange={setCity}
+          status={statusFilter}
+          onStatusChange={setStatusFilter}
         />
 
         {loading ? (
