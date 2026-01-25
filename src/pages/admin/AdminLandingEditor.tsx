@@ -1,20 +1,16 @@
 import { useEffect } from "react";
 import { useLandingContent } from "@/contexts/LandingContentContext";
-import { VisualEditorProvider, useVisualEditor } from "@/components/VisualEditor";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import SkipToContent from "@/components/SkipToContent";
 import { Button } from "@/components/ui/button";
 import { 
   Eye, 
-  Save, 
   RotateCcw, 
   Download, 
   Upload, 
   X,
   Pencil,
-  Undo2,
-  Redo2,
   Check,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -25,7 +21,6 @@ import { lazy, Suspense } from "react";
 import AnimatedSection from "@/components/AnimatedSection";
 import AnimatedCard from "@/components/AnimatedCard";
 import MemberCard from "@/components/MemberCard";
-import FeaturedMembersFilter from "@/components/FeaturedMembersFilter";
 import { InlineEditable, EditableSection } from "@/components/VisualEditor";
 import { Heart, Shield, Sparkles, Users } from "lucide-react";
 
@@ -578,9 +573,5 @@ function WYSIWYGEditorContent() {
 }
 
 export default function AdminLandingEditor() {
-  return (
-    <VisualEditorProvider>
-      <WYSIWYGEditorContent />
-    </VisualEditorProvider>
-  );
+  return <WYSIWYGEditorContent />;
 }

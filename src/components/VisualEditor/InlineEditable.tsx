@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, KeyboardEvent, FocusEvent } from "react";
 import { cn } from "@/lib/utils";
 import { Pencil } from "lucide-react";
-import { useVisualEditor } from "./VisualEditorProvider";
+import { useLandingContent } from "@/contexts/LandingContentContext";
 
 interface InlineEditableProps {
   value: string;
@@ -24,7 +24,7 @@ export default function InlineEditable({
   placeholder = "לחץ לעריכה...",
   multiline = false,
 }: InlineEditableProps) {
-  const { isEditMode } = useVisualEditor();
+  const { isEditMode } = useLandingContent();
   const [isEditing, setIsEditing] = useState(false);
   const [localValue, setLocalValue] = useState(value);
   const editableRef = useRef<HTMLElement>(null);
@@ -93,6 +93,7 @@ export default function InlineEditable({
   // Edit mode: render editable element
   return (
     <Tag
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ref={editableRef as any}
       contentEditable={isEditing}
       suppressContentEditableWarning
@@ -111,7 +112,7 @@ export default function InlineEditable({
         ],
         isEditing && [
           "ring-2 ring-primary ring-offset-2 ring-offset-background",
-          "bg-background rounded-md",
+          "bg-background rounded-md px-1",
           "min-w-[50px]",
         ],
         !value && "text-muted-foreground/50 italic"
