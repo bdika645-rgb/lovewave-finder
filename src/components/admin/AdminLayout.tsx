@@ -1,10 +1,24 @@
-import { ReactNode } from "react";
-import AdminSidebar, { useSidebarContext } from "./AdminSidebar";
+import { ReactNode, createContext, useContext, useState } from "react";
+import AdminSidebar from "./AdminSidebar";
 import AdminHeader from "./AdminHeader";
 import { Navigate } from "react-router-dom";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { Loader2, ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+
+// Shared context for sidebar state
+interface AdminLayoutContextType {
+  collapsed: boolean;
+  setCollapsed: (value: boolean) => void;
+}
+
+const AdminLayoutContext = createContext<AdminLayoutContextType>({
+  collapsed: false,
+  setCollapsed: () => {},
+});
+
+export const useAdminLayoutContext = () => useContext(AdminLayoutContext);
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -12,6 +26,7 @@ interface AdminLayoutProps {
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const { isAdmin, loading, user } = useAdminAuth();
+  const [collapsed, setCollapsed] = useState(false);
 
   if (loading) {
     return (
@@ -52,22 +67,21 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   }
 
   return (
-    <div className="min-h-screen bg-muted/30" dir="rtl">
-      <AdminSidebar />
-      <AdminLayoutContent>{children}</AdminLayoutContent>
-    </div>
-  );
-}
-
-function AdminLayoutContent({ children }: { children: ReactNode }) {
-  // This component reads the sidebar context to adjust margins
-  // Default to non-collapsed for server-side rendering
-  return (
-    <div className="lg:mr-[280px] min-h-screen transition-all duration-300">
-      <AdminHeader />
-      <main id="admin-main" tabIndex={-1} className="p-4 lg:p-6">
-        {children}
-      </main>
-    </div>
+    <AdminLayoutContext.Provider value={{ collapsed, setCollapsed }}>
+      <div className="min-h-screen bg-muted/30" dir="rtl">
+        <AdminSidebar />
+        <div 
+          className={cn(
+            "min-h-screen transition-all duration-300",
+            collapsed ? "lg:mr-[72px]" : "lg:mr-[280px]"
+          )}
+        >
+          <AdminHeader />
+          <main id="admin-main" tabIndex={-1} className="p-4 lg:p-6">
+            {children}
+          </main>
+        </div>
+      </div>
+    </AdminLayoutContext.Provider>
   );
 }
