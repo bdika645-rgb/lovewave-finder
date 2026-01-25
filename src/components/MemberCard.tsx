@@ -15,7 +15,7 @@ interface MemberCardProps {
 const MemberCard = memo(({ member, onLike, onPass }: MemberCardProps) => {
   return (
     <article 
-      className="group relative bg-card rounded-2xl overflow-hidden shadow-card card-hover border border-border"
+      className="group relative bg-card rounded-2xl overflow-hidden shadow-card card-glow border border-border"
       aria-label={`פרופיל של ${member.name}`}
     >
       {/* Image */}
@@ -27,15 +27,17 @@ const MemberCard = memo(({ member, onLike, onPass }: MemberCardProps) => {
           <LazyImage
             src={member.image}
             alt={`תמונת פרופיל של ${member.name}`}
-            className="w-full h-full"
+            className="w-full h-full transition-transform duration-500 group-hover:scale-105"
             aspectRatio="portrait"
           />
-          <div className="absolute inset-0 gradient-overlay" />
+          {/* Enhanced gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-transparent" />
           
           {/* Online Status */}
           {member.isOnline && (
             <div 
-              className="absolute top-4 right-4 flex items-center gap-2 glass-effect px-3 py-1.5 rounded-full"
+              className="absolute top-4 right-4 flex items-center gap-2 glass-effect px-3 py-1.5 rounded-full shadow-lg"
               role="status"
               aria-label="מחובר כעת"
             >
@@ -45,13 +47,13 @@ const MemberCard = memo(({ member, onLike, onPass }: MemberCardProps) => {
           )}
 
           {/* Info Overlay */}
-          <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6">
+          <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 backdrop-blur-[2px]">
             <div className="flex items-end justify-between">
               <div>
-                <h3 className="font-display text-xl sm:text-2xl font-bold text-white drop-shadow-md">
+                <h3 className="font-display text-xl sm:text-2xl font-bold text-white drop-shadow-lg tracking-tight">
                   {member.name}, {member.age}
                 </h3>
-                <p className="flex items-center gap-1 text-white/80 text-sm mt-1 drop-shadow-md">
+                <p className="flex items-center gap-1 text-white/90 text-sm mt-1 drop-shadow-md">
                   <MapPin className="w-4 h-4 text-white" aria-hidden="true" />
                   <span>{member.city}</span>
                 </p>

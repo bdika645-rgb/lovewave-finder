@@ -80,10 +80,10 @@ const SuccessStoriesSection = () => {
           aria-roledescription="carousel"
           aria-label="סיפורי הצלחה"
         >
-          {/* Navigation Arrows */}
+          {/* Navigation Arrows - enhanced */}
           <button
             onClick={prevSlide}
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-card rounded-full shadow-lg flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors -translate-x-6 md:translate-x-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-card rounded-full shadow-card flex items-center justify-center hover:bg-primary hover:text-primary-foreground nav-arrow -translate-x-6 md:translate-x-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 border border-border hover:border-primary"
             aria-label="סיפורים קודמים"
           >
             <ChevronLeft className="w-6 h-6" aria-hidden="true" />
@@ -91,7 +91,7 @@ const SuccessStoriesSection = () => {
           
           <button
             onClick={nextSlide}
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-card rounded-full shadow-lg flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors translate-x-6 md:translate-x-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-card rounded-full shadow-card flex items-center justify-center hover:bg-primary hover:text-primary-foreground nav-arrow translate-x-6 md:translate-x-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 border border-border hover:border-primary"
             aria-label="סיפורים הבאים"
           >
             <ChevronRight className="w-6 h-6" aria-hidden="true" />

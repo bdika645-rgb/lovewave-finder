@@ -28,15 +28,15 @@ const FAQSection = () => {
         </div>
 
         <div className="max-w-3xl mx-auto">
-          <Accordion type="single" collapsible className="space-y-4">
+          <Accordion type="single" collapsible className="space-y-5">
             {faqs.map((faqItem, index) => (
               <AccordionItem
                 key={faqItem.id}
                 value={faqItem.id}
-                className="bg-card rounded-2xl border border-border px-6 overflow-hidden"
+                className="bg-card rounded-2xl border border-border px-6 overflow-hidden shadow-card hover:shadow-elevated transition-all duration-300"
               >
                 <AccordionTrigger 
-                  className="text-right font-display text-lg hover:text-primary py-6 focus-ring"
+                  className="text-right font-display text-lg hover:text-primary py-6 focus-ring transition-transform hover:scale-[1.01]"
                   aria-controls={`faq-content-${index}`}
                 >
                   {faqItem.question}

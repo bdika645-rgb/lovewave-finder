@@ -37,19 +37,25 @@ const DatingTipsSection = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6" role="list" aria-label="רשימת טיפים">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8" role="list" aria-label="רשימת טיפים">
           {datingTips.map((tip) => {
             const Icon = getCategoryIcon(tip.category);
             return (
-              <article key={tip.id} className="card-hover border-gold/10 bg-card rounded-lg border shadow-sm" role="listitem">
+              <article 
+                key={tip.id} 
+                className="card-premium card-accent-hover bg-card rounded-xl overflow-hidden" 
+                role="listitem"
+              >
                 <div className="pb-3 p-6">
                   <div className="flex items-center justify-between">
-                    <Badge variant="secondary" className="bg-primary/10 text-primary">
+                    <Badge variant="secondary" className="bg-primary/10 text-primary font-medium">
                       {tip.category}
                     </Badge>
-                    <Icon className="w-5 h-5 text-primary" aria-hidden="true" />
+                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center icon-pulse">
+                      <Icon className="w-5 h-5 text-primary" aria-hidden="true" />
+                    </div>
                   </div>
-                  <h3 className="font-display text-lg mt-3 font-semibold">
+                  <h3 className="font-display text-lg mt-4 font-semibold tracking-tight">
                     {tip.title}
                   </h3>
                 </div>
