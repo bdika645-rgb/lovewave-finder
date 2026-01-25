@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useMyProfileId } from './useMyProfileId';
+import { useImpersonationGuard } from '@/contexts/ImpersonationContext';
 
 interface Photo {
   id: string;
@@ -14,6 +15,7 @@ interface Photo {
 export function usePhotos(profileId?: string) {
   const { user } = useAuth();
   const { profileId: myProfileId } = useMyProfileId();
+  const { guardAction } = useImpersonationGuard();
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -48,6 +50,10 @@ export function usePhotos(profileId?: string) {
   }, [fetchPhotos]);
 
   const uploadPhoto = async (file: File): Promise<{ url: string | null; error: Error | null }> => {
+    // Block action during impersonation
+    if (!guardAction('upload_photo', 'להעלות תמונה')) {
+      return { url: null, error: new Error('Action blocked during impersonation') };
+    }
     if (!user || !myProfileId) return { url: null, error: new Error('Not authenticated') };
 
     try {
@@ -122,6 +128,10 @@ export function usePhotos(profileId?: string) {
   };
 
   const deletePhoto = async (photoId: string): Promise<{ error: Error | null }> => {
+    // Block action during impersonation
+    if (!guardAction('delete_photo', 'למחוק תמונה')) {
+      return { error: new Error('Action blocked during impersonation') };
+    }
     try {
       const photo = photos.find(p => p.id === photoId);
       if (!photo) throw new Error('Photo not found');
@@ -173,6 +183,10 @@ export function usePhotos(profileId?: string) {
   };
 
   const setAsAvatar = async (photoUrl: string): Promise<{ error: Error | null }> => {
+    // Block action during impersonation
+    if (!guardAction('edit_profile', 'לשנות תמונת פרופיל')) {
+      return { error: new Error('Action blocked during impersonation') };
+    }
     if (!user) return { error: new Error('Not authenticated') };
 
     try {

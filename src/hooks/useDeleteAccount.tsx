@@ -2,13 +2,19 @@ import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useMyProfileId } from './useMyProfileId';
+import { useImpersonationGuard } from '@/contexts/ImpersonationContext';
 
 export function useDeleteAccount() {
   const { user, signOut } = useAuth();
   const { profileId } = useMyProfileId();
+  const { guardAction } = useImpersonationGuard();
   const [loading, setLoading] = useState(false);
 
   const deleteAccount = async (): Promise<{ error: Error | null }> => {
+    // Block action during impersonation
+    if (!guardAction('delete_account', 'למחוק חשבון')) {
+      return { error: new Error('Action blocked during impersonation') };
+    }
     if (!user) return { error: new Error('Not authenticated') };
 
     try {

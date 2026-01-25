@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
+import { useImpersonationGuard } from '@/contexts/ImpersonationContext';
 
 export interface UserSettings {
   id?: string;
@@ -26,6 +27,7 @@ const defaultSettings: UserSettings = {
 
 export function useUserSettings() {
   const { user } = useAuth();
+  const { guardAction } = useImpersonationGuard();
   const [settings, setSettings] = useState<UserSettings>(defaultSettings);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -96,6 +98,10 @@ export function useUserSettings() {
   }, [fetchSettings]);
 
   const updateSettings = async (updates: Partial<UserSettings>): Promise<{ error: Error | null }> => {
+    // Block action during impersonation
+    if (!guardAction('update_settings', 'לעדכן הגדרות')) {
+      return { error: new Error('Action blocked during impersonation') };
+    }
     if (!user) return { error: new Error('Not authenticated') };
 
     try {
