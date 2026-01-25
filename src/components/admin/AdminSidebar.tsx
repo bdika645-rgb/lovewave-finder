@@ -25,7 +25,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
-import { useEffect, useRef, useState, createContext, useContext } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -38,22 +38,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-
-interface SidebarContextType {
-  collapsed: boolean;
-  setCollapsed: (value: boolean) => void;
-  mobileOpen: boolean;
-  setMobileOpen: (value: boolean) => void;
-}
-
-const SidebarContext = createContext<SidebarContextType>({
-  collapsed: false,
-  setCollapsed: () => {},
-  mobileOpen: false,
-  setMobileOpen: () => {},
-});
-
-export const useSidebarContext = () => useContext(SidebarContext);
+import { useAdminLayoutContext } from "./AdminLayout";
 
 interface MenuItem {
   icon: React.ElementType;
@@ -109,7 +94,18 @@ const menuGroups = [
 export default function AdminSidebar() {
   const location = useLocation();
   const { signOut } = useAuth();
-  const [collapsed, setCollapsed] = useState(false);
+  // Try to use shared context from AdminLayout, fallback to local state
+  let layoutContext: { collapsed: boolean; setCollapsed: (v: boolean) => void } | null = null;
+  try {
+    layoutContext = useAdminLayoutContext();
+  } catch {
+    // Not wrapped in AdminLayout, will use local state
+  }
+  
+  const [localCollapsed, setLocalCollapsed] = useState(false);
+  const collapsed = layoutContext?.collapsed ?? localCollapsed;
+  const setCollapsed = layoutContext?.setCollapsed ?? setLocalCollapsed;
+  
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openGroups, setOpenGroups] = useState<string[]>(["ראשי", "ניהול משתמשים"]);
   const firstNavLinkRef = useRef<HTMLAnchorElement | null>(null);
@@ -331,7 +327,7 @@ export default function AdminSidebar() {
   );
 
   return (
-    <SidebarContext.Provider value={{ collapsed, setCollapsed, mobileOpen, setMobileOpen }}>
+    <>
       {/* Mobile Menu Toggle Button */}
       <Button
         variant="outline"
@@ -362,6 +358,6 @@ export default function AdminSidebar() {
       >
         <SidebarContent />
       </aside>
-    </SidebarContext.Provider>
+    </>
   );
 }
