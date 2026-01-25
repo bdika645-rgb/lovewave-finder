@@ -61,14 +61,15 @@ export function ImpersonationProvider({ children }: { children: ReactNode }) {
     }
 
     try {
-      // Fetch the target profile from profiles_public (accessible to authenticated users)
+      // Fetch the target profile from profiles (admins have access via RLS)
       const { data: profile, error } = await supabase
-        .from('profiles_public')
+        .from('profiles')
         .select('id, name, avatar_url')
         .eq('id', profileId)
         .single();
 
       if (error || !profile) {
+        console.error('Error fetching profile for impersonation:', error);
         toast.error('לא ניתן לטעון את פרטי המשתמש');
         return false;
       }
