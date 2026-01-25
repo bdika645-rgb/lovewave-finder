@@ -13,6 +13,7 @@ export interface AdminUser {
   bio: string | null;
   is_online: boolean | null;
   is_demo: boolean | null;
+  is_verified: boolean | null;
   created_at: string;
   last_seen: string | null;
   role?: string;
@@ -170,6 +171,23 @@ export function useAdminUsers(options: UseAdminUsersOptions = {}) {
     }
   };
 
+  const verifyUser = async (profileId: string, verified: boolean = true) => {
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({ is_verified: verified })
+        .eq("id", profileId);
+      
+      if (error) throw error;
+      
+      toast.success(verified ? "המשתמש אומת בהצלחה" : "האימות הוסר בהצלחה");
+      fetchUsers();
+    } catch (err) {
+      console.error("Error verifying user:", err);
+      toast.error("שגיאה באימות המשתמש");
+    }
+  };
+
   return { 
     users, 
     loading, 
@@ -177,6 +195,7 @@ export function useAdminUsers(options: UseAdminUsersOptions = {}) {
     totalCount, 
     refetch: fetchUsers,
     updateUserRole,
-    deleteUser 
+    deleteUser,
+    verifyUser
   };
 }

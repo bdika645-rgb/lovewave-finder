@@ -193,11 +193,11 @@ export default function AdminRoles() {
   const getRoleBadge = (role: string) => {
     switch (role) {
       case "admin":
-        return <Badge className="bg-destructive hover:bg-destructive/90">מנהל</Badge>;
+        return <Badge className="bg-destructive hover:bg-destructive/90 text-destructive-foreground">מנהל</Badge>;
       case "moderator":
-        return <Badge className="bg-secondary hover:bg-secondary/90 text-secondary-foreground">מנחה</Badge>;
+        return <Badge className="bg-amber-500 hover:bg-amber-500/90 text-white">מנחה</Badge>;
       default:
-        return <Badge variant="secondary">משתמש</Badge>;
+        return <Badge variant="outline" className="text-muted-foreground">משתמש</Badge>;
     }
   };
 

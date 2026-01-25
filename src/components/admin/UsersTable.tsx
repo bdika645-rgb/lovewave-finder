@@ -36,7 +36,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { MoreHorizontal, Eye, Trash2, Shield, ShieldCheck, User, UserX, Edit2, Bell, X, UserCheck } from "lucide-react";
+import { MoreHorizontal, Eye, Trash2, Shield, ShieldCheck, User, UserX, Edit2, Bell, X, UserCheck, BadgeCheck } from "lucide-react";
 import { AdminUser } from "@/hooks/useAdminUsers";
 import { formatDistanceToNow } from "date-fns";
 import { he } from "date-fns/locale";
@@ -50,6 +50,7 @@ interface UsersTableProps {
   onBlock?: (profileId: string, reason: string) => Promise<void>;
   onEdit?: (user: AdminUser) => void;
   onImpersonate?: (user: AdminUser) => void;
+  onVerify?: (profileId: string, verified: boolean) => void;
   // Bulk action handlers
   onBulkDelete?: (profileIds: string[]) => Promise<void>;
   onBulkBlock?: (profileIds: string[], reason: string) => Promise<void>;
@@ -65,6 +66,7 @@ export default function UsersTable({
   onBlock, 
   onEdit,
   onImpersonate,
+  onVerify,
   onBulkDelete,
   onBulkBlock,
   onBulkUpdateRole,
@@ -176,7 +178,7 @@ export default function UsersTable({
       case "admin":
         return <Badge className="bg-destructive/90 hover:bg-destructive text-destructive-foreground">מנהל</Badge>;
       case "moderator":
-        return <Badge className="bg-secondary hover:bg-secondary/90 text-secondary-foreground">משתמש</Badge>;
+        return <Badge className="bg-amber-500/90 hover:bg-amber-500 text-white">מנחה</Badge>;
       default:
         return <Badge variant="outline" className="text-muted-foreground">משתמש</Badge>;
     }
@@ -339,7 +341,12 @@ export default function UsersTable({
                       />
                     </div>
                     <div>
-                      <p className="font-medium text-foreground">{user.name}</p>
+                      <div className="flex items-center gap-1.5">
+                        <p className="font-medium text-foreground">{user.name}</p>
+                        {user.is_verified && (
+                          <BadgeCheck className="w-4 h-4 text-primary" aria-label="מאומת" />
+                        )}
+                      </div>
                       <p className="text-xs text-muted-foreground truncate max-w-[150px]">
                         {user.bio || "אין תיאור"}
                       </p>
@@ -391,6 +398,16 @@ export default function UsersTable({
                         </DropdownMenuItem>
                       )}
                       <DropdownMenuSeparator />
+                      {/* Verify option */}
+                      {onVerify && (
+                        <DropdownMenuItem 
+                          onClick={() => onVerify(user.id, !user.is_verified)}
+                          className={user.is_verified ? "text-muted-foreground" : "text-primary focus:text-primary"}
+                        >
+                          <BadgeCheck className="w-4 h-4 ml-2" />
+                          {user.is_verified ? "הסר אימות" : "אמת משתמש"}
+                        </DropdownMenuItem>
+                      )}
                       {/* Impersonate option - available for all profiles */}
                       {onImpersonate && (
                         <DropdownMenuItem 
