@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
   Tooltip,
@@ -13,17 +12,15 @@ import {
   RotateCcw,
   Download,
   Upload,
-  Search,
   X,
   Check,
-  Keyboard,
-  MousePointer2,
+  Eye,
+  Pencil,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Link } from "react-router-dom";
 
 interface EditorToolbarProps {
-  isEditMode: boolean;
-  onToggleEditMode: () => void;
   canUndo: boolean;
   canRedo: boolean;
   onUndo: () => void;
@@ -31,15 +28,11 @@ interface EditorToolbarProps {
   onReset: () => void;
   onExport: () => void;
   onImport: () => void;
-  searchQuery: string;
-  onSearchChange: (query: string) => void;
   historyLength: number;
   hasChanges: boolean;
 }
 
 export default function EditorToolbar({
-  isEditMode,
-  onToggleEditMode,
   canUndo,
   canRedo,
   onUndo,
@@ -47,188 +40,155 @@ export default function EditorToolbar({
   onReset,
   onExport,
   onImport,
-  searchQuery,
-  onSearchChange,
   historyLength,
   hasChanges,
 }: EditorToolbarProps) {
   return (
     <TooltipProvider>
-      {/* Floating toolbar when in edit mode */}
-      <div
-        className={cn(
-          "fixed bottom-4 left-1/2 -translate-x-1/2 z-50",
-          "bg-card/95 backdrop-blur-xl border border-border rounded-2xl shadow-elevated",
-          "p-2 flex items-center gap-2 transition-all duration-300",
-          isEditMode ? "scale-100 opacity-100" : "scale-95 opacity-0 pointer-events-none"
-        )}
-        dir="rtl"
-      >
-        {/* Edit mode indicator */}
-        <div className="flex items-center gap-2 px-3 py-1.5 bg-primary/10 rounded-xl">
-          <MousePointer2 className="w-4 h-4 text-primary animate-pulse" />
-          <span className="text-sm font-medium text-primary">לחץ על טקסט לעריכה</span>
-        </div>
-
-        <div className="w-px h-6 bg-border" />
-
-        {/* Search */}
-        <div className="relative">
-          <Search className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="חיפוש..."
-            className="w-32 pr-8 h-9 text-sm bg-muted/50"
-            dir="rtl"
-          />
-        </div>
-
-        <div className="w-px h-6 bg-border" />
-
-        {/* Undo/Redo */}
-        <div className="flex items-center gap-1">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={onUndo}
-                disabled={!canUndo}
-                className="h-9 w-9"
-              >
-                <Undo2 className="w-4 h-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="top">
+      <div className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border shadow-lg">
+        <div className="container mx-auto px-4 py-3">
+          <div className="flex items-center justify-between gap-4">
+            {/* Left side - Close & Status */}
+            <div className="flex items-center gap-4">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link 
+                    to="/admin" 
+                    className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">סגור עורך</TooltipContent>
+              </Tooltip>
+              
               <div className="flex items-center gap-2">
-                <span>ביטול</span>
-                <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">Ctrl+Z</kbd>
+                <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                <span className="font-medium text-sm">מצב עריכה</span>
               </div>
-            </TooltipContent>
-          </Tooltip>
 
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={onRedo}
-                disabled={!canRedo}
-                className="h-9 w-9"
-              >
-                <Redo2 className="w-4 h-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="top">
-              <div className="flex items-center gap-2">
-                <span>שחזור</span>
-                <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">Ctrl+Y</kbd>
-              </div>
-            </TooltipContent>
-          </Tooltip>
-
-          {historyLength > 0 && (
-            <Badge variant="secondary" className="text-xs">
-              {historyLength}
-            </Badge>
-          )}
-        </div>
-
-        <div className="w-px h-6 bg-border" />
-
-        {/* Actions */}
-        <div className="flex items-center gap-1">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" onClick={onExport} className="h-9 w-9">
-                <Download className="w-4 h-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="top">ייצוא תוכן</TooltipContent>
-          </Tooltip>
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" onClick={onImport} className="h-9 w-9">
-                <Upload className="w-4 h-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="top">יבוא תוכן</TooltipContent>
-          </Tooltip>
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" onClick={onReset} className="h-9 w-9">
-                <RotateCcw className="w-4 h-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="top">איפוס לברירת מחדל</TooltipContent>
-          </Tooltip>
-        </div>
-
-        <div className="w-px h-6 bg-border" />
-
-        {/* Status */}
-        <div className="flex items-center gap-2 px-2">
-          {hasChanges && (
-            <Badge variant="outline" className="text-xs gap-1 text-primary border-primary">
-              <Check className="w-3 h-3" />
-              נשמר
-            </Badge>
-          )}
-        </div>
-
-        {/* Keyboard shortcut hint */}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-9 w-9">
-              <Keyboard className="w-4 h-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="top" className="max-w-xs">
-            <div className="space-y-1 text-xs">
-              <div className="flex justify-between gap-4">
-                <span>ביטול</span>
-                <kbd className="px-1 bg-muted rounded">Ctrl+Z</kbd>
-              </div>
-              <div className="flex justify-between gap-4">
-                <span>שחזור</span>
-                <kbd className="px-1 bg-muted rounded">Ctrl+Y</kbd>
-              </div>
-              <div className="flex justify-between gap-4">
-                <span>סגירת עורך</span>
-                <kbd className="px-1 bg-muted rounded">Escape</kbd>
-              </div>
+              {hasChanges && (
+                <Badge variant="outline" className="gap-1 text-primary border-primary/30 bg-primary/5">
+                  <Check className="w-3 h-3" />
+                  נשמר
+                </Badge>
+              )}
             </div>
-          </TooltipContent>
-        </Tooltip>
+
+            {/* Center - Edit Mode Hint */}
+            <div className="hidden md:flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
+              <Pencil className="w-4 h-4 text-primary" />
+              <span className="text-sm font-medium text-primary">לחץ על טקסט לעריכה</span>
+            </div>
+
+            {/* Right side - Actions */}
+            <div className="flex items-center gap-1">
+              {/* Undo/Redo */}
+              <div className="flex items-center gap-1 ml-2 pl-2 border-l border-border">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={onUndo}
+                      disabled={!canUndo}
+                      className="h-9 w-9"
+                    >
+                      <Undo2 className="w-4 h-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">
+                    <div className="flex items-center gap-2">
+                      <span>ביטול</span>
+                      <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">Ctrl+Z</kbd>
+                    </div>
+                  </TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={onRedo}
+                      disabled={!canRedo}
+                      className="h-9 w-9"
+                    >
+                      <Redo2 className="w-4 h-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">
+                    <div className="flex items-center gap-2">
+                      <span>שחזור</span>
+                      <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">Ctrl+Y</kbd>
+                    </div>
+                  </TooltipContent>
+                </Tooltip>
+
+                {historyLength > 0 && (
+                  <Badge variant="secondary" className="text-xs h-5 px-1.5">
+                    {historyLength}
+                  </Badge>
+                )}
+              </div>
+
+              {/* Preview */}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="sm" asChild className="gap-2">
+                    <a href="/" target="_blank" rel="noopener noreferrer">
+                      <Eye className="w-4 h-4" />
+                      <span className="hidden sm:inline">צפייה</span>
+                    </a>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">פתח בכרטיסייה חדשה</TooltipContent>
+              </Tooltip>
+
+              {/* Export */}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" onClick={onExport} className="h-9 w-9">
+                    <Download className="w-4 h-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">ייצוא JSON</TooltipContent>
+              </Tooltip>
+
+              {/* Import */}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" onClick={onImport} className="h-9 w-9">
+                    <Upload className="w-4 h-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">יבוא JSON</TooltipContent>
+              </Tooltip>
+
+              {/* Reset */}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" onClick={onReset} className="h-9 w-9 text-destructive hover:text-destructive">
+                    <RotateCcw className="w-4 h-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">איפוס לברירת מחדל</TooltipContent>
+              </Tooltip>
+
+              {/* Finish */}
+              <Button size="sm" asChild className="gap-2 mr-2">
+                <Link to="/admin">
+                  <Check className="w-4 h-4" />
+                  סיום
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Toggle Button - Always visible */}
-      <Button
-        onClick={onToggleEditMode}
-        className={cn(
-          "fixed bottom-6 left-6 z-50 shadow-elevated gap-2 transition-all duration-300",
-          "rounded-full px-6 py-6",
-          isEditMode
-            ? "bg-destructive hover:bg-destructive/90"
-            : "bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
-        )}
-        size="lg"
-      >
-        {isEditMode ? (
-          <>
-            <X className="w-5 h-5" />
-            סיים עריכה
-          </>
-        ) : (
-          <>
-            <MousePointer2 className="w-5 h-5" />
-            ערוך תוכן
-          </>
-        )}
-      </Button>
+      {/* Progress bar */}
+      <div className="fixed top-[60px] left-0 right-0 h-1 bg-gradient-to-r from-primary via-primary/50 to-primary z-50" />
     </TooltipProvider>
   );
 }

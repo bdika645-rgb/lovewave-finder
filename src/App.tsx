@@ -7,7 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { CurrentProfileProvider } from "@/hooks/useCurrentProfile";
 import { LandingContentProvider } from "@/contexts/LandingContentContext";
-import { VisualEditorProvider } from "@/components/VisualEditor";
+
 import { ThemeProvider } from "next-themes";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import PageErrorBoundary from "@/components/PageErrorBoundary";
@@ -78,7 +78,6 @@ const App = () => (
         <AuthProvider>
           <CurrentProfileProvider>
             <LandingContentProvider>
-            <VisualEditorProvider>
             <TooltipProvider>
               <SkipToContent />
               <Toaster />
@@ -317,7 +316,6 @@ const App = () => (
               </main>
             </BrowserRouter>
           </TooltipProvider>
-          </VisualEditorProvider>
           </LandingContentProvider>
         </CurrentProfileProvider>
       </AuthProvider>

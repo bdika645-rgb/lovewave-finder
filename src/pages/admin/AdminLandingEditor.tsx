@@ -1,28 +1,31 @@
-import { useEffect } from "react";
+import { useEffect, lazy, Suspense } from "react";
 import { useLandingContent } from "@/contexts/LandingContentContext";
+import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import SkipToContent from "@/components/SkipToContent";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import { 
-  Eye, 
-  RotateCcw, 
-  Download, 
-  Upload, 
+  Heart, 
+  Shield, 
+  Sparkles, 
+  Users,
+  Eye,
+  Download,
+  Upload,
+  RotateCcw,
   X,
   Pencil,
   Check,
 } from "lucide-react";
-import { toast } from "sonner";
-import { Link } from "react-router-dom";
-import { lazy, Suspense } from "react";
 
 // Import all landing page sections
 import AnimatedSection from "@/components/AnimatedSection";
 import AnimatedCard from "@/components/AnimatedCard";
 import MemberCard from "@/components/MemberCard";
-import { InlineEditable, EditableSection } from "@/components/VisualEditor";
-import { Heart, Shield, Sparkles, Users } from "lucide-react";
+import { InlineEditable, EditableSection, EditorToolbar } from "@/components/VisualEditor";
+import { useEditorActions } from "@/hooks/useEditorActions";
 
 // Lazy load sections
 const StatsSection = lazy(() => import("@/components/StatsSection"));
@@ -91,6 +94,23 @@ function WYSIWYGEditorContent() {
   const { isEditMode, setIsEditMode } = useLandingContent();
   const { features, featuredMembers, cta, footer, nav } = content;
 
+  // Editor actions hook for undo/redo and import/export
+  const {
+    canUndo,
+    canRedo,
+    undo,
+    redo,
+    handleExport,
+    handleImport,
+    handleReset,
+    historyLength,
+    hasChanges,
+  } = useEditorActions({
+    content,
+    updateContent,
+    resetContent,
+  });
+
   const updateFeatures = (key: keyof typeof features, value: string) => {
     updateContent("features", { [key]: value });
   };
@@ -103,50 +123,6 @@ function WYSIWYGEditorContent() {
     updateContent("cta", { [key]: value });
   };
 
-  const handleExport = () => {
-    const dataStr = JSON.stringify(content, null, 2);
-    const dataBlob = new Blob([dataStr], { type: "application/json" });
-    const url = URL.createObjectURL(dataBlob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "landing-content.json";
-    link.click();
-    URL.revokeObjectURL(url);
-    toast.success("הקובץ יורד בהצלחה");
-  };
-
-  const handleImport = () => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = ".json";
-    input.onchange = (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          try {
-            const imported = JSON.parse(event.target?.result as string);
-            Object.keys(imported).forEach((key) => {
-              updateContent(key as keyof typeof content, imported[key]);
-            });
-            toast.success("התוכן יובא בהצלחה");
-          } catch {
-            toast.error("שגיאה בקריאת הקובץ");
-          }
-        };
-        reader.readAsText(file);
-      }
-    };
-    input.click();
-  };
-
-  const handleReset = () => {
-    if (confirm("האם אתה בטוח שברצונך לאפס את כל התוכן לברירת המחדל?")) {
-      resetContent();
-      toast.success("התוכן אופס לברירת מחדל");
-    }
-  };
-
   // Enable edit mode on mount
   useEffect(() => {
     setIsEditMode(true);
@@ -155,60 +131,18 @@ function WYSIWYGEditorContent() {
 
   return (
     <div className="min-h-screen relative" dir="rtl">
-      {/* Fixed Editor Toolbar */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border shadow-lg">
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center justify-between gap-4">
-            {/* Left side - Title & Status */}
-            <div className="flex items-center gap-4">
-              <Link to="/admin" className="text-muted-foreground hover:text-foreground transition-colors">
-                <X className="w-5 h-5" />
-              </Link>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                <span className="font-medium text-sm">מצב עריכה פעיל</span>
-              </div>
-            </div>
-
-            {/* Center - Edit Mode Indicator */}
-            <div className="hidden md:flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
-              <Pencil className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium text-primary">לחץ על כל טקסט כדי לערוך</span>
-            </div>
-
-            {/* Right side - Actions */}
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" asChild>
-                <a href="/" target="_blank" rel="noopener noreferrer">
-                  <Eye className="w-4 h-4 ml-2" />
-                  צפייה
-                </a>
-              </Button>
-              <Button variant="outline" size="sm" onClick={handleExport}>
-                <Download className="w-4 h-4 ml-2" />
-                <span className="hidden sm:inline">ייצוא</span>
-              </Button>
-              <Button variant="outline" size="sm" onClick={handleImport}>
-                <Upload className="w-4 h-4 ml-2" />
-                <span className="hidden sm:inline">יבוא</span>
-              </Button>
-              <Button variant="outline" size="sm" onClick={handleReset}>
-                <RotateCcw className="w-4 h-4 ml-2" />
-                <span className="hidden sm:inline">איפוס</span>
-              </Button>
-              <Button size="sm" asChild className="gap-2">
-                <Link to="/admin">
-                  <Check className="w-4 h-4" />
-                  סיום
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Edit mode indicator bar */}
-      <div className="fixed top-[60px] left-0 right-0 h-1 bg-gradient-to-r from-primary via-primary/50 to-primary z-50" />
+      {/* Editor Toolbar Component */}
+      <EditorToolbar
+        canUndo={canUndo}
+        canRedo={canRedo}
+        onUndo={undo}
+        onRedo={redo}
+        onReset={handleReset}
+        onExport={handleExport}
+        onImport={handleImport}
+        historyLength={historyLength}
+        hasChanges={hasChanges}
+      />
 
       {/* Actual Landing Page Content with padding for toolbar */}
       <div className="pt-[68px]">
