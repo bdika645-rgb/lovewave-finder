@@ -77,7 +77,7 @@ export default function AdminUsers() {
   }, [sortBy]);
 
   // Determine filter values
-  const isOnlineFilter = statusFilter === "online" ? true : undefined;
+  const isOnlineFilter = statusFilter === "online" ? true : statusFilter === "offline" ? false : undefined;
   const isVerifiedFilter = statusFilter === "verified" ? true : statusFilter === "unverified" ? false : undefined;
   
   const { users, loading, totalCount, refetch, updateUserRole, deleteUser, verifyUser } = useAdminUsers({
@@ -85,6 +85,7 @@ export default function AdminUsers() {
     gender: gender !== "all" ? gender : undefined,
     city: city !== "all" ? city : undefined,
     isOnline: isOnlineFilter,
+    isVerified: isVerifiedFilter,
     sortBy: sortConfig.sortBy,
     sortOrder: sortConfig.sortOrder,
     page,
