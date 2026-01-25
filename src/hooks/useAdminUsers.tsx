@@ -24,6 +24,7 @@ interface UseAdminUsersOptions {
   gender?: string;
   city?: string;
   isOnline?: boolean;
+  isVerified?: boolean;
   sortBy?: string;
   sortOrder?: "asc" | "desc";
   page?: number;
@@ -41,6 +42,7 @@ export function useAdminUsers(options: UseAdminUsersOptions = {}) {
     gender,
     city,
     isOnline,
+    isVerified,
     sortBy = "created_at",
     sortOrder = "desc",
     page = 1,
@@ -70,6 +72,10 @@ export function useAdminUsers(options: UseAdminUsersOptions = {}) {
 
       if (isOnline !== undefined) {
         query = query.eq("is_online", isOnline);
+      }
+
+      if (isVerified !== undefined) {
+        query = query.eq("is_verified", isVerified);
       }
 
       // Sorting
@@ -114,7 +120,7 @@ export function useAdminUsers(options: UseAdminUsersOptions = {}) {
     } finally {
       setLoading(false);
     }
-  }, [search, gender, city, isOnline, sortBy, sortOrder, page, pageSize]);
+  }, [search, gender, city, isOnline, isVerified, sortBy, sortOrder, page, pageSize]);
 
   useEffect(() => {
     fetchUsers();

@@ -130,12 +130,13 @@ export default function UserFilters({
           
           {onStatusChange && (
             <Select value={status || "all"} onValueChange={onStatusChange}>
-              <SelectTrigger className="w-full sm:w-[140px]">
+              <SelectTrigger className="w-full sm:w-[160px]">
                 <SelectValue placeholder="סטטוס" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">כל הסטטוסים</SelectItem>
                 <SelectItem value="online">מחוברים</SelectItem>
+                <SelectItem value="offline">לא מחוברים</SelectItem>
                 <SelectItem value="verified">מאומתים</SelectItem>
                 <SelectItem value="unverified">לא מאומתים</SelectItem>
               </SelectContent>
