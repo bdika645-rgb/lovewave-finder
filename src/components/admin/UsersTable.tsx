@@ -174,11 +174,11 @@ export default function UsersTable({
   const getRoleBadge = (role?: string) => {
     switch (role) {
       case "admin":
-        return <Badge className="bg-red-500 hover:bg-red-600">מנהל</Badge>;
+        return <Badge className="bg-destructive/90 hover:bg-destructive text-destructive-foreground">מנהל</Badge>;
       case "moderator":
-        return <Badge className="bg-yellow-500 hover:bg-yellow-600">מנחה</Badge>;
+        return <Badge className="bg-secondary hover:bg-secondary/90 text-secondary-foreground">משתמש</Badge>;
       default:
-        return <Badge variant="secondary">משתמש</Badge>;
+        return <Badge variant="outline" className="text-muted-foreground">משתמש</Badge>;
     }
   };
 
@@ -323,12 +323,21 @@ export default function UsersTable({
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-3">
-                    <Avatar className="w-10 h-10">
-                      <AvatarImage src={user.avatar_url || undefined} />
-                      <AvatarFallback className="bg-primary/10 text-primary">
-                        {user.name.charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
+                    <div className="relative">
+                      <Avatar className="w-10 h-10">
+                        <AvatarImage src={user.avatar_url || undefined} />
+                        <AvatarFallback className="bg-primary/10 text-primary">
+                          {user.name.charAt(0)}
+                        </AvatarFallback>
+                      </Avatar>
+                      {/* Online Status Indicator */}
+                      <span 
+                        className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-background ${
+                          user.is_online ? 'bg-green-500' : 'bg-muted-foreground/40'
+                        }`}
+                        aria-hidden="true"
+                      />
+                    </div>
                     <div>
                       <p className="font-medium text-foreground">{user.name}</p>
                       <p className="text-xs text-muted-foreground truncate max-w-[150px]">
@@ -341,7 +350,13 @@ export default function UsersTable({
                 <TableCell className="text-muted-foreground hidden sm:table-cell">{getGenderDisplay(user.gender)}</TableCell>
                 <TableCell className="text-muted-foreground">{user.city}</TableCell>
                 <TableCell className="hidden md:table-cell">
-                  <Badge variant={user.is_online ? "default" : "secondary"}>
+                  <Badge 
+                    variant="outline" 
+                    className={user.is_online 
+                      ? "bg-green-500/10 text-green-600 border-green-500/30" 
+                      : "bg-orange-500/10 text-orange-600 border-orange-500/30"
+                    }
+                  >
                     {user.is_online ? "מחובר" : "לא מחובר"}
                   </Badge>
                 </TableCell>
