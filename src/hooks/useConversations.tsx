@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useMyProfileId } from './useMyProfileId';
+import { useImpersonationGuard } from '@/contexts/ImpersonationContext';
 import type { Tables } from '@/integrations/supabase/types';
 
 type Conversation = Tables<'conversations'>;
@@ -20,6 +21,7 @@ export function useConversations() {
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
   const { getMyProfileId, profileId: cachedProfileId } = useMyProfileId();
+  const { guardAction } = useImpersonationGuard();
 
   const fetchConversations = useCallback(async () => {
     if (!user) {
@@ -130,6 +132,10 @@ export function useConversations() {
   }, [user, getMyProfileId, cachedProfileId]);
 
   const createOrGetConversation = async (otherProfileId: string): Promise<string | null> => {
+    // Block action during impersonation
+    if (!guardAction('create_conversation', 'ליצור שיחה')) {
+      return null;
+    }
     try {
       // Server-side creation prevents unauthorized participant injection.
       const { data, error } = await supabase.functions.invoke('create-conversation', {

@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useImpersonationGuard } from '@/contexts/ImpersonationContext';
 
 interface ConversationMenuProps {
   conversationId: string;
@@ -36,6 +37,7 @@ const ConversationMenu = ({
   onConversationDeleted,
   onUserBlocked,
 }: ConversationMenuProps) => {
+  const { guardAction } = useImpersonationGuard();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showBlockDialog, setShowBlockDialog] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -63,6 +65,11 @@ const ConversationMenu = ({
   };
 
   const handleBlockUser = async () => {
+    // Block action during impersonation
+    if (!guardAction('block_user', 'לחסום משתמש')) {
+      setShowBlockDialog(false);
+      return;
+    }
     setLoading(true);
     try {
       // Get my profile ID

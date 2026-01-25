@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useMyProfileId } from './useMyProfileId';
+import { useImpersonationGuard } from '@/contexts/ImpersonationContext';
 
 export type ReportReason = 
   | 'fake_profile'
@@ -22,12 +23,17 @@ export const reportReasons: { value: ReportReason; label: string }[] = [
 export function useReportProfile() {
   const [loading, setLoading] = useState(false);
   const { getMyProfileId, profileId: cachedProfileId } = useMyProfileId();
+  const { guardAction } = useImpersonationGuard();
 
   const reportProfile = async (
     reportedProfileId: string,
     reason: ReportReason,
     description?: string
   ): Promise<{ error: Error | null }> => {
+    // Block action during impersonation
+    if (!guardAction('report_user', 'לדווח על משתמש')) {
+      return { error: new Error('Action blocked during impersonation') };
+    }
     try {
       setLoading(true);
       const myProfileId = cachedProfileId || await getMyProfileId();
