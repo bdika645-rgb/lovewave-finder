@@ -58,6 +58,7 @@ const AdminNotifications = lazy(() => import("./pages/admin/AdminNotifications")
 const AdminTips = lazy(() => import("./pages/admin/AdminTips"));
 const AdminSupport = lazy(() => import("./pages/admin/AdminSupport"));
 const AdminLandingEditor = lazy(() => import("./pages/admin/AdminLandingEditor"));
+const AdminCampaigns = lazy(() => import("./pages/admin/AdminCampaigns"));
 
 const RouteLoader = ({ label }: { label?: string }) => (
   <FullPageLoader label={label ?? "טוען..."} className="min-h-screen bg-background flex items-center justify-center" />
@@ -313,6 +314,13 @@ const App = () => (
                   <AdminProtectedRoute>
                     <Suspense fallback={<RouteLoader label="טוען עורך..." />}>
                       <AdminLandingEditor />
+                    </Suspense>
+                  </AdminProtectedRoute>
+                } />
+                <Route path="/admin/campaigns" element={
+                  <AdminProtectedRoute>
+                    <Suspense fallback={<RouteLoader label="טוען קמפיינים..." />}>
+                      <AdminCampaigns />
                     </Suspense>
                   </AdminProtectedRoute>
                 } />

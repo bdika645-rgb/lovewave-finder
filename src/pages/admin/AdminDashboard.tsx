@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 import { 
   Users, Heart, MessageCircle, ThumbsUp, UserPlus, Activity,
   Flag, Shield, Settings, BarChart3, TrendingUp, ArrowUpRight,
-  RefreshCw, AlertTriangle
+  RefreshCw, AlertTriangle, Mail
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -40,10 +40,10 @@ const CHART_COLORS = ["hsl(var(--primary))", "hsl(var(--secondary))", "hsl(var(-
 const quickActions = [
   { icon: Users, label: "משתמשים", description: "ניהול וצפייה", path: "/admin/users", gradient: "from-blue-500 to-blue-600" },
   { icon: Flag, label: "דיווחים", description: "דיווחים חדשים", path: "/admin/reports", gradient: "from-rose-500 to-rose-600" },
-  { icon: Shield, label: "תפקידים", description: "הרשאות", path: "/admin/roles", gradient: "from-amber-500 to-amber-600" },
-  { icon: Settings, label: "הגדרות", description: "הגדרות מערכת", path: "/admin/settings", gradient: "from-slate-500 to-slate-600" },
+  { icon: Mail, label: "קמפיינים", description: "שליחת אימיילים", path: "/admin/campaigns", gradient: "from-pink-500 to-pink-600" },
   { icon: BarChart3, label: "ניתוח", description: "סטטיסטיקות", path: "/admin/analytics", gradient: "from-emerald-500 to-emerald-600" },
   { icon: MessageCircle, label: "הודעות", description: "צפייה בהודעות", path: "/admin/messages", gradient: "from-violet-500 to-violet-600" },
+  { icon: Settings, label: "הגדרות", description: "הגדרות מערכת", path: "/admin/settings", gradient: "from-slate-500 to-slate-600" },
 ];
 
 // Activity type icons and colors
