@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import heroBg from "@/assets/hero-bg.jpg";
 import { useLandingContent } from "@/contexts/LandingContentContext";
 import AnimatedCounter from "@/components/AnimatedCounter";
+import HeroSearch from "@/components/HeroSearch";
 
 // Parse stat value to extract number
 const parseStatValue = (value: string): { num: number; suffix: string } => {
@@ -84,8 +85,11 @@ const HeroSection = () => {
             {hero.description}
           </p>
 
+          {/* Quick Profile Search */}
+          <HeroSearch />
+
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-5 justify-center items-center">
+          <div className="flex flex-col sm:flex-row gap-5 justify-center items-center mt-8">
             <Link to="/register">
               <Button variant="hero" size="xl" className="gap-3 shadow-xl hover:shadow-2xl transition-all btn-lift">
                 <Crown className="w-5 h-5" />

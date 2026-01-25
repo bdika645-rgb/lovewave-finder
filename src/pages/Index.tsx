@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useState, useMemo } from "react";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import MemberCard from "@/components/MemberCard";
@@ -8,6 +8,7 @@ import SkipToContent from "@/components/SkipToContent";
 import { SkeletonGrid } from "@/components/ui/skeleton-card";
 import { VisualEditor } from "@/components/VisualEditor";
 import { useLandingContent } from "@/contexts/LandingContentContext";
+import FeaturedMembersFilter, { type FilterType, type SortType } from "@/components/FeaturedMembersFilter";
 
 import { useProfiles } from "@/hooks/useProfiles";
 import { Heart, Shield, Sparkles, Users } from "lucide-react";
@@ -108,11 +109,58 @@ const QuickSectionNav = () => {
 };
 
 const Index = () => {
-  // Fetch featured profiles from database (limit to 4)
+  // Filter state for Featured Members
+  const [activeFilter, setActiveFilter] = useState<FilterType>("all");
+  const [activeSort, setActiveSort] = useState<SortType>("newest");
+  
+  // Fetch featured profiles from database (limit to 8 for filtering)
   const { profiles, loading } = useProfiles({});
-  const featuredProfiles = profiles.length > 0 ? profiles.slice(0, 4) : [];
+  const featuredProfiles = profiles.length > 0 ? profiles.slice(0, 8) : [];
   // Use demo profiles as fallback when not logged in or no profiles available
   const displayProfiles = featuredProfiles.length > 0 ? featuredProfiles : demoProfiles;
+  
+  // Apply filters to displayed profiles
+  const filteredProfiles = useMemo(() => {
+    let result = [...displayProfiles];
+    
+    // Apply filter
+    switch (activeFilter) {
+      case "online":
+        result = result.filter(p => 
+          'is_online' in p ? p.is_online : (p as any).isOnline
+        );
+        break;
+      case "age25-35":
+        result = result.filter(p => p.age >= 25 && p.age <= 35);
+        break;
+      case "nearby":
+        // For demo, just show Tel Aviv profiles
+        result = result.filter(p => 
+          p.city === "תל אביב" || p.city === "הרצליה" || p.city === "רמת גן"
+        );
+        break;
+      default:
+        break;
+    }
+    
+    // Apply sort
+    if (activeSort === "newest") {
+      result.sort((a, b) => {
+        const dateA = 'updated_at' in a ? new Date(a.updated_at as string).getTime() : 0;
+        const dateB = 'updated_at' in b ? new Date(b.updated_at as string).getTime() : 0;
+        return dateB - dateA;
+      });
+    } else if (activeSort === "popular") {
+      // For demo, sort by online status as a proxy for popularity
+      result.sort((a, b) => {
+        const onlineA = 'is_online' in a ? a.is_online : (a as any).isOnline;
+        const onlineB = 'is_online' in b ? b.is_online : (b as any).isOnline;
+        return (onlineB ? 1 : 0) - (onlineA ? 1 : 0);
+      });
+    }
+    
+    return result.slice(0, 4);
+  }, [displayProfiles, activeFilter, activeSort]);
   
   const { content } = useLandingContent();
   const { features, featuredMembers, cta, footer, nav } = content;
@@ -185,11 +233,19 @@ const Index = () => {
               </p>
             </AnimatedSection>
 
+            {/* Smart Filter */}
+            <FeaturedMembersFilter
+              activeFilter={activeFilter}
+              activeSort={activeSort}
+              onFilterChange={setActiveFilter}
+              onSortChange={setActiveSort}
+            />
+
             {loading ? (
               <SkeletonGrid count={4} />
-            ) : (
+            ) : filteredProfiles.length > 0 ? (
               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
-                {displayProfiles.map((profile, index) => (
+                {filteredProfiles.map((profile, index) => (
                   <AnimatedCard key={profile.id} index={index}>
                     <MemberCard 
                       member={{
@@ -205,6 +261,19 @@ const Index = () => {
                     />
                   </AnimatedCard>
                 ))}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <Users className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
+                <p className="text-muted-foreground">לא נמצאו פרופילים בסינון זה</p>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="mt-4"
+                  onClick={() => setActiveFilter("all")}
+                >
+                  הצג הכל
+                </Button>
               </div>
             )}
 
