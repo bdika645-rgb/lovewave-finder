@@ -1,6 +1,7 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
-import { Loader2 } from "lucide-react";
+import { Loader2, ShieldAlert } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface AdminProtectedRouteProps {
   children: React.ReactNode;
@@ -29,19 +30,16 @@ const AdminProtectedRoute = ({ children }: AdminProtectedRouteProps) => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background" dir="rtl">
         <div className="text-center max-w-md p-8">
-          <div className="w-20 h-20 bg-destructive/10 rounded-full flex items-center justify-center mx-auto mb-6">
-            <span className="text-4xl">🚫</span>
+          <div className="w-20 h-20 bg-destructive/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <ShieldAlert className="w-10 h-10 text-destructive" aria-hidden="true" />
           </div>
           <h1 className="text-2xl font-bold text-foreground mb-4">אין גישה</h1>
           <p className="text-muted-foreground mb-6">
-            אין לך הרשאות גישה לפאנל הניהול. פנה למנהל המערכת.
+            אין לך הרשאות גישה לפאנל הניהול. פנה למנהל המערכת לקבלת הרשאות.
           </p>
-          <a
-            href="/"
-            className="inline-flex items-center justify-center px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
-          >
-            חזרה לדף הבית
-          </a>
+          <Button asChild>
+            <a href="/">חזרה לדף הבית</a>
+          </Button>
         </div>
       </div>
     );

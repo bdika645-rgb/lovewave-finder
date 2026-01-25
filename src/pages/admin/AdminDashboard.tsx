@@ -412,18 +412,24 @@ export default function AdminDashboard() {
         initial="hidden"
         animate="visible"
       >
-        {/* Header Actions */}
-        <motion.div variants={itemVariants} className="flex items-center justify-end gap-2">
-          <Button variant="ghost" size="sm" onClick={() => refetch()} className="gap-1.5">
-            <RefreshCw className="w-4 h-4" />
-            <span className="hidden sm:inline">רענון</span>
-          </Button>
-          <DashboardWidgetSettings
-            widgets={widgets}
-            onToggle={toggleWidget}
-            onReorder={reorderWidgets}
-            onReset={resetToDefaults}
-          />
+        {/* Header */}
+        <motion.div variants={itemVariants} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">לוח בקרה</h1>
+            <p className="text-muted-foreground mt-1">סקירה כללית של האפליקציה</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" onClick={() => refetch()} className="gap-1.5">
+              <RefreshCw className="w-4 h-4" />
+              <span className="hidden sm:inline">רענון</span>
+            </Button>
+            <DashboardWidgetSettings
+              widgets={widgets}
+              onToggle={toggleWidget}
+              onReorder={reorderWidgets}
+              onReset={resetToDefaults}
+            />
+          </div>
         </motion.div>
 
         {/* Stats Cards - WordPress Style Grid */}
