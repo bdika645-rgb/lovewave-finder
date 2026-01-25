@@ -152,15 +152,21 @@ export default function AdminSidebar() {
         "flex items-center gap-3 p-4 border-b border-sidebar-border",
         collapsed ? "justify-center" : "px-5"
       )}>
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shrink-0">
-          <Sparkles className="w-5 h-5 text-white" />
-        </div>
-        {!collapsed && (
-          <div className="flex flex-col">
-            <span className="font-bold text-sidebar-foreground text-lg">Spark</span>
-            <span className="text-xs text-sidebar-foreground/60">ניהול מערכת</span>
+        <Link 
+          to="/admin" 
+          className="flex items-center gap-3 focus-ring rounded-xl"
+          aria-label="לוח בקרה - Spark"
+        >
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shrink-0">
+            <Sparkles className="w-5 h-5 text-white" aria-hidden="true" />
           </div>
-        )}
+          {!collapsed && (
+            <div className="flex flex-col">
+              <span className="font-bold text-sidebar-foreground text-lg">Spark</span>
+              <span className="text-xs text-sidebar-foreground/60">ניהול מערכת</span>
+            </div>
+          )}
+        </Link>
       </div>
 
       {/* Navigation */}
