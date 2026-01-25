@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Lightbulb, User, MessageSquare, Calendar, Sparkles } from "lucide-react";
 import TipsCategoryFilter, { type TipCategory } from "@/components/TipsCategoryFilter";
 import { motion, AnimatePresence } from "framer-motion";
+import { InlineEditable, EditableSection } from "@/components/VisualEditor";
 
 const getCategoryIcon = (category: string) => {
   switch (category) {
@@ -22,9 +23,13 @@ const getCategoryIcon = (category: string) => {
 };
 
 const DatingTipsSection = () => {
-  const { content } = useLandingContent();
+  const { content, updateContent } = useLandingContent();
   const { datingTips: tipsContent } = content;
   const [activeCategory, setActiveCategory] = useState<TipCategory>("all");
+
+  const updateTips = (key: keyof typeof tipsContent, value: string) => {
+    updateContent("datingTips", { [key]: value });
+  };
 
   const filteredTips = useMemo(() => {
     if (activeCategory === "all") return datingTips;
@@ -32,19 +37,34 @@ const DatingTipsSection = () => {
   }, [activeCategory]);
 
   return (
-    <section id="dating-tips" className="py-24 bg-muted/30" aria-labelledby="dating-tips-heading">
-      <div className="container mx-auto px-6">
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center justify-center w-16 h-16 gradient-primary rounded-2xl mb-6" aria-hidden="true">
-            <Lightbulb className="w-8 h-8 text-primary-foreground" />
+    <EditableSection sectionName="טיפים לדייטינג">
+      <section id="dating-tips" className="py-24 bg-muted/30" aria-labelledby="dating-tips-heading">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center justify-center w-16 h-16 gradient-primary rounded-2xl mb-6" aria-hidden="true">
+              <Lightbulb className="w-8 h-8 text-primary-foreground" />
+            </div>
+            <h2 id="dating-tips-heading" className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
+              <InlineEditable
+                value={tipsContent.title}
+                onChange={(v) => updateTips("title", v)}
+                as="span"
+              />{" "}
+              <InlineEditable
+                value={tipsContent.titleHighlight}
+                onChange={(v) => updateTips("titleHighlight", v)}
+                className="text-gradient"
+                as="span"
+              />
+            </h2>
+            <InlineEditable
+              value={tipsContent.description}
+              onChange={(v) => updateTips("description", v)}
+              className="text-muted-foreground text-lg max-w-2xl mx-auto block"
+              as="p"
+              multiline
+            />
           </div>
-          <h2 id="dating-tips-heading" className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
-            {tipsContent.title} <span className="text-gradient">{tipsContent.titleHighlight}</span>
-          </h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            {tipsContent.description}
-          </p>
-        </div>
 
         {/* Category Filter */}
         <TipsCategoryFilter 
@@ -103,6 +123,7 @@ const DatingTipsSection = () => {
         )}
       </div>
     </section>
+  </EditableSection>
   );
 };
 

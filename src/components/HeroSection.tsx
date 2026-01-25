@@ -3,27 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import heroBg from "@/assets/hero-bg.jpg";
 import { useLandingContent } from "@/contexts/LandingContentContext";
-import AnimatedCounter from "@/components/AnimatedCounter";
 import HeroSearch from "@/components/HeroSearch";
 import { InlineEditable, EditableSection } from "@/components/VisualEditor";
-
-// Parse stat value to extract number
-const parseStatValue = (value: string): { num: number; suffix: string } => {
-  const match = value.match(/^([\d,]+)([+%K]*)$/);
-  if (match) {
-    const num = parseInt(match[1].replace(/,/g, ''), 10);
-    return { num, suffix: match[2] || '' };
-  }
-  return { num: 0, suffix: '' };
-};
 
 const HeroSection = () => {
   const { content, updateContent } = useLandingContent();
   const { hero } = content;
-
-  const stat1 = parseStatValue(hero.stat1Value);
-  const stat2 = parseStatValue(hero.stat2Value);
-  const stat3 = parseStatValue(hero.stat3Value);
 
   const updateHero = (key: keyof typeof hero, value: string) => {
     updateContent("hero", { [key]: value });
@@ -137,7 +122,11 @@ const HeroSection = () => {
                 <Users className="w-7 h-7 sm:w-10 sm:h-10 text-primary-foreground" />
               </div>
               <p className="font-display text-4xl sm:text-6xl font-bold text-gradient-shimmer tracking-tight">
-                <AnimatedCounter end={stat1.num} suffix={stat1.suffix} duration={2500} />
+                <InlineEditable
+                  value={hero.stat1Value}
+                  onChange={(v) => updateHero("stat1Value", v)}
+                  as="span"
+                />
               </p>
               <InlineEditable
                 value={hero.stat1Label}
@@ -153,7 +142,11 @@ const HeroSection = () => {
                 <Diamond className="w-7 h-7 sm:w-10 sm:h-10 text-primary-foreground" />
               </div>
               <p className="font-display text-4xl sm:text-6xl font-bold text-gradient-shimmer tracking-tight">
-                <AnimatedCounter end={stat2.num} suffix={stat2.suffix} duration={2500} delay={200} />
+                <InlineEditable
+                  value={hero.stat2Value}
+                  onChange={(v) => updateHero("stat2Value", v)}
+                  as="span"
+                />
               </p>
               <InlineEditable
                 value={hero.stat2Label}
@@ -169,7 +162,11 @@ const HeroSection = () => {
                 <Star className="w-7 h-7 sm:w-10 sm:h-10 text-primary-foreground" />
               </div>
               <p className="font-display text-4xl sm:text-6xl font-bold text-gradient-shimmer tracking-tight">
-                <AnimatedCounter end={stat3.num} suffix={stat3.suffix} duration={2500} delay={400} />
+                <InlineEditable
+                  value={hero.stat3Value}
+                  onChange={(v) => updateHero("stat3Value", v)}
+                  as="span"
+                />
               </p>
               <InlineEditable
                 value={hero.stat3Label}
