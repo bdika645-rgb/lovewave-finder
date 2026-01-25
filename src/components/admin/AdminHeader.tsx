@@ -37,7 +37,7 @@ const pageTitles: Record<string, { title: string; subtitle?: string }> = {
   "/admin/reports": { title: "דיווחים", subtitle: "טיפול בדיווחי משתמשים" },
   "/admin/support": { title: "פניות תמיכה", subtitle: "מענה לפניות" },
   "/admin/blocked": { title: "משתמשים חסומים", subtitle: "ניהול חסימות" },
-  "/admin/content": { title: "ניהול תמונות", subtitle: "ניהול תמונות משתמשים" },
+  "/admin/content": { title: "גלריית תמונות", subtitle: "צפייה וניהול תמונות משתמשים" },
   "/admin/landing-editor": { title: "עורך דף נחיתה", subtitle: "עריכת תוכן דף הבית" },
   "/admin/tips": { title: "טיפים", subtitle: "ניהול טיפים למשתמשים" },
   "/admin/notifications": { title: "התראות", subtitle: "שליחת התראות" },

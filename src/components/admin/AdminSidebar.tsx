@@ -75,7 +75,7 @@ const menuGroups = [
   {
     title: "תוכן והגדרות",
     items: [
-      { icon: Image, label: "ניהול תמונות", path: "/admin/content" },
+      { icon: Image, label: "גלריית תמונות", path: "/admin/content" },
       { icon: MousePointer2, label: "עורך דף נחיתה", path: "/admin/landing-editor" },
       { icon: Lightbulb, label: "טיפים", path: "/admin/tips" },
       { icon: Bell, label: "התראות", path: "/admin/notifications" },
