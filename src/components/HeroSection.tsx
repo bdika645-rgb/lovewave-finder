@@ -36,12 +36,12 @@ const HeroSection = () => {
             </span>
           </div>
           
-          <h1 className="font-display text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold text-foreground mb-4 sm:mb-6 leading-tight">
+          <h1 className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-foreground mb-6 sm:mb-8 leading-[1.1] drop-shadow-sm">
             {hero.titleLine1}<br />
-            <span className="text-gradient">{hero.titleLine2}</span>
+            <span className="text-gradient drop-shadow-lg">{hero.titleLine2}</span>
           </h1>
           
-          <p className="font-body text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 sm:mb-12 leading-relaxed px-4">
+          <p className="font-body text-lg sm:text-xl md:text-2xl text-muted-foreground/90 max-w-2xl mx-auto mb-10 sm:mb-14 leading-relaxed px-4 font-medium">
             {hero.description}
           </p>
 
@@ -61,21 +61,27 @@ const HeroSection = () => {
         </div>
 
         {/* Stats */}
-        <div className="mt-16 sm:mt-24 grid grid-cols-3 gap-3 sm:gap-6 max-w-3xl mx-auto animate-slide-up">
-          <div className="glass-effect rounded-xl sm:rounded-2xl p-3 sm:p-6 card-hover border border-border">
-            <Users className="w-5 h-5 sm:w-8 sm:h-8 text-primary mx-auto mb-2 sm:mb-3" />
-            <p className="font-display text-2xl sm:text-4xl font-bold text-gradient">{hero.stat1Value}</p>
-            <p className="text-muted-foreground text-xs sm:text-sm mt-1">{hero.stat1Label}</p>
+        <div className="mt-20 sm:mt-32 grid grid-cols-3 gap-4 sm:gap-8 max-w-4xl mx-auto animate-slide-up">
+          <div className="glass-effect rounded-2xl sm:rounded-3xl p-4 sm:p-8 card-hover border border-white/20 dark:border-white/10">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-3 sm:mb-4">
+              <Users className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
+            </div>
+            <p className="font-display text-3xl sm:text-5xl font-bold text-gradient">{hero.stat1Value}</p>
+            <p className="text-muted-foreground text-sm sm:text-base mt-2 font-medium">{hero.stat1Label}</p>
           </div>
-          <div className="glass-effect rounded-xl sm:rounded-2xl p-3 sm:p-6 card-hover border border-border">
-            <Diamond className="w-5 h-5 sm:w-8 sm:h-8 text-primary mx-auto mb-2 sm:mb-3" />
-            <p className="font-display text-2xl sm:text-4xl font-bold text-gradient">{hero.stat2Value}</p>
-            <p className="text-muted-foreground text-xs sm:text-sm mt-1">{hero.stat2Label}</p>
+          <div className="glass-effect rounded-2xl sm:rounded-3xl p-4 sm:p-8 card-hover border border-white/20 dark:border-white/10">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-3 sm:mb-4">
+              <Diamond className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
+            </div>
+            <p className="font-display text-3xl sm:text-5xl font-bold text-gradient">{hero.stat2Value}</p>
+            <p className="text-muted-foreground text-sm sm:text-base mt-2 font-medium">{hero.stat2Label}</p>
           </div>
-          <div className="glass-effect rounded-xl sm:rounded-2xl p-3 sm:p-6 card-hover border border-border">
-            <Star className="w-5 h-5 sm:w-8 sm:h-8 text-primary mx-auto mb-2 sm:mb-3" />
-            <p className="font-display text-2xl sm:text-4xl font-bold text-gradient">{hero.stat3Value}</p>
-            <p className="text-muted-foreground text-xs sm:text-sm mt-1">{hero.stat3Label}</p>
+          <div className="glass-effect rounded-2xl sm:rounded-3xl p-4 sm:p-8 card-hover border border-white/20 dark:border-white/10">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-3 sm:mb-4">
+              <Star className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
+            </div>
+            <p className="font-display text-3xl sm:text-5xl font-bold text-gradient">{hero.stat3Value}</p>
+            <p className="text-muted-foreground text-sm sm:text-base mt-2 font-medium">{hero.stat3Label}</p>
           </div>
         </div>
       </div>
