@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ChevronLeft, ChevronRight, RefreshCw, Download, UserPlus, Loader2, Edit2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, RefreshCw, Download, UserPlus, Loader2, Edit2, Users, BadgeCheck, UserX as UserOffIcon } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -74,7 +74,7 @@ export default function AdminUsers() {
     };
   }, [sortBy]);
 
-  const { users, loading, totalCount, refetch, updateUserRole, deleteUser } = useAdminUsers({
+  const { users, loading, totalCount, refetch, updateUserRole, deleteUser, verifyUser } = useAdminUsers({
     search,
     gender: gender !== "all" ? gender : undefined,
     sortBy: sortConfig.sortBy,
@@ -200,6 +200,10 @@ export default function AdminUsers() {
     link.click();
   };
 
+  // Calculate quick stats
+  const onlineCount = users.filter(u => u.is_online).length;
+  const verifiedCount = users.filter(u => u.is_verified).length;
+
   return (
     <AdminLayout>
       <div className="space-y-6">
@@ -223,6 +227,54 @@ export default function AdminUsers() {
               <UserPlus className="w-4 h-4 ml-2" />
               צור משתמש
             </Button>
+          </div>
+        </div>
+
+        {/* Quick Stats */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="bg-card rounded-xl p-4 border border-border">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <Users className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-foreground">{totalCount}</p>
+                <p className="text-xs text-muted-foreground">סה״כ משתמשים</p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-card rounded-xl p-4 border border-border">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-green-500/10 rounded-lg">
+                <span className="w-5 h-5 flex items-center justify-center text-green-500 text-lg">●</span>
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-foreground">{onlineCount}</p>
+                <p className="text-xs text-muted-foreground">מחוברים כעת</p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-card rounded-xl p-4 border border-border">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <BadgeCheck className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-foreground">{verifiedCount}</p>
+                <p className="text-xs text-muted-foreground">מאומתים</p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-card rounded-xl p-4 border border-border">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-destructive/10 rounded-lg">
+                <UserOffIcon className="w-5 h-5 text-destructive" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-foreground">{totalCount - onlineCount}</p>
+                <p className="text-xs text-muted-foreground">לא מחוברים</p>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -256,6 +308,7 @@ export default function AdminUsers() {
                   onBlock={handleBlockUser}
                   onEdit={handleEditUser}
                   onImpersonate={handleImpersonate}
+                  onVerify={verifyUser}
                 />
               </div>
             </div>
