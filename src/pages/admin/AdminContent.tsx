@@ -54,7 +54,7 @@ export default function AdminContent() {
     return (
       <AdminLayout>
         <div className="space-y-6">
-          <h1 className="text-3xl font-bold text-foreground">ניהול תוכן</h1>
+          <h1 className="text-3xl font-bold text-foreground">גלריית תמונות</h1>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {[...Array(2)].map((_, i) => (
               <Skeleton key={i} className="h-32 rounded-xl" />
@@ -75,8 +75,8 @@ export default function AdminContent() {
       <div className="space-y-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">ניהול תוכן</h1>
-            <p className="text-muted-foreground mt-1">צפייה וניהול תמונות שהועלו</p>
+            <h1 className="text-3xl font-bold text-foreground">גלריית תמונות</h1>
+            <p className="text-muted-foreground mt-1">צפייה וניהול כל התמונות שהועלו על ידי משתמשים</p>
           </div>
           <Button variant="outline" onClick={() => refetch()}>
             <RefreshCw className="w-4 h-4 ml-2" />
