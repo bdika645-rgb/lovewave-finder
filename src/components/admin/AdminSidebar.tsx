@@ -20,7 +20,8 @@ import {
   ChevronRight,
   HelpCircle,
   Sparkles,
-  ChevronDown
+  ChevronDown,
+  MousePointer2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
@@ -89,7 +90,8 @@ const menuGroups = [
   {
     title: "תוכן והגדרות",
     items: [
-      { icon: Image, label: "ניהול תוכן", path: "/admin/content" },
+      { icon: Image, label: "ניהול תמונות", path: "/admin/content" },
+      { icon: MousePointer2, label: "עורך דף נחיתה", path: "/admin/landing-editor" },
       { icon: Lightbulb, label: "טיפים", path: "/admin/tips" },
       { icon: Bell, label: "התראות", path: "/admin/notifications" },
     ],
