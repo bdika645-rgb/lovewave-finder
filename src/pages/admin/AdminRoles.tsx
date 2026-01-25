@@ -51,6 +51,7 @@ interface AvailableUser {
 export default function AdminRoles() {
   const [roleUsers, setRoleUsers] = useState<RoleUser[]>([]);
   const [availableUsers, setAvailableUsers] = useState<AvailableUser[]>([]);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState("");
@@ -59,6 +60,10 @@ export default function AdminRoles() {
 
   const fetchData = async () => {
     try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      setCurrentUserId(user?.id || null);
+
       // Fetch users with roles
       const { data: rolesData } = await supabase
         .from("user_roles")
@@ -152,6 +157,12 @@ export default function AdminRoles() {
   };
 
   const removeRole = async (userId: string) => {
+    // Prevent self-removal
+    if (userId === currentUserId) {
+      toast.error("לא ניתן להסיר את התפקיד שלך עצמך");
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from("user_roles")
@@ -171,20 +182,20 @@ export default function AdminRoles() {
   const getRoleIcon = (role: string) => {
     switch (role) {
       case "admin":
-        return <ShieldCheck className="w-4 h-4 text-red-500" />;
+        return <ShieldCheck className="w-4 h-4 text-destructive" />;
       case "moderator":
-        return <Shield className="w-4 h-4 text-yellow-500" />;
+        return <Shield className="w-4 h-4 text-secondary" />;
       default:
-        return <User className="w-4 h-4 text-gray-500" />;
+        return <User className="w-4 h-4 text-muted-foreground" />;
     }
   };
 
   const getRoleBadge = (role: string) => {
     switch (role) {
       case "admin":
-        return <Badge className="bg-red-500 hover:bg-red-600">מנהל</Badge>;
+        return <Badge className="bg-destructive hover:bg-destructive/90">מנהל</Badge>;
       case "moderator":
-        return <Badge className="bg-yellow-500 hover:bg-yellow-600">מנחה</Badge>;
+        return <Badge className="bg-secondary hover:bg-secondary/90 text-secondary-foreground">מנחה</Badge>;
       default:
         return <Badge variant="secondary">משתמש</Badge>;
     }
@@ -280,8 +291,8 @@ export default function AdminRoles() {
         {/* Role Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6">
           <div className="bg-card rounded-xl p-6 border border-border flex items-center gap-4">
-            <div className="p-3 bg-red-500/10 rounded-lg">
-              <ShieldCheck className="w-6 h-6 text-red-500" />
+            <div className="p-3 bg-destructive/10 rounded-lg">
+              <ShieldCheck className="w-6 h-6 text-destructive" />
             </div>
             <div>
               <p className="text-2xl font-bold">{roleUsers.filter(r => r.role === "admin").length}</p>
@@ -289,8 +300,8 @@ export default function AdminRoles() {
             </div>
           </div>
           <div className="bg-card rounded-xl p-6 border border-border flex items-center gap-4">
-            <div className="p-3 bg-yellow-500/10 rounded-lg">
-              <Shield className="w-6 h-6 text-yellow-500" />
+            <div className="p-3 bg-secondary/10 rounded-lg">
+              <Shield className="w-6 h-6 text-secondary" />
             </div>
             <div>
               <p className="text-2xl font-bold">{roleUsers.filter(r => r.role === "moderator").length}</p>
@@ -298,8 +309,8 @@ export default function AdminRoles() {
             </div>
           </div>
           <div className="bg-card rounded-xl p-6 border border-border flex items-center gap-4">
-            <div className="p-3 bg-gray-500/10 rounded-lg">
-              <User className="w-6 h-6 text-gray-500" />
+            <div className="p-3 bg-muted rounded-lg">
+              <User className="w-6 h-6 text-muted-foreground" />
             </div>
             <div>
               <p className="text-2xl font-bold">{availableUsers.length}</p>
@@ -313,6 +324,7 @@ export default function AdminRoles() {
           <div className="p-4 border-b border-border">
             <h3 className="text-lg font-semibold">משתמשים עם תפקידים</h3>
           </div>
+          <div className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
@@ -352,6 +364,8 @@ export default function AdminRoles() {
                       variant="destructive" 
                       size="sm"
                       onClick={() => removeRole(roleUser.user_id)}
+                      disabled={roleUser.user_id === currentUserId}
+                      title={roleUser.user_id === currentUserId ? "לא ניתן להסיר את התפקיד שלך עצמך" : "הסר תפקיד"}
                     >
                       הסר תפקיד
                     </Button>
@@ -367,6 +381,7 @@ export default function AdminRoles() {
               )}
             </TableBody>
           </Table>
+          </div>
         </div>
       </div>
     </AdminLayout>

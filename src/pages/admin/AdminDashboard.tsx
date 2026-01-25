@@ -305,7 +305,7 @@ export default function AdminDashboard() {
                 <TrendingUp className="w-4 h-4 text-success" />
               </div>
               <p className="text-2xl font-bold text-primary">{stats?.newUsersThisWeek || 0}</p>
-              <p className="text-xs text-muted-foreground">+12% מהשבוע הקודם</p>
+              <p className="text-xs text-muted-foreground">רשומים חדשים</p>
             </div>
             
             <div className="bg-card rounded-xl p-5 border border-border">
@@ -314,7 +314,7 @@ export default function AdminDashboard() {
                 <TrendingUp className="w-4 h-4 text-success" />
               </div>
               <p className="text-2xl font-bold text-primary">{stats?.newUsersThisMonth || 0}</p>
-              <p className="text-xs text-muted-foreground">+8% מהחודש הקודם</p>
+              <p className="text-xs text-muted-foreground">רשומים חדשים</p>
             </div>
             
             <div className="bg-card rounded-xl p-5 border border-border">
