@@ -53,13 +53,13 @@ export default function AdminReports() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "pending":
-        return <Badge variant="outline" className="bg-yellow-500/10 text-yellow-600 border-yellow-500">ממתין</Badge>;
+        return <Badge variant="outline" className="bg-secondary/10 text-secondary border-secondary">ממתין</Badge>;
       case "reviewed":
-        return <Badge variant="outline" className="bg-blue-500/10 text-blue-600 border-blue-500">נבדק</Badge>;
+        return <Badge variant="outline" className="bg-primary/10 text-primary border-primary">נבדק</Badge>;
       case "resolved":
-        return <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-500">טופל</Badge>;
+        return <Badge variant="outline" className="bg-accent/10 text-accent-foreground border-accent">טופל</Badge>;
       case "dismissed":
-        return <Badge variant="outline" className="bg-gray-500/10 text-gray-600 border-gray-500">נדחה</Badge>;
+        return <Badge variant="outline" className="bg-muted text-muted-foreground border-muted-foreground/30">נדחה</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
     }
@@ -209,8 +209,12 @@ export default function AdminReports() {
                         variant="ghost"
                         size="sm"
                         className="text-destructive hover:text-destructive"
-                        onClick={() => deleteReport(report.id)}
-                        aria-label="מחק דיווח"
+                        onClick={() => {
+                          if (confirm("האם אתה בטוח שברצונך למחוק את הדיווח?")) {
+                            deleteReport(report.id);
+                          }
+                        }}
+                        aria-label={`מחק דיווח מ${report.reporter?.name || "לא ידוע"}`}
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
