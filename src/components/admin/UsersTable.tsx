@@ -376,14 +376,14 @@ export default function UsersTable({
                         </DropdownMenuItem>
                       )}
                       <DropdownMenuSeparator />
-                      {/* Impersonate option - only for users with user_id */}
-                      {user.user_id && onImpersonate && (
+                      {/* Impersonate option - available for all profiles */}
+                      {onImpersonate && (
                         <DropdownMenuItem 
                           onClick={() => onImpersonate(user)}
                           className="text-primary focus:text-primary"
                         >
                           <UserCheck className="w-4 h-4 ml-2" />
-                          צפה כמשתמש
+                          התחבר בתור משתמש
                         </DropdownMenuItem>
                       )}
                       {user.user_id && (
