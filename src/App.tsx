@@ -53,6 +53,7 @@ const AdminReports = lazy(() => import("./pages/admin/AdminReports"));
 const AdminActivityLog = lazy(() => import("./pages/admin/AdminActivityLog"));
 const AdminBlockedUsers = lazy(() => import("./pages/admin/AdminBlockedUsers"));
 const AdminContent = lazy(() => import("./pages/admin/AdminContent"));
+const AdminMedia = lazy(() => import("./pages/admin/AdminMedia"));
 const AdminNotifications = lazy(() => import("./pages/admin/AdminNotifications"));
 const AdminTips = lazy(() => import("./pages/admin/AdminTips"));
 const AdminSupport = lazy(() => import("./pages/admin/AdminSupport"));
@@ -277,6 +278,13 @@ const App = () => (
                   <AdminProtectedRoute>
                     <Suspense fallback={<RouteLoader label="טוען תוכן..." />}>
                       <AdminContent />
+                    </Suspense>
+                  </AdminProtectedRoute>
+                } />
+                <Route path="/admin/media" element={
+                  <AdminProtectedRoute>
+                    <Suspense fallback={<RouteLoader label="טוען מדיה..." />}>
+                      <AdminMedia />
                     </Suspense>
                   </AdminProtectedRoute>
                 } />
