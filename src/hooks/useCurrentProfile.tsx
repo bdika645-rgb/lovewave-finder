@@ -12,6 +12,7 @@ interface CurrentProfileContextType {
   error: string | null;
   refetch: () => Promise<void>;
   updateProfile: (updates: Partial<Profile>) => Promise<{ error: Error | null }>;
+  fetchProfileById: (profileId: string) => Promise<Profile | null>;
 }
 
 const CurrentProfileContext = createContext<CurrentProfileContextType | undefined>(undefined);
@@ -85,6 +86,23 @@ export function CurrentProfileProvider({ children }: { children: React.ReactNode
     }
   }, [user, profile]);
 
+  // Function to fetch any profile by ID (for impersonation viewing)
+  const fetchProfileById = useCallback(async (profileId: string): Promise<Profile | null> => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles_public')
+        .select('*')
+        .eq('id', profileId)
+        .single();
+
+      if (error) throw error;
+      return data as unknown as Profile;
+    } catch (err) {
+      console.error('Error fetching profile by ID:', err);
+      return null;
+    }
+  }, []);
+
   const value = useMemo(() => ({
     profile,
     profileId: profile?.id || null,
@@ -92,7 +110,8 @@ export function CurrentProfileProvider({ children }: { children: React.ReactNode
     error,
     refetch: fetchProfile,
     updateProfile,
-  }), [profile, loading, error, fetchProfile, updateProfile]);
+    fetchProfileById,
+  }), [profile, loading, error, fetchProfile, updateProfile, fetchProfileById]);
 
   return (
     <CurrentProfileContext.Provider value={value}>

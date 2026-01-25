@@ -1,16 +1,23 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useMyProfileId } from './useMyProfileId';
+import { useImpersonationGuard } from '@/contexts/ImpersonationContext';
 
 export function useLikes() {
   const { getMyProfileId, profileId: cachedProfileId } = useMyProfileId();
   const [loading, setLoading] = useState(false);
+  const { guardAction } = useImpersonationGuard();
 
   const sendLike = async (likedProfileId: string): Promise<{
     error: Error | null;
     isMatch?: boolean;
     alreadyLiked?: boolean;
   }> => {
+    // Block action during impersonation
+    if (!guardAction('like_profile', 'לבצע לייק')) {
+      return { error: new Error('Action blocked during impersonation') };
+    }
+
     setLoading(true);
     try {
       const myProfileId = cachedProfileId || await getMyProfileId();
@@ -56,6 +63,11 @@ export function useLikes() {
   };
 
   const removeLike = async (likedProfileId: string): Promise<{ error: Error | null }> => {
+    // Block action during impersonation
+    if (!guardAction('unlike_profile', 'להסיר לייק')) {
+      return { error: new Error('Action blocked during impersonation') };
+    }
+
     setLoading(true);
     try {
       const myProfileId = cachedProfileId || await getMyProfileId();

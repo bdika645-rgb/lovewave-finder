@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useMyProfileId } from './useMyProfileId';
+import { useImpersonationGuard } from '@/contexts/ImpersonationContext';
 import type { Tables } from '@/integrations/supabase/types';
 
 type Message = Tables<'messages'>;
@@ -9,6 +10,7 @@ export function useMessages(conversationId: string | null) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { guardAction } = useImpersonationGuard();
   const { getMyProfileId, profileId } = useMyProfileId();
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
 
@@ -38,6 +40,11 @@ export function useMessages(conversationId: string | null) {
   }, [conversationId]);
 
   const sendMessage = async (content: string): Promise<{ error: Error | null }> => {
+    // Block action during impersonation
+    if (!guardAction('send_message', 'לשלוח הודעות')) {
+      return { error: new Error('Action blocked during impersonation') };
+    }
+
     if (!conversationId || !content.trim()) {
       return { error: new Error('Invalid message or conversation') };
     }

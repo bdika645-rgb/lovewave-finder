@@ -36,7 +36,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { MoreHorizontal, Eye, Trash2, Shield, ShieldCheck, User, UserX, Edit2, Bell, X } from "lucide-react";
+import { MoreHorizontal, Eye, Trash2, Shield, ShieldCheck, User, UserX, Edit2, Bell, X, UserCheck } from "lucide-react";
 import { AdminUser } from "@/hooks/useAdminUsers";
 import { formatDistanceToNow } from "date-fns";
 import { he } from "date-fns/locale";
@@ -49,6 +49,7 @@ interface UsersTableProps {
   onView: (user: AdminUser) => void;
   onBlock?: (profileId: string, reason: string) => Promise<void>;
   onEdit?: (user: AdminUser) => void;
+  onImpersonate?: (user: AdminUser) => void;
   // Bulk action handlers
   onBulkDelete?: (profileIds: string[]) => Promise<void>;
   onBulkBlock?: (profileIds: string[], reason: string) => Promise<void>;
@@ -63,6 +64,7 @@ export default function UsersTable({
   onView, 
   onBlock, 
   onEdit,
+  onImpersonate,
   onBulkDelete,
   onBulkBlock,
   onBulkUpdateRole,
@@ -374,6 +376,16 @@ export default function UsersTable({
                         </DropdownMenuItem>
                       )}
                       <DropdownMenuSeparator />
+                      {/* Impersonate option - only for users with user_id */}
+                      {user.user_id && onImpersonate && (
+                        <DropdownMenuItem 
+                          onClick={() => onImpersonate(user)}
+                          className="text-primary focus:text-primary"
+                        >
+                          <UserCheck className="w-4 h-4 ml-2" />
+                          צפה כמשתמש
+                        </DropdownMenuItem>
+                      )}
                       {user.user_id && (
                         <>
                           <DropdownMenuItem onClick={() => onUpdateRole(user.user_id!, "admin")}>
