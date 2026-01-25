@@ -16,6 +16,9 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
 
+// Default fallback profile image
+import defaultProfileImage from "@/assets/profiles/profile1.jpg";
+
 const ITEMS_PER_PAGE = 20;
 
 const Members = () => {
@@ -380,7 +383,7 @@ const Members = () => {
                           age: profile.age,
                           city: profile.city,
                           bio: "",
-                          image: profile.avatar_url || "/profiles/profile1.jpg",
+                          image: profile.avatar_url || defaultProfileImage,
                           interests: profile.interests || [],
                           isOnline: profile.is_online || false,
                           lastActive: undefined,
@@ -395,7 +398,7 @@ const Members = () => {
                         className="flex items-center gap-4 p-4 bg-card rounded-xl border border-border hover:shadow-card transition-shadow focus-ring"
                       >
                         <LazyImage 
-                          src={profile.avatar_url || "/profiles/profile1.jpg"} 
+                          src={profile.avatar_url || defaultProfileImage} 
                           alt={profile.name}
                           className="w-16 h-16 rounded-full"
                           aspectRatio="square"
