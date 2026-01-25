@@ -6,7 +6,7 @@ import AnimatedSection from "@/components/AnimatedSection";
 import AnimatedCard from "@/components/AnimatedCard";
 import SkipToContent from "@/components/SkipToContent";
 import { SkeletonGrid } from "@/components/ui/skeleton-card";
-import { VisualEditor, InlineEditable, EditableSection } from "@/components/VisualEditor";
+import { InlineEditable, EditableSection } from "@/components/VisualEditor";
 import { useLandingContent } from "@/contexts/LandingContentContext";
 import FeaturedMembersFilter, { type FilterType, type SortType } from "@/components/FeaturedMembersFilter";
 
@@ -498,9 +498,6 @@ const Index = () => {
           </div>
         </div>
       </footer>
-
-      {/* Visual Editor */}
-      <VisualEditor />
     </div>
   );
 };

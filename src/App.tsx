@@ -54,6 +54,7 @@ const AdminContent = lazy(() => import("./pages/admin/AdminContent"));
 const AdminNotifications = lazy(() => import("./pages/admin/AdminNotifications"));
 const AdminTips = lazy(() => import("./pages/admin/AdminTips"));
 const AdminSupport = lazy(() => import("./pages/admin/AdminSupport"));
+const AdminLandingEditor = lazy(() => import("./pages/admin/AdminLandingEditor"));
 
 const RouteLoader = ({ label }: { label?: string }) => (
   <FullPageLoader label={label ?? "טוען..."} className="min-h-screen bg-background flex items-center justify-center" />
@@ -294,6 +295,13 @@ const App = () => (
                   <AdminProtectedRoute>
                     <Suspense fallback={<RouteLoader label="טוען פניות..." />}>
                       <AdminSupport />
+                    </Suspense>
+                  </AdminProtectedRoute>
+                } />
+                <Route path="/admin/landing-editor" element={
+                  <AdminProtectedRoute>
+                    <Suspense fallback={<RouteLoader label="טוען עורך..." />}>
+                      <AdminLandingEditor />
                     </Suspense>
                   </AdminProtectedRoute>
                 } />
