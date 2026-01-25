@@ -264,10 +264,27 @@ function WYSIWYGEditorContent() {
                             <Icon className="w-10 h-10 text-primary-foreground" />
                           </div>
                           <h3 className="font-display text-2xl font-bold text-foreground mb-4 tracking-tight">
-                            {item.title}
+                            <InlineEditable
+                              value={item.title}
+                              onChange={(v) => {
+                                const newItems = [...features.items];
+                                newItems[index] = { ...newItems[index], title: v };
+                                updateContent("features", { items: newItems });
+                              }}
+                              as="span"
+                            />
                           </h3>
                           <p className="text-muted-foreground leading-relaxed text-lg">
-                            {item.description}
+                            <InlineEditable
+                              value={item.description}
+                              onChange={(v) => {
+                                const newItems = [...features.items];
+                                newItems[index] = { ...newItems[index], description: v };
+                                updateContent("features", { items: newItems });
+                              }}
+                              as="span"
+                              multiline
+                            />
                           </p>
                         </div>
                       </AnimatedCard>
@@ -391,28 +408,153 @@ function WYSIWYGEditorContent() {
         </main>
 
         {/* Footer */}
-        <footer className="bg-foreground py-16">
-          <div className="container mx-auto px-6">
-            <div className="grid md:grid-cols-4 gap-8 mb-12">
-              <div className="md:col-span-1">
-                <div className="flex items-center gap-2 mb-4">
-                  <Heart className="w-7 h-7 text-primary fill-current" />
-                  <span className="font-display text-2xl font-bold text-primary-foreground">{nav.brandName}</span>
+        <EditableSection sectionName="פוטר">
+          <footer className="bg-foreground py-16">
+            <div className="container mx-auto px-6">
+              <div className="grid md:grid-cols-4 gap-8 mb-12">
+                <div className="md:col-span-1">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Heart className="w-7 h-7 text-primary fill-current" />
+                    <InlineEditable
+                      value={nav.brandName}
+                      onChange={(v) => updateContent("nav", { brandName: v })}
+                      className="font-display text-2xl font-bold text-primary-foreground"
+                      as="span"
+                    />
+                  </div>
+                  <InlineEditable
+                    value={footer.brandDescription}
+                    onChange={(v) => updateContent("footer", { brandDescription: v })}
+                    className="text-primary-foreground/60 text-sm leading-relaxed block"
+                    as="p"
+                    multiline
+                  />
                 </div>
-                <p className="text-primary-foreground/60 text-sm leading-relaxed">
-                  {footer.brandDescription}
-                </p>
+                
+                {/* Quick Links */}
+                <div>
+                  <InlineEditable
+                    value={footer.quickLinksTitle}
+                    onChange={(v) => updateContent("footer", { quickLinksTitle: v })}
+                    className="font-semibold text-primary-foreground mb-4 block"
+                    as="h4"
+                  />
+                  <ul className="space-y-2 text-primary-foreground/60 text-sm">
+                    <li>
+                      <InlineEditable
+                        value={footer.quickLink1}
+                        onChange={(v) => updateContent("footer", { quickLink1: v })}
+                        as="span"
+                      />
+                    </li>
+                    <li>
+                      <InlineEditable
+                        value={footer.quickLink2}
+                        onChange={(v) => updateContent("footer", { quickLink2: v })}
+                        as="span"
+                      />
+                    </li>
+                    <li>
+                      <InlineEditable
+                        value={footer.quickLink3}
+                        onChange={(v) => updateContent("footer", { quickLink3: v })}
+                        as="span"
+                      />
+                    </li>
+                  </ul>
+                </div>
+                
+                {/* Account */}
+                <div>
+                  <InlineEditable
+                    value={footer.accountTitle}
+                    onChange={(v) => updateContent("footer", { accountTitle: v })}
+                    className="font-semibold text-primary-foreground mb-4 block"
+                    as="h4"
+                  />
+                  <ul className="space-y-2 text-primary-foreground/60 text-sm">
+                    <li>
+                      <InlineEditable
+                        value={footer.accountLink1}
+                        onChange={(v) => updateContent("footer", { accountLink1: v })}
+                        as="span"
+                      />
+                    </li>
+                    <li>
+                      <InlineEditable
+                        value={footer.accountLink2}
+                        onChange={(v) => updateContent("footer", { accountLink2: v })}
+                        as="span"
+                      />
+                    </li>
+                    <li>
+                      <InlineEditable
+                        value={footer.accountLink3}
+                        onChange={(v) => updateContent("footer", { accountLink3: v })}
+                        as="span"
+                      />
+                    </li>
+                  </ul>
+                </div>
+                
+                {/* Support */}
+                <div>
+                  <InlineEditable
+                    value={footer.supportTitle}
+                    onChange={(v) => updateContent("footer", { supportTitle: v })}
+                    className="font-semibold text-primary-foreground mb-4 block"
+                    as="h4"
+                  />
+                  <ul className="space-y-2 text-primary-foreground/60 text-sm">
+                    <li>
+                      <InlineEditable
+                        value={footer.supportLink1}
+                        onChange={(v) => updateContent("footer", { supportLink1: v })}
+                        as="span"
+                      />
+                    </li>
+                    <li>
+                      <InlineEditable
+                        value={footer.supportLink2}
+                        onChange={(v) => updateContent("footer", { supportLink2: v })}
+                        as="span"
+                      />
+                    </li>
+                    <li>
+                      <InlineEditable
+                        value={footer.supportLink3}
+                        onChange={(v) => updateContent("footer", { supportLink3: v })}
+                        as="span"
+                      />
+                    </li>
+                    <li>
+                      <InlineEditable
+                        value={footer.supportLink4}
+                        onChange={(v) => updateContent("footer", { supportLink4: v })}
+                        as="span"
+                      />
+                    </li>
+                  </ul>
+                </div>
               </div>
-            </div>
 
-            <div className="border-t border-primary-foreground/10 pt-8">
-              <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-primary-foreground/50">
-                <p>{footer.copyright.replace("{year}", new Date().getFullYear().toString())}</p>
-                <p>{footer.madeWith}</p>
+              <div className="border-t border-primary-foreground/10 pt-8">
+                <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-primary-foreground/50">
+                  <InlineEditable
+                    value={footer.copyright.replace("{year}", new Date().getFullYear().toString())}
+                    onChange={(v) => updateContent("footer", { copyright: v })}
+                    as="p"
+                  />
+                  <InlineEditable
+                    value={footer.madeWith}
+                    onChange={(v) => updateContent("footer", { madeWith: v })}
+                    as="p"
+                  />
+                </div>
               </div>
             </div>
-          </div>
-        </footer>
+          </footer>
+        </EditableSection>
       </div>
 
       {/* Floating Help Tooltip */}
