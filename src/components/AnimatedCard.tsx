@@ -22,16 +22,16 @@ const AnimatedCard = ({
 
   return (
     <motion.div
-      initial={shouldAnimate ? { opacity: 0, y: 40, scale: 0.95 } : { opacity: 1, y: 0, scale: 1 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      viewport={{ once: true, margin: "-50px" }}
+      initial={shouldAnimate ? { opacity: 0, y: 30 } : false}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "100px" }}
       transition={{ 
-        duration: 0.5, 
-        delay: index * 0.1,
-        ease: [0.25, 0.46, 0.45, 0.94]
+        duration: 0.4, 
+        delay: Math.min(index * 0.08, 0.3),
+        ease: "easeOut"
       }}
       whileHover={{ 
-        y: -8,
+        y: -6,
         transition: { duration: 0.2 },
       }}
       className={className}
