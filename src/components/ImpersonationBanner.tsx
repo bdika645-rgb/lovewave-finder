@@ -3,9 +3,23 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { useImpersonation } from '@/contexts/ImpersonationContext';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect } from 'react';
 
 export default function ImpersonationBanner() {
   const { isImpersonating, impersonatedProfile, stopImpersonation } = useImpersonation();
+
+  // Add/remove body padding when impersonation is active to prevent content overlap
+  useEffect(() => {
+    if (isImpersonating) {
+      document.body.style.paddingTop = '48px';
+    } else {
+      document.body.style.paddingTop = '0px';
+    }
+    
+    return () => {
+      document.body.style.paddingTop = '0px';
+    };
+  }, [isImpersonating]);
 
   return (
     <AnimatePresence>
