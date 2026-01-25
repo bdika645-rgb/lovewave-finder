@@ -14,12 +14,10 @@ import {
   Download,
   Upload,
   Search,
-  Eye,
-  EyeOff,
-  Sparkles,
   X,
   Check,
   Keyboard,
+  MousePointer2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -56,6 +54,7 @@ export default function EditorToolbar({
 }: EditorToolbarProps) {
   return (
     <TooltipProvider>
+      {/* Floating toolbar when in edit mode */}
       <div
         className={cn(
           "fixed bottom-4 left-1/2 -translate-x-1/2 z-50",
@@ -65,6 +64,14 @@ export default function EditorToolbar({
         )}
         dir="rtl"
       >
+        {/* Edit mode indicator */}
+        <div className="flex items-center gap-2 px-3 py-1.5 bg-primary/10 rounded-xl">
+          <MousePointer2 className="w-4 h-4 text-primary animate-pulse" />
+          <span className="text-sm font-medium text-primary">לחץ על טקסט לעריכה</span>
+        </div>
+
+        <div className="w-px h-6 bg-border" />
+
         {/* Search */}
         <div className="relative">
           <Search className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -72,7 +79,7 @@ export default function EditorToolbar({
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="חיפוש..."
-            className="w-40 pr-8 h-9 text-sm bg-muted/50"
+            className="w-32 pr-8 h-9 text-sm bg-muted/50"
             dir="rtl"
           />
         </div>
@@ -167,7 +174,7 @@ export default function EditorToolbar({
           {hasChanges && (
             <Badge variant="outline" className="text-xs gap-1 text-primary border-primary">
               <Check className="w-3 h-3" />
-              נשמר אוטומטית
+              נשמר
             </Badge>
           )}
         </div>
@@ -198,7 +205,7 @@ export default function EditorToolbar({
         </Tooltip>
       </div>
 
-      {/* Toggle Button */}
+      {/* Toggle Button - Always visible */}
       <Button
         onClick={onToggleEditMode}
         className={cn(
@@ -213,12 +220,12 @@ export default function EditorToolbar({
         {isEditMode ? (
           <>
             <X className="w-5 h-5" />
-            סגור עורך
+            סיים עריכה
           </>
         ) : (
           <>
-            <Sparkles className="w-5 h-5" />
-            עורך ויזואלי
+            <MousePointer2 className="w-5 h-5" />
+            ערוך תוכן
           </>
         )}
       </Button>

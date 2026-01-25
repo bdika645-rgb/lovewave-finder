@@ -6,7 +6,7 @@ import AnimatedSection from "@/components/AnimatedSection";
 import AnimatedCard from "@/components/AnimatedCard";
 import SkipToContent from "@/components/SkipToContent";
 import { SkeletonGrid } from "@/components/ui/skeleton-card";
-import { VisualEditor } from "@/components/VisualEditor";
+import { VisualEditor, InlineEditable, EditableSection } from "@/components/VisualEditor";
 import { useLandingContent } from "@/contexts/LandingContentContext";
 import FeaturedMembersFilter, { type FilterType, type SortType } from "@/components/FeaturedMembersFilter";
 
@@ -162,8 +162,20 @@ const Index = () => {
     return result.slice(0, 4);
   }, [displayProfiles, activeFilter, activeSort]);
   
-  const { content } = useLandingContent();
+  const { content, updateContent } = useLandingContent();
   const { features, featuredMembers, cta, footer, nav } = content;
+
+  const updateFeatures = (key: keyof typeof features, value: string) => {
+    updateContent("features", { [key]: value });
+  };
+
+  const updateFeaturedMembers = (key: keyof typeof featuredMembers, value: string) => {
+    updateContent("featuredMembers", { [key]: value });
+  };
+
+  const updateCta = (key: keyof typeof cta, value: string) => {
+    updateContent("cta", { [key]: value });
+  };
   
   return (
     <div className="min-h-screen" dir="rtl">
@@ -175,117 +187,153 @@ const Index = () => {
         <QuickSectionNav />
 
         {/* Features Section - enhanced with glass cards */}
-        <section id="features" className="py-28 md:py-36 bg-muted/20 relative overflow-hidden" aria-labelledby="features-title">
-          {/* Background decoration */}
-          <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-            <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-[120px]" />
-            <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-secondary/5 rounded-full blur-[100px]" />
-          </div>
-
-          <div className="container mx-auto px-6 relative z-10">
-            <AnimatedSection className="text-center mb-20">
-              <h2 id="features-title" className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 tracking-tight">
-                {features.title} <span className="text-gradient-shimmer">{features.titleHighlight}</span>?
-              </h2>
-              <p className="text-muted-foreground text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
-                {features.description}
-              </p>
-            </AnimatedSection>
-
-            <div className="grid md:grid-cols-3 gap-8 lg:gap-10">
-              {features.items.map((item, index) => {
-                const Icon = featureIcons[index] || Sparkles;
-                return (
-                  <AnimatedCard key={item.id} index={index}>
-                    <div className="glass-effect p-10 rounded-3xl text-center h-full border border-white/30 dark:border-white/10 hover:border-primary/30 transition-all duration-500 tilt-card bg-noise group">
-                      <div className="w-20 h-20 gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-xl group-hover:scale-110 transition-transform duration-500">
-                        <Icon className="w-10 h-10 text-primary-foreground" />
-                      </div>
-                      <h3 className="font-display text-2xl font-bold text-foreground mb-4 tracking-tight">
-                        {item.title}
-                      </h3>
-                      <p className="text-muted-foreground leading-relaxed text-lg">
-                        {item.description}
-                      </p>
-                    </div>
-                  </AnimatedCard>
-                );
-              })}
+        <EditableSection sectionName="פיצ'רים">
+          <section id="features" className="py-28 md:py-36 bg-muted/20 relative overflow-hidden" aria-labelledby="features-title">
+            {/* Background decoration */}
+            <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+              <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-[120px]" />
+              <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-secondary/5 rounded-full blur-[100px]" />
             </div>
-          </div>
-        </section>
+
+            <div className="container mx-auto px-6 relative z-10">
+              <AnimatedSection className="text-center mb-20">
+                <h2 id="features-title" className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 tracking-tight">
+                  <InlineEditable
+                    value={features.title}
+                    onChange={(v) => updateFeatures("title", v)}
+                    as="span"
+                  />{" "}
+                  <InlineEditable
+                    value={features.titleHighlight}
+                    onChange={(v) => updateFeatures("titleHighlight", v)}
+                    className="text-gradient-shimmer"
+                    as="span"
+                  />?
+                </h2>
+                <InlineEditable
+                  value={features.description}
+                  onChange={(v) => updateFeatures("description", v)}
+                  className="text-muted-foreground text-lg md:text-xl max-w-2xl mx-auto leading-relaxed block"
+                  as="p"
+                  multiline
+                />
+              </AnimatedSection>
+
+              <div className="grid md:grid-cols-3 gap-8 lg:gap-10">
+                {features.items.map((item, index) => {
+                  const Icon = featureIcons[index] || Sparkles;
+                  return (
+                    <AnimatedCard key={item.id} index={index}>
+                      <div className="glass-effect p-10 rounded-3xl text-center h-full border border-white/30 dark:border-white/10 hover:border-primary/30 transition-all duration-500 tilt-card bg-noise group">
+                        <div className="w-20 h-20 gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-xl group-hover:scale-110 transition-transform duration-500">
+                          <Icon className="w-10 h-10 text-primary-foreground" />
+                        </div>
+                        <h3 className="font-display text-2xl font-bold text-foreground mb-4 tracking-tight">
+                          {item.title}
+                        </h3>
+                        <p className="text-muted-foreground leading-relaxed text-lg">
+                          {item.description}
+                        </p>
+                      </div>
+                    </AnimatedCard>
+                  );
+                })}
+              </div>
+            </div>
+          </section>
+        </EditableSection>
 
         {/* Featured Members - Enhanced with glass styling */}
-        <section id="featured-members" className="py-28 md:py-36 relative overflow-hidden" aria-labelledby="featured-title">
-          {/* Background decoration */}
-          <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-            <div className="absolute top-1/4 right-0 w-72 h-72 bg-primary/5 rounded-full blur-[100px]" />
-            <div className="absolute bottom-1/4 left-0 w-64 h-64 bg-secondary/5 rounded-full blur-[80px]" />
-          </div>
+        <EditableSection sectionName="חברים מומלצים">
+          <section id="featured-members" className="py-28 md:py-36 relative overflow-hidden" aria-labelledby="featured-title">
+            {/* Background decoration */}
+            <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+              <div className="absolute top-1/4 right-0 w-72 h-72 bg-primary/5 rounded-full blur-[100px]" />
+              <div className="absolute bottom-1/4 left-0 w-64 h-64 bg-secondary/5 rounded-full blur-[80px]" />
+            </div>
 
-          <div className="container mx-auto px-6 relative z-10">
-            <AnimatedSection className="text-center mb-20">
-              <h2 id="featured-title" className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 tracking-tight">
-                {featuredMembers.title} <span className="text-gradient-shimmer">{featuredMembers.titleHighlight}</span>
-              </h2>
-              <p className="text-muted-foreground text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
-                {featuredMembers.description}
-              </p>
-            </AnimatedSection>
+            <div className="container mx-auto px-6 relative z-10">
+              <AnimatedSection className="text-center mb-20">
+                <h2 id="featured-title" className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 tracking-tight">
+                  <InlineEditable
+                    value={featuredMembers.title}
+                    onChange={(v) => updateFeaturedMembers("title", v)}
+                    as="span"
+                  />{" "}
+                  <InlineEditable
+                    value={featuredMembers.titleHighlight}
+                    onChange={(v) => updateFeaturedMembers("titleHighlight", v)}
+                    className="text-gradient-shimmer"
+                    as="span"
+                  />
+                </h2>
+                <InlineEditable
+                  value={featuredMembers.description}
+                  onChange={(v) => updateFeaturedMembers("description", v)}
+                  className="text-muted-foreground text-lg md:text-xl max-w-2xl mx-auto leading-relaxed block"
+                  as="p"
+                  multiline
+                />
+              </AnimatedSection>
 
-            {/* Smart Filter */}
-            <FeaturedMembersFilter
-              activeFilter={activeFilter}
-              activeSort={activeSort}
-              onFilterChange={setActiveFilter}
-              onSortChange={setActiveSort}
-            />
+              {/* Smart Filter */}
+              <FeaturedMembersFilter
+                activeFilter={activeFilter}
+                activeSort={activeSort}
+                onFilterChange={setActiveFilter}
+                onSortChange={setActiveSort}
+              />
 
-            {loading ? (
-              <SkeletonGrid count={4} />
-            ) : filteredProfiles.length > 0 ? (
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
-                {filteredProfiles.map((profile, index) => (
-                  <AnimatedCard key={profile.id} index={index}>
-                    <MemberCard 
-                      member={{
-                        id: profile.id,
-                        name: profile.name,
-                        age: profile.age,
-                        city: profile.city,
-                        bio: 'bio' in profile ? profile.bio || "" : (profile as any).bio,
-                        image: 'avatar_url' in profile ? profile.avatar_url || "/profiles/profile1.jpg" : (profile as any).image,
-                        interests: profile.interests || [],
-                        isOnline: 'is_online' in profile ? profile.is_online || false : (profile as any).isOnline,
-                      }}
+              {loading ? (
+                <SkeletonGrid count={4} />
+              ) : filteredProfiles.length > 0 ? (
+                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+                  {filteredProfiles.map((profile, index) => (
+                    <AnimatedCard key={profile.id} index={index}>
+                      <MemberCard 
+                        member={{
+                          id: profile.id,
+                          name: profile.name,
+                          age: profile.age,
+                          city: profile.city,
+                          bio: 'bio' in profile ? profile.bio || "" : (profile as any).bio,
+                          image: 'avatar_url' in profile ? profile.avatar_url || "/profiles/profile1.jpg" : (profile as any).image,
+                          interests: profile.interests || [],
+                          isOnline: 'is_online' in profile ? profile.is_online || false : (profile as any).isOnline,
+                        }}
+                      />
+                    </AnimatedCard>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <Users className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
+                  <p className="text-muted-foreground">לא נמצאו פרופילים בסינון זה</p>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="mt-4"
+                    onClick={() => setActiveFilter("all")}
+                  >
+                    הצג הכל
+                  </Button>
+                </div>
+              )}
+
+              <AnimatedSection delay={0.3} className="text-center mt-16">
+                <Link to="/members">
+                  <Button variant="hero" size="lg" className="btn-lift shadow-xl">
+                    <InlineEditable
+                      value={featuredMembers.ctaButton}
+                      onChange={(v) => updateFeaturedMembers("ctaButton", v)}
+                      as="span"
                     />
-                  </AnimatedCard>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-12">
-                <Users className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
-                <p className="text-muted-foreground">לא נמצאו פרופילים בסינון זה</p>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="mt-4"
-                  onClick={() => setActiveFilter("all")}
-                >
-                  הצג הכל
-                </Button>
-              </div>
-            )}
-
-            <AnimatedSection delay={0.3} className="text-center mt-16">
-              <Link to="/members">
-                <Button variant="hero" size="lg" className="btn-lift shadow-xl">
-                  {featuredMembers.ctaButton}
-                </Button>
-              </Link>
-            </AnimatedSection>
-          </div>
-        </section>
+                  </Button>
+                </Link>
+              </AnimatedSection>
+            </div>
+          </section>
+        </EditableSection>
 
         {/* Lazy loaded sections */}
         <Suspense fallback={<SectionLoader />}>
@@ -305,34 +353,49 @@ const Index = () => {
         </Suspense>
 
         {/* CTA Section - enhanced with glass overlay */}
-        <section className="py-32 md:py-40 gradient-primary overflow-hidden relative" aria-labelledby="cta-title">
-          {/* Decorative glass panels */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-            <div className="absolute -top-20 -left-20 w-80 h-80 bg-white/10 rounded-full blur-3xl" />
-            <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-white/5 rounded-full blur-[150px]" />
-          </div>
-
-          <AnimatedSection className="container mx-auto px-6 text-center relative z-10">
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm mb-10 shadow-xl">
-              <Heart className="w-10 h-10 text-primary-foreground animate-pulse-soft" aria-hidden="true" />
+        <EditableSection sectionName="קריאה לפעולה">
+          <section className="py-32 md:py-40 gradient-primary overflow-hidden relative" aria-labelledby="cta-title">
+            {/* Decorative glass panels */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+              <div className="absolute -top-20 -left-20 w-80 h-80 bg-white/10 rounded-full blur-3xl" />
+              <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-white/5 rounded-full blur-[150px]" />
             </div>
-            <h2 id="cta-title" className="font-display text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-primary-foreground mb-8 tracking-tight drop-shadow-lg">
-              {cta.title}
-            </h2>
-            <p className="text-primary-foreground/90 text-lg md:text-xl lg:text-2xl max-w-3xl mx-auto mb-14 leading-relaxed font-medium">
-              {cta.description}
-            </p>
-            <Link to="/register">
-              <Button 
-                size="xl" 
-                className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 font-bold shadow-2xl hover:shadow-3xl transition-all btn-lift text-lg px-10"
-              >
-                {cta.button}
-              </Button>
-            </Link>
-          </AnimatedSection>
-        </section>
+
+            <AnimatedSection className="container mx-auto px-6 text-center relative z-10">
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm mb-10 shadow-xl">
+                <Heart className="w-10 h-10 text-primary-foreground animate-pulse-soft" aria-hidden="true" />
+              </div>
+              <h2 id="cta-title" className="font-display text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-primary-foreground mb-8 tracking-tight drop-shadow-lg">
+                <InlineEditable
+                  value={cta.title}
+                  onChange={(v) => updateCta("title", v)}
+                  className="text-primary-foreground"
+                  as="span"
+                />
+              </h2>
+              <InlineEditable
+                value={cta.description}
+                onChange={(v) => updateCta("description", v)}
+                className="text-primary-foreground/90 text-lg md:text-xl lg:text-2xl max-w-3xl mx-auto mb-14 leading-relaxed font-medium block"
+                as="p"
+                multiline
+              />
+              <Link to="/register">
+                <Button 
+                  size="xl" 
+                  className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 font-bold shadow-2xl hover:shadow-3xl transition-all btn-lift text-lg px-10"
+                >
+                  <InlineEditable
+                    value={cta.button}
+                    onChange={(v) => updateCta("button", v)}
+                    as="span"
+                  />
+                </Button>
+              </Link>
+            </AnimatedSection>
+          </section>
+        </EditableSection>
       </main>
 
       {/* Footer */}
