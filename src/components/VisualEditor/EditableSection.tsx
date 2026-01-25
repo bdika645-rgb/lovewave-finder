@@ -1,7 +1,8 @@
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { cn } from "@/lib/utils";
 import { useLandingContent } from "@/contexts/LandingContentContext";
-import { Settings } from "lucide-react";
+import { Settings, GripVertical } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface EditableSectionProps {
   children: ReactNode;
@@ -20,6 +21,7 @@ export default function EditableSection({
   onOpenSettings,
 }: EditableSectionProps) {
   const { isEditMode } = useLandingContent();
+  const [isHovered, setIsHovered] = useState(false);
 
   if (!isEditMode) {
     return <>{children}</>;
@@ -28,29 +30,53 @@ export default function EditableSection({
   return (
     <div
       className={cn(
-        "relative group/section",
-        "outline-2 outline-dashed outline-transparent",
-        "hover:outline-primary/30 transition-all duration-300",
+        "relative",
         className
       )}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Section label */}
-      <div 
-        className="absolute -top-3 right-4 z-20 opacity-0 group-hover/section:opacity-100 transition-all duration-200 flex items-center gap-2"
-      >
-        <span className="bg-primary text-primary-foreground text-xs font-medium px-3 py-1 rounded-full shadow-lg">
-          {sectionName}
-        </span>
-        {onOpenSettings && (
-          <button
-            onClick={onOpenSettings}
-            className="bg-muted hover:bg-muted/80 text-foreground p-1.5 rounded-full shadow-lg transition-colors"
-            aria-label={`הגדרות ${sectionName}`}
+      {/* Section highlight border */}
+      <AnimatePresence>
+        {isHovered && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="absolute inset-0 pointer-events-none z-10"
           >
-            <Settings className="w-3.5 h-3.5" />
-          </button>
+            <div className="absolute inset-0 border-2 border-dashed border-primary/40 rounded-lg" />
+          </motion.div>
         )}
-      </div>
+      </AnimatePresence>
+      
+      {/* Section label badge */}
+      <AnimatePresence>
+        {isHovered && (
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            transition={{ duration: 0.2 }}
+            className="absolute top-2 right-2 z-20 flex items-center gap-1.5"
+          >
+            <div className="flex items-center gap-1.5 bg-primary text-primary-foreground text-xs font-bold px-3 py-1.5 rounded-full shadow-xl">
+              <GripVertical className="w-3 h-3 opacity-60" />
+              {sectionName}
+            </div>
+            {onOpenSettings && (
+              <button
+                onClick={onOpenSettings}
+                className="bg-card hover:bg-muted text-foreground p-2 rounded-full shadow-xl transition-colors border border-border"
+                aria-label={`הגדרות ${sectionName}`}
+              >
+                <Settings className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
       
       {children}
     </div>

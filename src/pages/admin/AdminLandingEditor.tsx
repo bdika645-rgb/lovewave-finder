@@ -1,4 +1,4 @@
-import { useEffect, lazy, Suspense } from "react";
+import { useEffect, lazy, Suspense, useState } from "react";
 import { useLandingContent } from "@/contexts/LandingContentContext";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -90,9 +90,16 @@ const featureIcons = [Sparkles, Shield, Users];
 
 // The actual WYSIWYG editor content
 function WYSIWYGEditorContent() {
-  const { content, updateContent, resetContent } = useLandingContent();
-  const { isEditMode, setIsEditMode } = useLandingContent();
+  const { content, updateContent, resetContent, isEditMode, setIsEditMode } = useLandingContent();
   const { features, featuredMembers, cta, footer, nav } = content;
+  const [showHelp, setShowHelp] = useState(() => {
+    return localStorage.getItem("editor_help_dismissed") !== "true";
+  });
+
+  const dismissHelp = () => {
+    setShowHelp(false);
+    localStorage.setItem("editor_help_dismissed", "true");
+  };
 
   // Editor actions hook for undo/redo and import/export
   const {
@@ -487,21 +494,36 @@ function WYSIWYGEditorContent() {
       </div>
 
       {/* Floating Help Tooltip */}
-      <div className="fixed bottom-6 left-6 z-50">
-        <div className="bg-card border border-border rounded-xl shadow-2xl p-4 max-w-xs animate-fade-in">
-          <div className="flex items-start gap-3">
-            <div className="p-2 rounded-lg bg-primary/10 shrink-0">
-              <Pencil className="w-4 h-4 text-primary" />
-            </div>
-            <div>
-              <h4 className="font-medium text-sm mb-1">עורך WYSIWYG</h4>
-              <p className="text-xs text-muted-foreground">
-                לחץ על כל טקסט באתר כדי לערוך אותו ישירות. השינויים נשמרים אוטומטית.
-              </p>
+      {showHelp && (
+        <div className="fixed bottom-6 left-6 z-50 animate-fade-in">
+          <div className="bg-card border border-border rounded-2xl shadow-2xl p-4 max-w-xs relative">
+            <button
+              onClick={dismissHelp}
+              className="absolute top-2 left-2 p-1 hover:bg-muted rounded-full transition-colors"
+              aria-label="סגור טיפ"
+            >
+              <X className="w-3.5 h-3.5 text-muted-foreground" />
+            </button>
+            <div className="flex items-start gap-3">
+              <div className="p-2.5 rounded-xl bg-primary/10 shrink-0">
+                <Pencil className="w-4 h-4 text-primary" />
+              </div>
+              <div className="pl-4">
+                <h4 className="font-bold text-sm mb-1">עורך ויזואלי WYSIWYG</h4>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  לחץ על כל טקסט באתר כדי לערוך אותו ישירות. השינויים נשמרים אוטומטית.
+                </p>
+                <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
+                  <kbd className="px-1.5 py-0.5 bg-muted rounded font-mono text-[10px]">Ctrl+Z</kbd>
+                  <span>ביטול</span>
+                  <kbd className="px-1.5 py-0.5 bg-muted rounded font-mono text-[10px]">Esc</kbd>
+                  <span>בטל עריכה</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
