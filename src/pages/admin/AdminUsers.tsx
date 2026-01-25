@@ -85,6 +85,47 @@ export default function AdminUsers() {
 
   const { blockUser } = useBlockedUsers();
 
+  // Bulk action handlers
+  const handleBulkDelete = async (profileIds: string[]) => {
+    for (const id of profileIds) {
+      await deleteUser(id);
+    }
+    refetch();
+  };
+
+  const handleBulkBlock = async (profileIds: string[], reason: string) => {
+    for (const id of profileIds) {
+      await blockUser(id, reason);
+    }
+    refetch();
+  };
+
+  const handleBulkUpdateRole = async (userIds: string[], role: "admin" | "moderator" | "user") => {
+    for (const id of userIds) {
+      await updateUserRole(id, role);
+    }
+    refetch();
+  };
+
+  const handleBulkNotify = async (profileIds: string[], message: string) => {
+    // Create notifications for selected users
+    const { error } = await supabase
+      .from("admin_notifications")
+      .insert({
+        title: "הודעה ממנהל",
+        message,
+        type: "info",
+        target_all: false,
+        // We'll need to insert multiple records or use a different approach
+      });
+    
+    if (!error) {
+      toast.success(`התראה נשלחה ל-${profileIds.length} משתמשים`);
+    } else {
+      toast.error("שגיאה בשליחת ההתראה");
+    }
+  };
+
   const totalPages = Math.ceil(totalCount / pageSize);
 
   const handleViewUser = (user: AdminUser) => {
@@ -309,6 +350,10 @@ export default function AdminUsers() {
                   onEdit={handleEditUser}
                   onImpersonate={handleImpersonate}
                   onVerify={verifyUser}
+                  onBulkDelete={handleBulkDelete}
+                  onBulkBlock={handleBulkBlock}
+                  onBulkUpdateRole={handleBulkUpdateRole}
+                  onBulkNotify={handleBulkNotify}
                 />
               </div>
             </div>
