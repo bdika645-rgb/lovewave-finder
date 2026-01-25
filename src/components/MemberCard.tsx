@@ -15,7 +15,7 @@ interface MemberCardProps {
 const MemberCard = memo(({ member, onLike, onPass }: MemberCardProps) => {
   return (
     <article 
-      className="group relative glass-effect rounded-3xl overflow-hidden border border-white/30 dark:border-white/10 hover:border-primary/30 transition-all duration-500 tilt-card"
+      className="group relative bg-card rounded-3xl overflow-hidden border border-border shadow-lg hover:shadow-xl transition-all duration-300"
       aria-label={`פרופיל של ${member.name}`}
     >
       {/* Image */}
@@ -29,6 +29,7 @@ const MemberCard = memo(({ member, onLike, onPass }: MemberCardProps) => {
             alt={`תמונת פרופיל של ${member.name}`}
             className="w-full h-full transition-transform duration-500 group-hover:scale-105"
             aspectRatio="portrait"
+            priority
           />
           {/* Enhanced gradient overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
