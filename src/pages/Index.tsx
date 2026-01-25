@@ -126,11 +126,11 @@ const Index = () => {
 
         <QuickSectionNav />
 
-        {/* Features Section */}
-        <section id="features" className="py-24 bg-muted/30" aria-labelledby="features-title">
+        {/* Features Section - enhanced spacing */}
+        <section id="features" className="py-28 md:py-32 bg-muted/30" aria-labelledby="features-title">
           <div className="container mx-auto px-6">
             <AnimatedSection className="text-center mb-16">
-              <h2 id="features-title" className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
+              <h2 id="features-title" className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4 text-shadow-premium tracking-tight">
                 {features.title} <span className="text-gradient">{features.titleHighlight}</span>?
               </h2>
               <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
@@ -143,14 +143,14 @@ const Index = () => {
                 const Icon = featureIcons[index] || Sparkles;
                 return (
                   <AnimatedCard key={item.id} index={index}>
-                    <div className="bg-card p-8 rounded-3xl shadow-card text-center h-full">
-                      <div className="w-16 h-16 gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-6">
+                    <div className="bg-card p-8 rounded-3xl shadow-card card-glow text-center h-full border border-border">
+                      <div className="w-16 h-16 gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-6 icon-pulse shadow-lg">
                         <Icon className="w-8 h-8 text-primary-foreground" />
                       </div>
-                      <h3 className="font-display text-xl font-bold text-foreground mb-3">
+                      <h3 className="font-display text-xl font-bold text-foreground mb-3 tracking-tight">
                         {item.title}
                       </h3>
-                      <p className="text-muted-foreground">
+                      <p className="text-muted-foreground leading-relaxed">
                         {item.description}
                       </p>
                     </div>
@@ -176,7 +176,7 @@ const Index = () => {
             {loading ? (
               <SkeletonGrid count={4} />
             ) : (
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
                 {displayProfiles.map((profile, index) => (
                   <AnimatedCard key={profile.id} index={index}>
                     <MemberCard 
@@ -223,20 +223,20 @@ const Index = () => {
           <FAQSection />
         </Suspense>
 
-        {/* CTA Section */}
-        <section className="py-24 gradient-primary overflow-hidden" aria-labelledby="cta-title">
+        {/* CTA Section - enhanced spacing and typography */}
+        <section className="py-28 md:py-36 gradient-primary overflow-hidden" aria-labelledby="cta-title">
           <AnimatedSection className="container mx-auto px-6 text-center">
-            <Heart className="w-16 h-16 text-primary-foreground mx-auto mb-6 animate-pulse-soft" aria-hidden="true" />
-            <h2 id="cta-title" className="font-display text-4xl md:text-5xl font-bold text-primary-foreground mb-6">
+            <Heart className="w-16 h-16 text-primary-foreground mx-auto mb-8 animate-pulse-soft drop-shadow-lg" aria-hidden="true" />
+            <h2 id="cta-title" className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-primary-foreground mb-6 tracking-tight drop-shadow-md">
               {cta.title}
             </h2>
-            <p className="text-primary-foreground/80 text-lg max-w-2xl mx-auto mb-10">
+            <p className="text-primary-foreground/90 text-lg md:text-xl max-w-2xl mx-auto mb-12 leading-relaxed">
               {cta.description}
             </p>
             <Link to="/register">
               <Button 
                 size="xl" 
-                className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 font-semibold"
+                className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 font-semibold shadow-xl hover:shadow-2xl transition-all"
               >
                 {cta.button}
               </Button>
