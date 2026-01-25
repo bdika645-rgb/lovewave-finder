@@ -22,6 +22,7 @@ import {
   Sparkles,
   ChevronDown,
   MousePointer2,
+  Mail,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
@@ -79,6 +80,12 @@ const menuGroups = [
       { icon: MousePointer2, label: "עורך דף נחיתה", path: "/admin/landing-editor" },
       { icon: Lightbulb, label: "טיפים", path: "/admin/tips" },
       { icon: Bell, label: "התראות", path: "/admin/notifications" },
+    ],
+  },
+  {
+    title: "שיווק",
+    items: [
+      { icon: Mail, label: "קמפיינים וניוזלטר", path: "/admin/campaigns" },
     ],
   },
   {
