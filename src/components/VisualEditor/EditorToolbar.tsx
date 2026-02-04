@@ -6,6 +6,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 import {
   Undo2,
   Redo2,
@@ -79,17 +80,24 @@ export default function EditorToolbar({
                   <span className="font-medium text-sm text-primary">עריכה חיה</span>
                 </div>
 
-                {hasChanges && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  key={hasChanges ? "has-changes" : "no-changes"}
+                >
+                  <Badge 
+                    variant={hasChanges ? "default" : "secondary"}
+                    className={cn(
+                      "gap-1.5 transition-colors",
+                      hasChanges 
+                        ? "border-primary/20 bg-primary/10 text-primary" 
+                        : "border-muted bg-muted/50 text-muted-foreground"
+                    )}
                   >
-                    <Badge variant="secondary" className="gap-1 border-primary/20 bg-primary/10 text-primary">
-                      <Check className="w-3 h-3" />
-                      נשמר אוטומטית
-                    </Badge>
-                  </motion.div>
-                )}
+                    <Check className={cn("w-3 h-3", hasChanges && "animate-pulse")} />
+                    {hasChanges ? "נשמר אוטומטית ✓" : "אין שינויים"}
+                  </Badge>
+                </motion.div>
               </div>
 
               {/* Center - Edit Mode Hint */}
