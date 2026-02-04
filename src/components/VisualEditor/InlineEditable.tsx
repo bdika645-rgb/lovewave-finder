@@ -127,13 +127,13 @@ export default function InlineEditable({
           "relative transition-all duration-200 outline-none inline",
           isEditMode && !isEditing && [
             "cursor-pointer",
-            "hover:bg-primary/10 rounded-md px-0.5 -mx-0.5",
-            "border-b-2 border-dashed border-transparent hover:border-primary/40",
+            "hover:bg-primary/10 rounded-md px-1 -mx-1 py-0.5",
+            "border-b-2 border-dashed border-primary/20 hover:border-primary/50",
           ],
           isEditing && [
             "ring-2 ring-primary ring-offset-2 ring-offset-background",
-            "bg-background text-foreground rounded-md px-2 py-0.5",
-            "min-w-[60px] shadow-lg",
+            "bg-background text-foreground rounded-md px-2 py-1",
+            "min-w-[80px] shadow-xl",
           ],
           !value && "text-muted-foreground/50 italic"
         )}
@@ -149,11 +149,11 @@ export default function InlineEditable({
       <AnimatePresence>
         {isEditMode && !isEditing && isHovered && (
           <motion.span 
-            initial={{ opacity: 0, scale: 0.5, y: 5 }}
+            initial={{ opacity: 0, scale: 0.8, y: 8 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.5, y: 5 }}
-            transition={{ duration: 0.15 }}
-            className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground px-2 py-1 rounded-md shadow-lg text-xs font-medium whitespace-nowrap z-20 pointer-events-none flex items-center gap-1"
+            exit={{ opacity: 0, scale: 0.8, y: 8 }}
+            transition={{ duration: 0.2, type: "spring", stiffness: 400 }}
+            className="absolute -top-7 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground px-2.5 py-1 rounded-lg shadow-xl text-xs font-bold whitespace-nowrap z-20 pointer-events-none flex items-center gap-1.5"
           >
             <Pencil className="w-3 h-3" />
             לחץ לעריכה
