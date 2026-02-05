@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -30,6 +31,16 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
+} as const;
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+} as const;
 
 type AppRole = "admin" | "moderator" | "user";
 
@@ -195,7 +206,7 @@ export default function AdminRoles() {
       case "admin":
         return <Badge className="bg-destructive hover:bg-destructive/90 text-destructive-foreground">מנהל</Badge>;
       case "moderator":
-        return <Badge className="bg-amber-500 hover:bg-amber-500/90 text-white">מנחה</Badge>;
+        return <Badge className="bg-warning hover:bg-warning/90 text-warning-foreground">מנחה</Badge>;
       default:
         return <Badge variant="outline" className="text-muted-foreground">משתמש</Badge>;
     }
@@ -218,8 +229,13 @@ export default function AdminRoles() {
 
   return (
     <AdminLayout>
-      <div className="space-y-6 sm:space-y-8">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <motion.div 
+        className="space-y-6 sm:space-y-8"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        <motion.div variants={itemVariants} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-foreground">תפקידים והרשאות</h1>
             <p className="text-muted-foreground mt-1 text-sm sm:text-base">ניהול תפקידי משתמשים במערכת</p>
@@ -286,7 +302,7 @@ export default function AdminRoles() {
               </div>
             </DialogContent>
           </Dialog>
-        </div>
+        </motion.div>
 
         {/* Role Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6">
@@ -383,7 +399,7 @@ export default function AdminRoles() {
           </Table>
           </div>
         </div>
-      </div>
+      </motion.div>
     </AdminLayout>
   );
 }
