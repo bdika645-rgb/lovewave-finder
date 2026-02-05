@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import SwipeCard from "@/components/SwipeCard";
 import ReportDialog from "@/components/ReportDialog";
@@ -23,6 +24,23 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+
+// Animation variants for card entrance
+const cardEntranceVariants = {
+  hidden: { opacity: 0, scale: 0.8, y: 50 },
+  visible: { 
+    opacity: 1, 
+    scale: 1, 
+    y: 0,
+    transition: { type: "spring" as const, stiffness: 300, damping: 25 }
+  },
+  exit: { 
+    opacity: 0, 
+    scale: 0.8, 
+    y: -50,
+    transition: { duration: 0.2 }
+  }
+};
 
 const Discover = () => {
   const { user } = useAuth();
@@ -552,39 +570,54 @@ const Discover = () => {
           <div className="relative">
             {/* Stack effect - show next cards behind */}
             {availableProfiles.slice(currentIndex + 1, currentIndex + 3).map((profile, idx) => (
-              <div
+              <motion.div
                 key={profile.id}
                 className="absolute inset-0 rounded-3xl bg-card shadow-card"
-                style={{
-                  transform: `scale(${1 - (idx + 1) * 0.05}) translateY(${(idx + 1) * 10}px)`,
-                  zIndex: -idx - 1,
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ 
                   opacity: 1 - (idx + 1) * 0.3,
+                  scale: 1 - (idx + 1) * 0.05,
+                  y: (idx + 1) * 10 
                 }}
+                style={{
+                  zIndex: -idx - 1,
+                }}
+                transition={{ duration: 0.3 }}
               />
             ))}
 
-            {currentProfile && (
-              <SwipeCard
-                member={{
-                  id: currentProfile.id,
-                  name: currentProfile.name,
-                  age: currentProfile.age,
-                  city: currentProfile.city,
-                  bio: "",
-                  image: currentProfile.avatar_url || "/profiles/profile1.jpg",
-                  interests: currentProfile.interests || [],
-                  isOnline: currentProfile.is_online || false,
-                  isVerified: false,
-                }}
-                images={currentProfilePhotos}
-                onLike={handleLike}
-                onPass={handlePass}
-                onSuperLike={handleSuperLike}
-                onUndo={handleUndo}
-                onReport={() => setReportDialogOpen(true)}
-                canUndo={canUndo}
-              />
-            )}
+            <AnimatePresence mode="wait">
+              {currentProfile && (
+                <motion.div
+                  key={currentProfile.id}
+                  variants={cardEntranceVariants}
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                >
+                  <SwipeCard
+                    member={{
+                      id: currentProfile.id,
+                      name: currentProfile.name,
+                      age: currentProfile.age,
+                      city: currentProfile.city,
+                      bio: "",
+                      image: currentProfile.avatar_url || "/profiles/profile1.jpg",
+                      interests: currentProfile.interests || [],
+                      isOnline: currentProfile.is_online || false,
+                      isVerified: false,
+                    }}
+                    images={currentProfilePhotos}
+                    onLike={handleLike}
+                    onPass={handlePass}
+                    onSuperLike={handleSuperLike}
+                    onUndo={handleUndo}
+                    onReport={() => setReportDialogOpen(true)}
+                    canUndo={canUndo}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
 
