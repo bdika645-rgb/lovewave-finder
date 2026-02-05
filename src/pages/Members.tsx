@@ -1,10 +1,11 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import Navbar from "@/components/Navbar";
 import MemberCard from "@/components/MemberCard";
 import SEOHead from "@/components/SEOHead";
 import LazyImage from "@/components/LazyImage";
 import EmptyState from "@/components/EmptyState";
 import { SkeletonGrid } from "@/components/ui/skeleton-card";
+import PullToRefresh from "@/components/PullToRefresh";
 import { useProfiles } from "@/hooks/useProfiles";
 import { useLikes } from "@/hooks/useLikes";
 import { useAuth } from "@/hooks/useAuth";
@@ -35,13 +36,19 @@ const Members = () => {
   const [activeFilters, setActiveFilters] = useState<{ageFrom?: number; ageTo?: number; city?: string}>({});
 
   // Show all profiles - don't filter by gender
-  const { profiles, loading, error } = useProfiles({
+  const { profiles, loading, error, refetch } = useProfiles({
     search: searchQuery || undefined,
     ageFrom: activeFilters.ageFrom,
     ageTo: activeFilters.ageTo,
     city: activeFilters.city,
     filterByOppositeGender: false,
   });
+
+  // Pull-to-refresh handler
+  const handleRefresh = useCallback(async () => {
+    await refetch();
+    toast.success("הפרופילים עודכנו!");
+  }, [refetch]);
 
   // Pagination
   const pagination = usePagination({
@@ -198,15 +205,16 @@ const Members = () => {
   }
 
   return (
-    <div className="min-h-screen bg-muted/20" dir="rtl">
-      <SEOHead 
-        title="גלו פרופילים"
-        description="דפדפו בפרופילים של משתמשים ומצאו את ההתאמה המושלמת שלכם. אלפי פרופילים מאומתים מחכים לכם."
-        keywords="חיפוש פרופילים, היכרויות, דייטינג, פרופילים"
-      />
-      <Navbar />
-      
-      <main className="container mx-auto px-6 pt-28 pb-16">
+    <PullToRefresh onRefresh={handleRefresh} className="min-h-screen bg-muted/20" disabled={loading}>
+      <div dir="rtl">
+        <SEOHead 
+          title="גלו פרופילים"
+          description="דפדפו בפרופילים של משתמשים ומצאו את ההתאמה המושלמת שלכם. אלפי פרופילים מאומתים מחכים לכם."
+          keywords="חיפוש פרופילים, היכרויות, דייטינג, פרופילים"
+        />
+        <Navbar />
+        
+        <main className="container mx-auto px-6 pt-28 pb-16">
         {/* Header */}
         <header className="text-center mb-12">
           <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
@@ -491,7 +499,8 @@ const Members = () => {
           </>
         )}
       </main>
-    </div>
+      </div>
+    </PullToRefresh>
   );
 };
 
