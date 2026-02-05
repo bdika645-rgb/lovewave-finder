@@ -68,13 +68,13 @@ const Navbar = () => {
             </span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-6 lg:gap-8">
+          {/* Desktop Navigation - Simplified & Focused */}
+          <div className="hidden md:flex items-center gap-4 lg:gap-6">
             <Link 
               to="/discover" 
-              className={`font-body font-medium transition-colors hover:text-primary flex items-center gap-1 ${
-                isHome && !isScrolled ? "text-primary-foreground/80 hover:text-primary-foreground" : "text-muted-foreground"
-              } ${location.pathname === '/discover' ? 'text-primary' : ''}`}
+              className={`font-body font-medium transition-all hover:text-primary flex items-center gap-1.5 px-3 py-2 rounded-lg ${
+                isHome && !isScrolled ? "text-primary-foreground/90 hover:text-primary-foreground hover:bg-white/10" : "text-muted-foreground hover:bg-accent"
+              } ${location.pathname === '/discover' ? 'text-primary bg-primary/10' : ''}`}
               aria-current={location.pathname === "/discover" ? "page" : undefined}
             >
               <Sparkles className="w-4 h-4" />
@@ -82,9 +82,9 @@ const Navbar = () => {
             </Link>
             <Link 
               to="/members" 
-              className={`font-body font-medium transition-colors hover:text-primary flex items-center gap-1 ${
-                isHome && !isScrolled ? "text-primary-foreground/80 hover:text-primary-foreground" : "text-muted-foreground"
-              } ${location.pathname === '/members' ? 'text-primary' : ''}`}
+              className={`font-body font-medium transition-all hover:text-primary flex items-center gap-1.5 px-3 py-2 rounded-lg ${
+                isHome && !isScrolled ? "text-primary-foreground/90 hover:text-primary-foreground hover:bg-white/10" : "text-muted-foreground hover:bg-accent"
+              } ${location.pathname === '/members' ? 'text-primary bg-primary/10' : ''}`}
               aria-current={location.pathname === "/members" ? "page" : undefined}
             >
               <Search className="w-4 h-4" />
@@ -92,9 +92,9 @@ const Navbar = () => {
             </Link>
             <Link 
               to="/matches" 
-              className={`font-body font-medium transition-colors hover:text-primary flex items-center gap-1 ${
-                isHome && !isScrolled ? "text-primary-foreground/80 hover:text-primary-foreground" : "text-muted-foreground"
-              } ${location.pathname === '/matches' ? 'text-primary' : ''}`}
+              className={`font-body font-medium transition-all hover:text-primary flex items-center gap-1.5 px-3 py-2 rounded-lg ${
+                isHome && !isScrolled ? "text-primary-foreground/90 hover:text-primary-foreground hover:bg-white/10" : "text-muted-foreground hover:bg-accent"
+              } ${location.pathname === '/matches' ? 'text-primary bg-primary/10' : ''}`}
               aria-current={location.pathname === "/matches" ? "page" : undefined}
             >
               <Heart className="w-4 h-4" />
@@ -102,9 +102,9 @@ const Navbar = () => {
             </Link>
             <Link 
               to="/messages" 
-              className={`font-body font-medium transition-colors hover:text-primary flex items-center gap-1 relative ${
-                isHome && !isScrolled ? "text-primary-foreground/80 hover:text-primary-foreground" : "text-muted-foreground"
-              } ${location.pathname === '/messages' ? 'text-primary' : ''}`}
+              className={`font-body font-medium transition-all hover:text-primary flex items-center gap-1.5 px-3 py-2 rounded-lg relative ${
+                isHome && !isScrolled ? "text-primary-foreground/90 hover:text-primary-foreground hover:bg-white/10" : "text-muted-foreground hover:bg-accent"
+              } ${location.pathname === '/messages' ? 'text-primary bg-primary/10' : ''}`}
               aria-current={location.pathname === "/messages" ? "page" : undefined}
             >
               <MessageCircle className="w-4 h-4" />
@@ -112,31 +112,11 @@ const Navbar = () => {
               {unreadCount > 0 && (
                 <Badge 
                   variant="destructive" 
-                  className="absolute -top-2 -right-2 h-5 min-w-5 px-1 flex items-center justify-center text-xs"
+                  className="absolute -top-1 -right-1 h-5 min-w-5 px-1 flex items-center justify-center text-xs animate-pulse"
                 >
                   {unreadCount > 99 ? "99+" : unreadCount}
                 </Badge>
               )}
-            </Link>
-            <Link 
-              to="/who-viewed-me" 
-              className={`font-body font-medium transition-colors hover:text-primary flex items-center gap-1 ${
-                isHome && !isScrolled ? "text-primary-foreground/80 hover:text-primary-foreground" : "text-muted-foreground"
-              } ${location.pathname === '/who-viewed-me' ? 'text-primary' : ''}`}
-              aria-current={location.pathname === "/who-viewed-me" ? "page" : undefined}
-            >
-              <Eye className="w-4 h-4" />
-              צפו בי
-            </Link>
-            <Link 
-              to="/who-liked-me" 
-              className={`font-body font-medium transition-colors hover:text-primary flex items-center gap-1 ${
-                isHome && !isScrolled ? "text-primary-foreground/80 hover:text-primary-foreground" : "text-muted-foreground"
-              } ${location.pathname === '/who-liked-me' ? 'text-primary' : ''}`}
-              aria-current={location.pathname === "/who-liked-me" ? "page" : undefined}
-            >
-              <Heart className="w-4 h-4 fill-current" />
-              לייקים
             </Link>
           </div>
 

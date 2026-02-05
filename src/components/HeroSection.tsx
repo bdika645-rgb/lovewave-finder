@@ -97,14 +97,14 @@ const HeroSection = () => {
             </div>
           </div>
 
-          {/* Stats Cards */}
-          <div className="mt-20 sm:mt-28 grid grid-cols-3 gap-3 sm:gap-6 max-w-4xl mx-auto animate-slide-up">
+          {/* Stats Cards - Enhanced for mobile */}
+          <div className="mt-16 sm:mt-24 grid grid-cols-3 gap-2 sm:gap-6 max-w-4xl mx-auto animate-slide-up">
             {/* Stat Card 1 */}
-            <div className="bg-card rounded-2xl p-4 sm:p-8 border border-border shadow-lg hover:shadow-xl transition-all duration-300 group">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl gradient-primary flex items-center justify-center mx-auto mb-3 sm:mb-5 shadow-md group-hover:scale-105 transition-transform duration-300">
-                <Users className="w-6 h-6 sm:w-8 sm:h-8 text-primary-foreground" />
+            <div className="bg-card/95 backdrop-blur-sm rounded-xl sm:rounded-2xl p-3 sm:p-8 border border-border/50 shadow-xl hover:shadow-2xl transition-all duration-300 group hover:scale-[1.02] hover:-translate-y-1">
+              <div className="w-10 h-10 sm:w-16 sm:h-16 rounded-lg sm:rounded-xl gradient-primary flex items-center justify-center mx-auto mb-2 sm:mb-5 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <Users className="w-5 h-5 sm:w-8 sm:h-8 text-primary-foreground" />
               </div>
-              <p className="font-display text-2xl sm:text-4xl font-bold text-primary tracking-tight">
+              <p className="font-display text-xl sm:text-4xl font-bold text-primary tracking-tight leading-none">
                 <InlineEditable
                   value={hero.stat1Value}
                   onChange={(v) => updateHero("stat1Value", v)}
@@ -114,37 +114,40 @@ const HeroSection = () => {
               <InlineEditable
                 value={hero.stat1Label}
                 onChange={(v) => updateHero("stat1Label", v)}
-                className="text-muted-foreground text-xs sm:text-sm mt-2 font-medium block"
+                className="text-muted-foreground text-[10px] sm:text-sm mt-1 sm:mt-2 font-semibold block leading-tight"
                 as="p"
               />
             </div>
 
-            {/* Stat Card 2 */}
-            <div className="bg-card rounded-2xl p-4 sm:p-8 border border-border shadow-lg hover:shadow-xl transition-all duration-300 group">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl gradient-primary flex items-center justify-center mx-auto mb-3 sm:mb-5 shadow-md group-hover:scale-105 transition-transform duration-300">
-                <Diamond className="w-6 h-6 sm:w-8 sm:h-8 text-primary-foreground" />
-              </div>
-              <p className="font-display text-2xl sm:text-4xl font-bold text-primary tracking-tight">
+            {/* Stat Card 2 - Featured/Highlighted */}
+            <div className="bg-card/95 backdrop-blur-sm rounded-xl sm:rounded-2xl p-3 sm:p-8 border-2 border-primary/30 shadow-xl hover:shadow-2xl transition-all duration-300 group hover:scale-[1.02] hover:-translate-y-1 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none" />
+              <div className="relative">
+                <div className="w-10 h-10 sm:w-16 sm:h-16 rounded-lg sm:rounded-xl gradient-primary flex items-center justify-center mx-auto mb-2 sm:mb-5 shadow-lg group-hover:scale-110 transition-transform duration-300 ring-2 ring-primary/20 ring-offset-2 ring-offset-card">
+                  <Diamond className="w-5 h-5 sm:w-8 sm:h-8 text-primary-foreground" />
+                </div>
+                <p className="font-display text-xl sm:text-4xl font-bold text-primary tracking-tight leading-none">
+                  <InlineEditable
+                    value={hero.stat2Value}
+                    onChange={(v) => updateHero("stat2Value", v)}
+                    as="span"
+                  />
+                </p>
                 <InlineEditable
-                  value={hero.stat2Value}
-                  onChange={(v) => updateHero("stat2Value", v)}
-                  as="span"
+                  value={hero.stat2Label}
+                  onChange={(v) => updateHero("stat2Label", v)}
+                  className="text-muted-foreground text-[10px] sm:text-sm mt-1 sm:mt-2 font-semibold block leading-tight"
+                  as="p"
                 />
-              </p>
-              <InlineEditable
-                value={hero.stat2Label}
-                onChange={(v) => updateHero("stat2Label", v)}
-                className="text-muted-foreground text-xs sm:text-sm mt-2 font-medium block"
-                as="p"
-              />
+              </div>
             </div>
 
             {/* Stat Card 3 */}
-            <div className="bg-card rounded-2xl p-4 sm:p-8 border border-border shadow-lg hover:shadow-xl transition-all duration-300 group">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl gradient-primary flex items-center justify-center mx-auto mb-3 sm:mb-5 shadow-md group-hover:scale-105 transition-transform duration-300">
-                <Star className="w-6 h-6 sm:w-8 sm:h-8 text-primary-foreground" />
+            <div className="bg-card/95 backdrop-blur-sm rounded-xl sm:rounded-2xl p-3 sm:p-8 border border-border/50 shadow-xl hover:shadow-2xl transition-all duration-300 group hover:scale-[1.02] hover:-translate-y-1">
+              <div className="w-10 h-10 sm:w-16 sm:h-16 rounded-lg sm:rounded-xl gradient-primary flex items-center justify-center mx-auto mb-2 sm:mb-5 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <Star className="w-5 h-5 sm:w-8 sm:h-8 text-primary-foreground" />
               </div>
-              <p className="font-display text-2xl sm:text-4xl font-bold text-primary tracking-tight">
+              <p className="font-display text-xl sm:text-4xl font-bold text-primary tracking-tight leading-none">
                 <InlineEditable
                   value={hero.stat3Value}
                   onChange={(v) => updateHero("stat3Value", v)}
@@ -154,7 +157,7 @@ const HeroSection = () => {
               <InlineEditable
                 value={hero.stat3Label}
                 onChange={(v) => updateHero("stat3Label", v)}
-                className="text-muted-foreground text-xs sm:text-sm mt-2 font-medium block"
+                className="text-muted-foreground text-[10px] sm:text-sm mt-1 sm:mt-2 font-semibold block leading-tight"
                 as="p"
               />
             </div>
