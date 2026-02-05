@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import AdminLayout from "@/components/admin/AdminLayout";
 import UsersTable from "@/components/admin/UsersTable";
@@ -12,6 +13,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ChevronLeft, ChevronRight, RefreshCw, Download, UserPlus, Loader2, Edit2, Users, BadgeCheck, UserX as UserOffIcon } from "lucide-react";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
+} as const;
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+} as const;
 import {
   Dialog,
   DialogContent,
@@ -256,8 +267,13 @@ export default function AdminUsers() {
 
   return (
     <AdminLayout>
-      <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <motion.div 
+        className="space-y-6"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        <motion.div variants={itemVariants} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-foreground">ניהול משתמשים</h1>
             <p className="text-muted-foreground mt-1">
@@ -278,10 +294,10 @@ export default function AdminUsers() {
               צור משתמש
             </Button>
           </div>
-        </div>
+        </motion.div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <motion.div variants={itemVariants} className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <div className="bg-card rounded-xl p-4 border border-border">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-primary/10 rounded-lg">
@@ -326,7 +342,7 @@ export default function AdminUsers() {
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         <UserFilters
           search={search}
@@ -666,7 +682,7 @@ export default function AdminUsers() {
             </div>
           </DialogContent>
         </Dialog>
-      </div>
+      </motion.div>
     </AdminLayout>
   );
 }
