@@ -296,10 +296,11 @@ const Profile = () => {
               )}
             </div>
 
-            <div className="pt-20">
-              <div className="flex items-start justify-between">
+            <div className="pt-20 sm:pt-20">
+              {/* Mobile: Stack vertically */}
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                 <div>
-                  <h1 className="font-display text-3xl font-bold text-foreground">
+                  <h1 className="font-display text-2xl sm:text-3xl font-bold text-foreground">
                     {displayProfile.name}, {displayProfile.age}
                   </h1>
                   <p className="flex items-center gap-2 text-muted-foreground mt-1">
@@ -307,18 +308,20 @@ const Profile = () => {
                     {displayProfile.city}
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
+                
+                {/* Action buttons - Full width on mobile */}
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
                   {hasUnsavedChanges && (
-                    <span className="text-sm text-muted-foreground">יש שינויים שלא נשמרו</span>
+                    <span className="text-sm text-muted-foreground text-center sm:text-right">יש שינויים שלא נשמרו</span>
                   )}
 
                   {isEditing ? (
-                    <>
+                    <div className="flex gap-2 w-full sm:w-auto">
                       <Button
                         variant="hero"
                         onClick={handleSave}
                         disabled={isSaving}
-                        className="focus-ring gap-2"
+                        className="focus-ring gap-2 flex-1 sm:flex-initial h-12 sm:h-auto"
                       >
                         {isSaving ? (
                           <>
@@ -336,13 +339,17 @@ const Profile = () => {
                         variant="outline"
                         onClick={cancelEditing}
                         disabled={isSaving}
-                        className="focus-ring"
+                        className="focus-ring flex-1 sm:flex-initial h-12 sm:h-auto"
                       >
                         בטל
                       </Button>
-                    </>
+                    </div>
                   ) : (
-                    <Button variant="outline" onClick={startEditing} className="focus-ring gap-2">
+                    <Button 
+                      variant="outline" 
+                      onClick={startEditing} 
+                      className="focus-ring gap-2 w-full sm:w-auto h-12 sm:h-auto"
+                    >
                       <Edit2 className="w-4 h-4" aria-hidden="true" />
                       ערוך פרופיל
                     </Button>

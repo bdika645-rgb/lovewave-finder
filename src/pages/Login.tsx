@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import SEOHead from "@/components/SEOHead";
@@ -8,6 +9,24 @@ import { useFormValidation } from "@/hooks/useFormValidation";
 import { Heart, Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
+
+// Animation variants
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1, delayChildren: 0.2 }
+  }
+} as const;
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: { type: "spring", stiffness: 300, damping: 24 }
+  }
+} as const;
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -96,26 +115,49 @@ const Login = () => {
         description="התחברו לחשבון Spark שלכם והתחילו לפגוש אנשים חדשים"
         keywords="התחברות, לוגין, כניסה"
       />
-      <div className="min-h-screen gradient-hero flex items-center justify-center p-6" dir="rtl">
-      <div className="w-full max-w-md">
+      <motion.div 
+        className="min-h-screen gradient-hero flex items-center justify-center p-6" 
+        dir="rtl"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4 }}
+      >
+      <motion.div 
+        className="w-full max-w-md"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
         {/* Logo */}
-        <div className="text-center mb-6">
+        <motion.div variants={itemVariants} className="text-center mb-6">
           <Link to="/" className="inline-flex items-center gap-2">
-            <Heart className="w-10 h-10 text-primary-foreground fill-current" />
+            <motion.div
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ type: "spring", stiffness: 200, delay: 0.1 }}
+            >
+              <Heart className="w-10 h-10 text-primary-foreground fill-current" />
+            </motion.div>
             <span className="font-display text-3xl font-bold text-primary-foreground">Spark</span>
           </Link>
           <p className="text-primary-foreground/80 mt-2">ברוכים השבים!</p>
-        </div>
+        </motion.div>
 
         {/* Social Proof Banner */}
-        <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-3 mb-4 text-center">
+        <motion.div 
+          variants={itemVariants}
+          className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-3 mb-4 text-center"
+        >
           <p className="text-primary-foreground/90 text-sm">
             <span className="font-bold text-primary-foreground">+8,000</span> זוגות מאושרים כבר מצאו את האהבה 💕
           </p>
-        </div>
+        </motion.div>
 
         {/* Login Form */}
-        <div className="bg-card rounded-3xl p-8 shadow-elevated">
+        <motion.div 
+          variants={itemVariants}
+          className="bg-card rounded-3xl p-8 shadow-elevated"
+        >
           <h1 className="font-display text-2xl font-bold text-foreground text-center mb-2">
             התחברות
           </h1>
@@ -217,9 +259,9 @@ const Login = () => {
               </Link>
             </p>
           </div>
-        </div>
-      </div>
-      </div>
+        </motion.div>
+      </motion.div>
+      </motion.div>
     </>
   );
 };
