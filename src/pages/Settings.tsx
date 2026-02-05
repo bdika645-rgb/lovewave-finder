@@ -160,32 +160,42 @@ const Settings = () => {
           </div>
         </div>
 
-        <div className="space-y-6">
+        <motion.div 
+          className="space-y-6"
+          initial="hidden"
+          animate="visible"
+          variants={{
+            hidden: { opacity: 0 },
+            visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
+          }}
+        >
           {/* Account Info */}
-          <Card className="overflow-hidden">
-            <CardHeader className="bg-gradient-to-l from-primary/5 to-transparent">
-              <CardTitle className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <User className="w-4 h-4 text-primary" aria-hidden="true" />
+          <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
+            <Card className="overflow-hidden">
+              <CardHeader className="bg-gradient-to-l from-primary/5 to-transparent">
+                <CardTitle className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <User className="w-4 h-4 text-primary" aria-hidden="true" />
+                  </div>
+                  פרטי חשבון
+                </CardTitle>
+                <CardDescription>מידע בסיסי על החשבון שלך</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4 pt-6">
+                <div className="flex items-center justify-between p-3 bg-muted/50 rounded-xl">
+                  <div>
+                    <Label className="text-muted-foreground text-sm">אימייל</Label>
+                    <p className="font-medium text-foreground">{user?.email || "לא זמין"}</p>
+                  </div>
+                  <Check className="w-5 h-5 text-success" aria-label="מאומת" />
                 </div>
-                פרטי חשבון
-              </CardTitle>
-              <CardDescription>מידע בסיסי על החשבון שלך</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4 pt-6">
-              <div className="flex items-center justify-between p-3 bg-muted/50 rounded-xl">
-                <div>
-                  <Label className="text-muted-foreground text-sm">אימייל</Label>
-                  <p className="font-medium text-foreground">{user?.email || "לא זמין"}</p>
+                <div className="p-3 bg-muted/50 rounded-xl">
+                  <Label className="text-muted-foreground text-sm">שם משתמש</Label>
+                  <p className="font-medium text-foreground">{profile?.name || "לא זמין"}</p>
                 </div>
-                <Check className="w-5 h-5 text-success" aria-label="מאומת" />
-              </div>
-              <div className="p-3 bg-muted/50 rounded-xl">
-                <Label className="text-muted-foreground text-sm">שם משתמש</Label>
-                <p className="font-medium text-foreground">{profile?.name || "לא זמין"}</p>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </motion.div>
 
           {/* Notifications */}
           <Card className={`overflow-hidden transition-all duration-300 ${showNotificationSuccess ? 'ring-2 ring-success/50' : ''}`} aria-busy={saving ? true : undefined}>
@@ -483,7 +493,7 @@ const Settings = () => {
               </AlertDialog>
             </CardContent>
           </Card>
-        </div>
+        </motion.div>
       </main>
     </div>
   );
