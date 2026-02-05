@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Heart, MessageCircle, Loader2, Users, Sparkles } from "lucide-react";
 import { toast } from "sonner";
-
+import { MatchCardSkeleton } from "@/components/MatchCardSkeleton";
 const Matches = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -87,15 +87,9 @@ const Matches = () => {
         </nav>
 
         {loading ? (
-          <div
-            className="flex justify-center py-20"
-            role="status"
-            aria-label="טוען התאמות"
-            aria-live="polite"
-            aria-busy="true"
-          >
-            <Loader2 className="w-12 h-12 text-primary animate-spin" aria-hidden="true" />
+          <div role="status" aria-label="טוען התאמות" aria-live="polite" aria-busy="true">
             <span className="sr-only">טוען התאמות...</span>
+            <MatchCardSkeleton count={4} />
           </div>
         ) : displayedMatches.length === 0 ? (
           <section className="text-center py-20 max-w-md mx-auto" aria-labelledby="empty-matches-heading">

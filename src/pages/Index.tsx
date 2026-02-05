@@ -385,14 +385,37 @@ const Index = () => {
             </div>
 
             <AnimatedSection className="container mx-auto px-6 text-center relative z-10">
-              {/* Social proof badge */}
-              <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm border border-white/30 px-4 py-2 rounded-full mb-8 animate-pulse">
+              {/* Testimonial Quote */}
+              <div className="max-w-xl mx-auto mb-8">
+                <blockquote className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 relative">
+                  <div className="absolute -top-3 right-6 text-4xl text-white/30">"</div>
+                  <p className="text-white/90 text-lg font-medium leading-relaxed mb-4">
+                    פגשנו דרך Spark לפני שנתיים, היום אנחנו נשואים ומאושרים. תודה שעזרתם לנו למצוא אחד את השני!
+                  </p>
+                  <footer className="flex items-center justify-center gap-3">
+                    <div className="flex -space-x-2 rtl:space-x-reverse">
+                      <div className="w-8 h-8 rounded-full bg-white/80 border-2 border-white flex items-center justify-center text-sm">💑</div>
+                    </div>
+                    <cite className="text-white/70 text-sm not-italic">
+                      דנה ויואב, תל אביב
+                    </cite>
+                  </footer>
+                </blockquote>
+              </div>
+
+              {/* Social proof badge - Enhanced */}
+              <div className="inline-flex items-center gap-3 bg-white/20 backdrop-blur-sm border border-white/30 px-5 py-3 rounded-full mb-8">
                 <div className="flex -space-x-2 rtl:space-x-reverse">
-                  <div className="w-6 h-6 rounded-full bg-white/80 border-2 border-white flex items-center justify-center text-xs">👩</div>
-                  <div className="w-6 h-6 rounded-full bg-white/80 border-2 border-white flex items-center justify-center text-xs">👨</div>
-                  <div className="w-6 h-6 rounded-full bg-white/80 border-2 border-white flex items-center justify-center text-xs">👩</div>
+                  <div className="w-7 h-7 rounded-full bg-white/90 border-2 border-white flex items-center justify-center text-xs shadow-lg">👩</div>
+                  <div className="w-7 h-7 rounded-full bg-white/90 border-2 border-white flex items-center justify-center text-xs shadow-lg">👨</div>
+                  <div className="w-7 h-7 rounded-full bg-white/90 border-2 border-white flex items-center justify-center text-xs shadow-lg">👩</div>
+                  <div className="w-7 h-7 rounded-full bg-white/90 border-2 border-white flex items-center justify-center text-xs shadow-lg">👨</div>
                 </div>
-                <span className="text-white/90 text-sm font-medium">+234 נרשמו היום</span>
+                <div className="text-right">
+                  <span className="text-white font-bold text-lg">+234</span>
+                  <span className="text-white/80 text-sm mr-1">נרשמו היום</span>
+                </div>
+                <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
               </div>
 
               <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/20 backdrop-blur-sm mb-8 shadow-2xl ring-4 ring-white/20">
@@ -433,19 +456,24 @@ const Index = () => {
                 </Link>
               </div>
 
-              {/* Trust indicators */}
-              <div className="mt-10 flex flex-wrap items-center justify-center gap-6 text-white/70 text-sm">
-                <div className="flex items-center gap-2">
-                  <Shield className="w-4 h-4" />
-                  <span>100% פרטיות</span>
+              {/* Limited time offer hint */}
+              <p className="mt-4 text-white/60 text-sm">
+                🎁 הרשמה חינמית לזמן מוגבל
+              </p>
+
+              {/* Trust indicators - Enhanced */}
+              <div className="mt-10 grid grid-cols-3 gap-4 max-w-lg mx-auto">
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 text-center">
+                  <Shield className="w-5 h-5 mx-auto mb-1 text-white/80" />
+                  <span className="text-white/90 text-xs font-medium block">100% פרטיות</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Users className="w-4 h-4" />
-                  <span>אלפי זוגות מאושרים</span>
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 text-center">
+                  <Users className="w-5 h-5 mx-auto mb-1 text-white/80" />
+                  <span className="text-white/90 text-xs font-medium block">8,000+ זוגות</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Star className="w-4 h-4 fill-current" />
-                  <span>4.9 דירוג</span>
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 text-center">
+                  <Star className="w-5 h-5 mx-auto mb-1 text-white/80 fill-current" />
+                  <span className="text-white/90 text-xs font-medium block">4.9 דירוג</span>
                 </div>
               </div>
             </AnimatedSection>
