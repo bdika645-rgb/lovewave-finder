@@ -6,11 +6,15 @@ import { useConversations } from "@/hooks/useConversations";
 import { useAuth } from "@/hooks/useAuth";
 import { useCompatibility } from "@/hooks/useCompatibility";
 import Navbar from "@/components/Navbar";
+import SkipToContent from "@/components/SkipToContent";
+import FullPageLoader from "@/components/FullPageLoader";
+import SEOHead from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Heart, MessageCircle, MapPin, ArrowRight, Star, Share2, Loader2 } from "lucide-react";
+import { Heart, MessageCircle, MapPin, ArrowRight, Star, Share2, Loader2, Sparkles, Check } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
+import { motion } from "framer-motion";
 
 const MemberProfile = () => {
   const { id } = useParams();
@@ -27,9 +31,11 @@ const MemberProfile = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" dir="rtl">
-        <Loader2 className="w-12 h-12 text-primary animate-spin" />
-      </div>
+      <FullPageLoader 
+        label="טוען פרופיל..." 
+        branded 
+        className="min-h-screen bg-muted/20 flex items-center justify-center" 
+      />
     );
   }
 
@@ -109,12 +115,21 @@ const MemberProfile = () => {
 
   return (
     <div className="min-h-screen bg-muted/20" dir="rtl">
+      <SkipToContent />
+      <SEOHead 
+        title={`${member.name}, ${member.age} - פרופיל`}
+        description={`צפו בפרופיל של ${member.name} מ${member.city}`}
+      />
       <Navbar />
 
-      <div className="container mx-auto px-6 pt-28 pb-16">
+      <main id="main-content" className="container mx-auto px-6 pt-28 pb-16">
         {/* Back Button */}
-        <Link to="/members" className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary mb-6 transition-colors">
-          <ArrowRight className="w-4 h-4" />
+        <Link 
+          to="/members" 
+          className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary mb-6 transition-colors group"
+          aria-label="חזרה לפרופילים"
+        >
+          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           חזרה לפרופילים
         </Link>
 
@@ -131,7 +146,7 @@ const MemberProfile = () => {
               
               {member.is_online && (
                 <div className="absolute top-6 right-6 flex items-center gap-2 glass-effect px-4 py-2 rounded-full">
-                  <span className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
+                  <span className="w-3 h-3 bg-success rounded-full animate-pulse" />
                   <span className="font-medium text-foreground">מחובר/ת עכשיו</span>
                 </div>
               )}
@@ -242,84 +257,78 @@ const MemberProfile = () => {
 
             {/* Compatibility Card - Real Data */}
             {user && currentUserProfile && compatibility.score > 0 && (
-              <div className="bg-card rounded-2xl p-6 shadow-card mt-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-display text-lg font-semibold text-foreground">
-                    התאמה
-                  </h3>
-                  <div className="text-3xl font-bold text-primary">
-                    {compatibility.score}%
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="bg-gradient-to-br from-card via-card to-primary/5 rounded-2xl p-6 shadow-card mt-6 border border-primary/10"
+              >
+                <div className="flex items-center justify-between mb-5">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-primary" />
+                    <h3 className="font-display text-lg font-semibold text-foreground">
+                      התאמה
+                    </h3>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                      {compatibility.score}%
+                    </div>
                   </div>
                 </div>
                 
                 {/* Compatibility Breakdown */}
-                <div className="space-y-2 mb-4">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">תחומי עניין</span>
-                    <div className="flex items-center gap-2">
-                      <div className="w-24 h-2 bg-muted rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-primary rounded-full" 
-                          style={{ width: `${(compatibility.breakdown.interests / 40) * 100}%` }}
-                        />
+                <div className="space-y-3 mb-5">
+                  {[
+                    { label: "תחומי עניין", value: compatibility.breakdown.interests, max: 40, icon: "🎯" },
+                    { label: "מיקום", value: compatibility.breakdown.location, max: 25, icon: "📍" },
+                    { label: "מטרות", value: compatibility.breakdown.relationshipGoal, max: 20, icon: "💕" },
+                    { label: "גיל", value: compatibility.breakdown.ageRange, max: 15, icon: "🎂" },
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground flex items-center gap-2">
+                        <span>{item.icon}</span>
+                        {item.label}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <div className="w-28 h-2.5 bg-muted rounded-full overflow-hidden">
+                          <motion.div 
+                            initial={{ width: 0 }}
+                            animate={{ width: `${(item.value / item.max) * 100}%` }}
+                            transition={{ delay: 0.3 + i * 0.1, duration: 0.5 }}
+                            className="h-full bg-gradient-to-r from-primary to-secondary rounded-full" 
+                          />
+                        </div>
+                        <span className="text-xs font-medium text-foreground w-10 text-left">
+                          {item.value}/{item.max}
+                        </span>
                       </div>
-                      <span className="text-xs text-muted-foreground w-8">{compatibility.breakdown.interests}/40</span>
                     </div>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">מיקום</span>
-                    <div className="flex items-center gap-2">
-                      <div className="w-24 h-2 bg-muted rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-primary rounded-full" 
-                          style={{ width: `${(compatibility.breakdown.location / 25) * 100}%` }}
-                        />
-                      </div>
-                      <span className="text-xs text-muted-foreground w-8">{compatibility.breakdown.location}/25</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">מטרות</span>
-                    <div className="flex items-center gap-2">
-                      <div className="w-24 h-2 bg-muted rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-primary rounded-full" 
-                          style={{ width: `${(compatibility.breakdown.relationshipGoal / 20) * 100}%` }}
-                        />
-                      </div>
-                      <span className="text-xs text-muted-foreground w-8">{compatibility.breakdown.relationshipGoal}/20</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">גיל</span>
-                    <div className="flex items-center gap-2">
-                      <div className="w-24 h-2 bg-muted rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-primary rounded-full" 
-                          style={{ width: `${(compatibility.breakdown.ageRange / 15) * 100}%` }}
-                        />
-                      </div>
-                      <span className="text-xs text-muted-foreground w-8">{compatibility.breakdown.ageRange}/15</span>
-                    </div>
-                  </div>
+                  ))}
                 </div>
 
                 {/* Match Reasons */}
                 {compatibility.matchReasons.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
-                    {compatibility.matchReasons.map((reason, i) => (
-                      <Badge key={i} variant="secondary" className="text-xs">
-                        ✓ {reason}
-                      </Badge>
-                    ))}
+                  <div className="pt-4 border-t border-border">
+                    <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
+                      <Check className="w-3.5 h-3.5 text-success" />
+                      מה משותף לכם:
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {compatibility.matchReasons.map((reason, i) => (
+                        <Badge key={i} className="bg-success/10 text-success border-success/20 text-xs">
+                          {reason}
+                        </Badge>
+                      ))}
+                    </div>
                   </div>
                 )}
-              </div>
+              </motion.div>
             )}
 
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 };

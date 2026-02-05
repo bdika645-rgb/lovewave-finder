@@ -1,4 +1,6 @@
 import Navbar from "@/components/Navbar";
+import SkipToContent from "@/components/SkipToContent";
+import FullPageLoader from "@/components/FullPageLoader";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -15,7 +17,7 @@ import {
   AlertDialogTitle, 
   AlertDialogTrigger 
 } from "@/components/ui/alert-dialog";
-import { ArrowRight, Bell, Eye, Lock, Shield, Trash2, Loader2 } from "lucide-react";
+import { ArrowRight, Bell, Eye, Lock, Shield, Trash2, Loader2, Check, LogOut, Key, User } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -110,21 +112,24 @@ const Settings = () => {
 
   if (settingsLoading) {
     return (
-      <div className="min-h-screen bg-muted/20 flex items-center justify-center" dir="rtl">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
+      <FullPageLoader 
+        label="טוען הגדרות..." 
+        branded 
+        className="min-h-screen bg-muted/20 flex items-center justify-center" 
+      />
     );
   }
 
   return (
     <div className="min-h-screen bg-muted/20" dir="rtl">
+      <SkipToContent />
       <Navbar />
 
       <div className="sr-only" aria-live="polite" aria-atomic="true">
         {notificationsStatus || privacyStatus}
       </div>
 
-      <div className="container mx-auto px-6 pt-28 pb-16 max-w-2xl">
+      <main id="main-content" className="container mx-auto px-6 pt-28 pb-16 max-w-2xl">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
           <Button 
@@ -144,41 +149,49 @@ const Settings = () => {
 
         <div className="space-y-6">
           {/* Account Info */}
-          <Card>
-            <CardHeader>
+          <Card className="overflow-hidden">
+            <CardHeader className="bg-gradient-to-l from-primary/5 to-transparent">
               <CardTitle className="flex items-center gap-2">
-                <Shield className="w-5 h-5 text-primary" aria-hidden="true" />
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <User className="w-4 h-4 text-primary" aria-hidden="true" />
+                </div>
                 פרטי חשבון
               </CardTitle>
               <CardDescription>מידע בסיסי על החשבון שלך</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label className="text-muted-foreground">אימייל</Label>
-                <p className="font-medium text-foreground">{user?.email || "לא זמין"}</p>
+            <CardContent className="space-y-4 pt-6">
+              <div className="flex items-center justify-between p-3 bg-muted/50 rounded-xl">
+                <div>
+                  <Label className="text-muted-foreground text-sm">אימייל</Label>
+                  <p className="font-medium text-foreground">{user?.email || "לא זמין"}</p>
+                </div>
+                <Check className="w-5 h-5 text-success" aria-label="מאומת" />
               </div>
-              <div>
-                <Label className="text-muted-foreground">שם משתמש</Label>
+              <div className="p-3 bg-muted/50 rounded-xl">
+                <Label className="text-muted-foreground text-sm">שם משתמש</Label>
                 <p className="font-medium text-foreground">{profile?.name || "לא זמין"}</p>
               </div>
             </CardContent>
           </Card>
 
           {/* Notifications */}
-          <Card aria-busy={saving ? true : undefined}>
-            <CardHeader>
+          <Card className="overflow-hidden" aria-busy={saving ? true : undefined}>
+            <CardHeader className="bg-gradient-to-l from-primary/5 to-transparent">
               <CardTitle className="flex items-center gap-2">
-                <Bell className="w-5 h-5 text-primary" aria-hidden="true" />
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <Bell className="w-4 h-4 text-primary" aria-hidden="true" />
+                </div>
                 התראות
               </CardTitle>
               <CardDescription>בחר אילו התראות תרצה לקבל</CardDescription>
               {notificationsStatus && (
-                <p className="text-sm text-muted-foreground" aria-live="polite">
+                <p className="text-sm font-medium text-success flex items-center gap-1" aria-live="polite">
+                  <Check className="w-4 h-4" />
                   {notificationsStatus}
                 </p>
               )}
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-4 pt-6">
               <div className="flex items-center justify-between">
                 <div>
                   <Label id="email-notifications-label">התראות אימייל</Label>
@@ -254,20 +267,23 @@ const Settings = () => {
           </Card>
 
           {/* Privacy */}
-          <Card aria-busy={saving ? true : undefined}>
-            <CardHeader>
+          <Card className="overflow-hidden" aria-busy={saving ? true : undefined}>
+            <CardHeader className="bg-gradient-to-l from-primary/5 to-transparent">
               <CardTitle className="flex items-center gap-2">
-                <Eye className="w-5 h-5 text-primary" aria-hidden="true" />
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <Eye className="w-4 h-4 text-primary" aria-hidden="true" />
+                </div>
                 פרטיות
               </CardTitle>
               <CardDescription>שליטה במה שאחרים רואים</CardDescription>
               {privacyStatus && (
-                <p className="text-sm text-muted-foreground" aria-live="polite">
+                <p className="text-sm font-medium text-success flex items-center gap-1" aria-live="polite">
+                  <Check className="w-4 h-4" />
                   {privacyStatus}
                 </p>
               )}
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-4 pt-6">
               <div className="flex items-center justify-between">
                 <div>
                   <Label id="online-status-label">הצג סטטוס אונליין</Label>
@@ -327,76 +343,89 @@ const Settings = () => {
           </Card>
 
           {/* Security */}
-          <Card>
-            <CardHeader>
+          <Card className="overflow-hidden">
+            <CardHeader className="bg-gradient-to-l from-primary/5 to-transparent">
               <CardTitle className="flex items-center gap-2">
-                <Lock className="w-5 h-5 text-primary" aria-hidden="true" />
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <Lock className="w-4 h-4 text-primary" aria-hidden="true" />
+                </div>
                 אבטחה
               </CardTitle>
               <CardDescription>הגדרות אבטחת חשבון</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-3 pt-6">
               <Button 
                 variant="outline" 
-                className="w-full"
+                className="w-full justify-start gap-3 h-12"
                 onClick={handleResetPassword}
                 disabled={resetLoading}
               >
                 {resetLoading ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin ml-2" />
+                    <Loader2 className="w-5 h-5 animate-spin" />
                     שולח...
                   </>
                 ) : (
-                  "שנה סיסמה"
+                  <>
+                    <Key className="w-5 h-5 text-muted-foreground" />
+                    שנה סיסמה
+                  </>
                 )}
               </Button>
               <Button 
                 variant="outline" 
-                className="w-full"
+                className="w-full justify-start gap-3 h-12 text-muted-foreground hover:text-foreground"
                 onClick={handleLogout}
               >
+                <LogOut className="w-5 h-5" />
                 התנתק
               </Button>
             </CardContent>
           </Card>
 
           {/* Danger Zone */}
-          <Card className="border-destructive/50">
-            <CardHeader>
+          <Card className="border-destructive/30 overflow-hidden">
+            <CardHeader className="bg-gradient-to-l from-destructive/5 to-transparent">
               <CardTitle className="flex items-center gap-2 text-destructive">
-                <Trash2 className="w-5 h-5" aria-hidden="true" />
+                <div className="w-8 h-8 rounded-lg bg-destructive/10 flex items-center justify-center">
+                  <Trash2 className="w-4 h-4" aria-hidden="true" />
+                </div>
                 אזור מסוכן
               </CardTitle>
               <CardDescription>פעולות בלתי הפיכות</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-6">
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button variant="destructive" className="w-full">
+                  <Button variant="outline" className="w-full justify-start gap-3 h-12 border-destructive/30 text-destructive hover:bg-destructive hover:text-destructive-foreground">
+                    <Trash2 className="w-5 h-5" />
                     מחק את החשבון שלי
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent dir="rtl">
                   <AlertDialogHeader>
-                    <AlertDialogTitle>האם אתה בטוח?</AlertDialogTitle>
-                    <AlertDialogDescription>
+                    <div className="w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center mx-auto mb-4">
+                      <Trash2 className="w-6 h-6 text-destructive" />
+                    </div>
+                    <AlertDialogTitle className="text-center">האם אתה בטוח?</AlertDialogTitle>
+                    <AlertDialogDescription className="text-center">
                       פעולה זו תמחק את כל הנתונים שלך לצמיתות, כולל:
-                      <ul className="list-disc list-inside mt-2 space-y-1">
+                      <ul className="list-disc list-inside mt-4 space-y-1 text-right">
                         <li>הפרופיל שלך</li>
                         <li>כל התמונות שלך</li>
                         <li>כל ההתאמות וההודעות</li>
                         <li>כל הלייקים והפעילות</li>
                       </ul>
-                      <br />
-                      לא ניתן לשחזר את הנתונים לאחר מחיקה.
+                      <p className="mt-4 font-medium text-destructive">
+                        לא ניתן לשחזר את הנתונים לאחר מחיקה.
+                      </p>
                     </AlertDialogDescription>
                   </AlertDialogHeader>
-                  <AlertDialogFooter className="flex gap-2">
-                    <AlertDialogCancel>ביטול</AlertDialogCancel>
+                  <AlertDialogFooter className="flex gap-2 sm:flex-row-reverse">
+                    <AlertDialogCancel className="flex-1">ביטול</AlertDialogCancel>
                     <AlertDialogAction 
                       onClick={handleDeleteAccount}
-                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      className="flex-1 bg-destructive text-destructive-foreground hover:bg-destructive/90"
                       disabled={deleteLoading}
                     >
                       {deleteLoading ? (
@@ -411,13 +440,10 @@ const Settings = () => {
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
-              <p className="text-xs text-muted-foreground text-center mt-2">
-                פעולה זו תמחק את כל הנתונים שלך לצמיתות
-              </p>
             </CardContent>
           </Card>
         </div>
-      </div>
+      </main>
     </div>
   );
 };
