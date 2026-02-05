@@ -236,39 +236,46 @@ const Messages = () => {
                       )}
                     </div>
                   ) : (
-                    filteredConversations.map((conv) => (
+                    filteredConversations.map((conv, index) => (
                       <button
                         key={conv.id}
                         onClick={() => handleSelectConversation(conv.id)}
-                        className={`w-full p-4 flex items-center gap-3 hover:bg-muted/50 transition-colors ${
-                          selectedConversationId === conv.id ? "bg-accent" : ""
+                        className={`w-full p-4 flex items-center gap-3 transition-all duration-200 ${
+                          selectedConversationId === conv.id 
+                            ? "bg-accent shadow-sm" 
+                            : "hover:bg-muted/50 hover:translate-x-1"
                         } focus-ring`}
                         role="listitem"
                         aria-selected={selectedConversationId === conv.id}
+                        style={{ animationDelay: `${index * 50}ms` }}
                       >
                         <div className="relative">
                           <img 
                             src={conv.otherProfile?.avatar_url || "/profiles/profile1.jpg"} 
                             alt={`תמונת פרופיל של ${conv.otherProfile?.name || "משתמש"}`}
-                            className="w-14 h-14 rounded-full object-cover"
+                            className="w-14 h-14 rounded-full object-cover ring-2 ring-transparent transition-all duration-200 group-hover:ring-primary/20"
                           />
                           {conv.otherProfile?.is_online && (
-                            <span className="absolute bottom-0 right-0 w-4 h-4 bg-success rounded-full border-2 border-card" aria-label="מחובר/ת" />
+                            <span className="absolute bottom-0 right-0 w-4 h-4 bg-success rounded-full border-2 border-card animate-pulse" aria-label="מחובר/ת" />
                           )}
                         </div>
                         <div className="flex-1 text-right">
                           <div className="flex items-center justify-between mb-1">
-                            <span className="font-semibold text-foreground">{conv.otherProfile?.name}</span>
+                            <span className={`font-semibold transition-colors ${
+                              conv.unreadCount > 0 ? "text-foreground" : "text-foreground/80"
+                            }`}>{conv.otherProfile?.name}</span>
                             <span className="text-xs text-muted-foreground">
                               {conv.lastMessage ? formatTime(conv.lastMessage.created_at) : formatTime(conv.created_at)}
                             </span>
                           </div>
                           <div className="flex items-center justify-between">
-                            <p className="text-sm text-muted-foreground truncate max-w-[180px]">
+                            <p className={`text-sm truncate max-w-[180px] ${
+                              conv.unreadCount > 0 ? "text-foreground font-medium" : "text-muted-foreground"
+                            }`}>
                               {conv.lastMessage?.content || "התחילו לשוחח!"}
                             </p>
                             {conv.unreadCount > 0 && (
-                              <span className="bg-primary text-primary-foreground text-xs w-5 h-5 rounded-full flex items-center justify-center" aria-label={`${conv.unreadCount} הודעות שלא נקראו`}>
+                              <span className="bg-primary text-primary-foreground text-xs min-w-[20px] h-5 px-1.5 rounded-full flex items-center justify-center animate-scale-in" aria-label={`${conv.unreadCount} הודעות שלא נקראו`}>
                                 {conv.unreadCount}
                               </span>
                             )}
