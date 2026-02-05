@@ -1,19 +1,42 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import { useMatches } from "@/hooks/useMatches";
 import { useAuth } from "@/hooks/useAuth";
 import { useConversations } from "@/hooks/useConversations";
+import { useCurrentProfile } from "@/hooks/useCurrentProfile";
+import { calculateCompatibility } from "@/hooks/useCompatibility";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Heart, MessageCircle, Loader2, Users, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { MatchCardSkeleton } from "@/components/MatchCardSkeleton";
+
+// Animation variants
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.08, delayChildren: 0.1 }
+  }
+} as const;
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 30, scale: 0.95 },
+  visible: { 
+    opacity: 1, 
+    y: 0, 
+    scale: 1,
+    transition: { type: "spring", stiffness: 300, damping: 24 }
+  }
+} as const;
 const Matches = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { matches, loading } = useMatches();
   const { createOrGetConversation } = useConversations();
+  const { profile: currentProfile } = useCurrentProfile();
   const [filter, setFilter] = useState<"all" | "new">("all");
   const [loadingMessage, setLoadingMessage] = useState<string | null>(null);
 
@@ -130,20 +153,34 @@ const Matches = () => {
             </div>
           </section>
         ) : (
-          <section id="matches-list" className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" role="list" aria-label="רשימת התאמות">
-            {displayedMatches.map((match, index) => {
+          <motion.section 
+            id="matches-list" 
+            className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" 
+            role="list" 
+            aria-label="רשימת התאמות"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            {displayedMatches.map((match) => {
               const profile = match.matchedProfile;
               const isNew =
                 new Date(match.created_at) >
                 new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+              
+              // Calculate real compatibility score
+              const compatibilityScore = currentProfile 
+                ? calculateCompatibility(currentProfile, profile)
+                : 75;
 
               return (
-                <article
+                <motion.article
                   key={match.id}
-                  className="bg-card rounded-3xl overflow-hidden shadow-card hover:shadow-xl transition-all duration-300 relative group hover:-translate-y-1"
+                  className="bg-card rounded-3xl overflow-hidden shadow-card hover:shadow-xl transition-shadow duration-300 relative group"
                   role="listitem"
                   aria-label={`התאמה עם ${profile.name}`}
-                  style={{ animationDelay: `${index * 50}ms` }}
+                  variants={cardVariants}
+                  whileHover={{ y: -4, transition: { duration: 0.2 } }}
                 >
                   {isNew && (
                     <Badge className="absolute top-3 right-3 z-10 bg-primary text-primary-foreground gap-1 shadow-lg animate-pulse">
@@ -152,13 +189,18 @@ const Matches = () => {
                     </Badge>
                   )}
 
-                  {/* Match percentage indicator */}
+                  {/* Match percentage indicator - uses real calculation */}
                   <div className="absolute top-3 left-3 z-10">
-                    <div className="bg-card/90 backdrop-blur-sm px-2.5 py-1 rounded-full shadow-lg border border-border">
+                    <motion.div 
+                      className="bg-card/90 backdrop-blur-sm px-2.5 py-1 rounded-full shadow-lg border border-border"
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ delay: 0.3, type: "spring", stiffness: 400 }}
+                    >
                       <span className="text-xs font-bold text-primary">
-                        {Math.floor(70 + Math.random() * 25)}% התאמה
+                        {compatibilityScore}% התאמה
                       </span>
-                    </div>
+                    </motion.div>
                   </div>
 
                   <Link to={`/member/${profile.id}`} aria-label={`צפה בפרופיל של ${profile.name}`}>
@@ -229,10 +271,10 @@ const Matches = () => {
                       שלחו הודעה
                     </Button>
                   </div>
-                </article>
+                </motion.article>
               );
             })}
-          </section>
+          </motion.section>
         )}
       </main>
     </div>
