@@ -12,6 +12,7 @@ import { useProfiles } from "@/hooks/useProfiles";
 import { useLikes } from "@/hooks/useLikes";
 import { useAuth } from "@/hooks/useAuth";
 import { useActionHistory } from "@/hooks/useActionHistory";
+import { useConfetti } from "@/hooks/useConfetti";
 import { Button } from "@/components/ui/button";
 import { Heart, Loader2, RefreshCcw, Sparkles, ArrowRight, ArrowLeft, ArrowUp, Star, Undo2 } from "lucide-react";
 import { toast } from "sonner";
@@ -43,6 +44,7 @@ const Discover = () => {
   });
   const { sendLike, removeLike } = useLikes();
   const { recordAction, undoLastAction } = useActionHistory();
+  const { fireConfetti } = useConfetti();
   
   const [currentIndex, setCurrentIndex] = useState(0);
   const [likedProfiles, setLikedProfiles] = useState<Set<string>>(new Set());
@@ -139,13 +141,15 @@ const Discover = () => {
       setMatchedName(currentProfile.name);
       setMatchedImage(currentProfile.avatar_url || "/profiles/profile1.jpg");
       setShowMatchAnimation(true);
+      // Fire confetti for match celebration! 🎉
+      fireConfetti();
       setTimeout(() => setShowMatchAnimation(false), 4000);
     } else {
       toast.success(`💕 שלחת לייק ל${currentProfile.name}!`);
     }
 
     goToNext();
-  }, [user, currentProfile, sendLike, recordAction, goToNext]);
+  }, [user, currentProfile, sendLike, recordAction, goToNext, fireConfetti]);
 
   const handlePass = useCallback(async () => {
     if (!currentProfile) return;
@@ -217,6 +221,8 @@ const Discover = () => {
       setMatchedName(currentProfile.name);
       setMatchedImage(currentProfile.avatar_url || "/profiles/profile1.jpg");
       setShowMatchAnimation(true);
+      // Fire confetti for match celebration! 🎉
+      fireConfetti();
       setTimeout(() => setShowMatchAnimation(false), 4000);
     } else {
       toast.success(`⭐ שלחת סופר לייק ל${currentProfile.name}!`);

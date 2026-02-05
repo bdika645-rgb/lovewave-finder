@@ -17,7 +17,7 @@ import {
   AlertDialogTitle, 
   AlertDialogTrigger 
 } from "@/components/ui/alert-dialog";
-import { ArrowRight, Bell, Eye, Lock, Shield, Trash2, Loader2, Check, LogOut, Key, User } from "lucide-react";
+import { ArrowRight, Bell, Eye, Lock, Shield, Trash2, Loader2, Check, LogOut, Key, User, CheckCircle2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -26,6 +26,8 @@ import { useCurrentProfile } from "@/hooks/useCurrentProfile";
 import { useUserSettings } from "@/hooks/useUserSettings";
 import { usePasswordReset } from "@/hooks/usePasswordReset";
 import { useDeleteAccount } from "@/hooks/useDeleteAccount";
+import { useConfetti } from "@/hooks/useConfetti";
+import { motion, AnimatePresence } from "framer-motion";
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -34,10 +36,13 @@ const Settings = () => {
   const { settings, loading: settingsLoading, saving, updateSettings } = useUserSettings();
   const { sendResetEmail, loading: resetLoading } = usePasswordReset();
   const { deleteAccount, loading: deleteLoading } = useDeleteAccount();
+  const { fireSuccessConfetti } = useConfetti();
 
   const [localSettings, setLocalSettings] = useState(settings);
   const [notificationsStatus, setNotificationsStatus] = useState<string>("");
   const [privacyStatus, setPrivacyStatus] = useState<string>("");
+  const [showNotificationSuccess, setShowNotificationSuccess] = useState(false);
+  const [showPrivacySuccess, setShowPrivacySuccess] = useState(false);
 
   useEffect(() => {
     setLocalSettings(settings);
@@ -45,6 +50,7 @@ const Settings = () => {
 
   const handleSaveNotifications = async () => {
     setNotificationsStatus("");
+    setShowNotificationSuccess(false);
     const { error } = await updateSettings({
       email_notifications: localSettings.email_notifications,
       push_notifications: localSettings.push_notifications,
@@ -58,11 +64,15 @@ const Settings = () => {
     } else {
       toast.success("הגדרות ההתראות נשמרו!");
       setNotificationsStatus("נשמר");
+      setShowNotificationSuccess(true);
+      fireSuccessConfetti();
+      setTimeout(() => setShowNotificationSuccess(false), 3000);
     }
   };
 
   const handleSavePrivacy = async () => {
     setPrivacyStatus("");
+    setShowPrivacySuccess(false);
     const { error } = await updateSettings({
       show_online_status: localSettings.show_online_status,
       show_last_seen: localSettings.show_last_seen,
@@ -75,6 +85,9 @@ const Settings = () => {
     } else {
       toast.success("הגדרות הפרטיות נשמרו!");
       setPrivacyStatus("נשמר");
+      setShowPrivacySuccess(true);
+      fireSuccessConfetti();
+      setTimeout(() => setShowPrivacySuccess(false), 3000);
     }
   };
 
@@ -175,8 +188,22 @@ const Settings = () => {
           </Card>
 
           {/* Notifications */}
-          <Card className="overflow-hidden" aria-busy={saving ? true : undefined}>
-            <CardHeader className="bg-gradient-to-l from-primary/5 to-transparent">
+          <Card className={`overflow-hidden transition-all duration-300 ${showNotificationSuccess ? 'ring-2 ring-success/50' : ''}`} aria-busy={saving ? true : undefined}>
+            <CardHeader className="bg-gradient-to-l from-primary/5 to-transparent relative">
+              <AnimatePresence>
+                {showNotificationSuccess && (
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    className="absolute left-4 top-4"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center">
+                      <CheckCircle2 className="w-6 h-6 text-success animate-bounce" />
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
               <CardTitle className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
                   <Bell className="w-4 h-4 text-primary" aria-hidden="true" />
@@ -267,8 +294,22 @@ const Settings = () => {
           </Card>
 
           {/* Privacy */}
-          <Card className="overflow-hidden" aria-busy={saving ? true : undefined}>
-            <CardHeader className="bg-gradient-to-l from-primary/5 to-transparent">
+          <Card className={`overflow-hidden transition-all duration-300 ${showPrivacySuccess ? 'ring-2 ring-success/50' : ''}`} aria-busy={saving ? true : undefined}>
+            <CardHeader className="bg-gradient-to-l from-primary/5 to-transparent relative">
+              <AnimatePresence>
+                {showPrivacySuccess && (
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    className="absolute left-4 top-4"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center">
+                      <CheckCircle2 className="w-6 h-6 text-success animate-bounce" />
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
               <CardTitle className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
                   <Eye className="w-4 h-4 text-primary" aria-hidden="true" />
