@@ -326,7 +326,8 @@ const Discover = () => {
         <SEOHead title="גלו התאמות" />
         <Navbar />
         <FullPageLoader
-          label="טוען פרופילים..."
+          label="מחפשים התאמות מושלמות..."
+          branded
           className="min-h-[calc(100vh-80px)] bg-transparent flex items-center justify-center"
         />
       </div>

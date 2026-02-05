@@ -127,7 +127,7 @@ const Messages = () => {
       <>
         <SkipToContent />
         <Navbar />
-        <FullPageLoader label="טוען שיחות..." className="min-h-screen bg-muted/20 flex items-center justify-center" />
+        <FullPageLoader label="טוען שיחות..." branded className="min-h-screen bg-muted/20 flex items-center justify-center" />
       </>
     );
   }

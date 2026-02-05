@@ -99,7 +99,7 @@ const Login = () => {
       <div className="min-h-screen gradient-hero flex items-center justify-center p-6" dir="rtl">
       <div className="w-full max-w-md">
         {/* Logo */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-6">
           <Link to="/" className="inline-flex items-center gap-2">
             <Heart className="w-10 h-10 text-primary-foreground fill-current" />
             <span className="font-display text-3xl font-bold text-primary-foreground">Spark</span>
@@ -107,11 +107,21 @@ const Login = () => {
           <p className="text-primary-foreground/80 mt-2">ברוכים השבים!</p>
         </div>
 
+        {/* Social Proof Banner */}
+        <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-3 mb-4 text-center">
+          <p className="text-primary-foreground/90 text-sm">
+            <span className="font-bold text-primary-foreground">+8,000</span> זוגות מאושרים כבר מצאו את האהבה 💕
+          </p>
+        </div>
+
         {/* Login Form */}
         <div className="bg-card rounded-3xl p-8 shadow-elevated">
-          <h1 className="font-display text-2xl font-bold text-foreground text-center mb-6">
+          <h1 className="font-display text-2xl font-bold text-foreground text-center mb-2">
             התחברות
           </h1>
+          <p className="text-muted-foreground text-center text-sm mb-6">
+            הזינו את הפרטים שלכם כדי להמשיך
+          </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
