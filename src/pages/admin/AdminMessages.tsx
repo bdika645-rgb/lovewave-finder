@@ -1,9 +1,23 @@
 import { useState, useEffect, useCallback } from "react";
+import { motion } from "framer-motion";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MessageCircle, Users, Clock, RefreshCw, Trash2, Eye } from "lucide-react";
 import StatsCard from "@/components/admin/StatsCard";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1 }
+  }
+} as const;
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 300, damping: 24 } }
+} as const;
 import {
   Table,
   TableBody,
@@ -158,8 +172,13 @@ export default function AdminMessages() {
 
   return (
     <AdminLayout>
-      <div className="space-y-8">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <motion.div 
+        className="space-y-8"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        <motion.div variants={itemVariants} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-foreground">הודעות</h1>
             <p className="text-muted-foreground mt-1">מעקב אחר הודעות במערכת</p>
@@ -168,15 +187,15 @@ export default function AdminMessages() {
             <RefreshCw className="w-4 h-4 ml-2" />
             רענן
           </Button>
-        </div>
+        </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <StatsCard title="סה״כ הודעות" value={stats.totalMessages} icon={MessageCircle} />
+        <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+          <StatsCard title="סה״כ הודעות" value={stats.totalMessages} icon={MessageCircle} variant="gradient" />
           <StatsCard title="סה״כ שיחות" value={stats.totalConversations} icon={Users} />
           <StatsCard title="הודעות שלא נקראו" value={stats.unreadMessages} icon={Clock} />
-        </div>
+        </motion.div>
 
-        <div className="bg-card rounded-xl border border-border overflow-hidden">
+        <motion.div variants={itemVariants} className="bg-card rounded-xl border border-border overflow-hidden">
           <div className="p-4 border-b border-border">
             <h3 className="text-lg font-semibold">הודעות אחרונות</h3>
           </div>
@@ -276,7 +295,7 @@ export default function AdminMessages() {
               </Button>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* View Message Dialog */}
         <Dialog open={!!viewMessage} onOpenChange={() => setViewMessage(null)}>
@@ -339,7 +358,7 @@ export default function AdminMessages() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-      </div>
+      </motion.div>
     </AdminLayout>
   );
 }
