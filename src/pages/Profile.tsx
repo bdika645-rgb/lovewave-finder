@@ -1,5 +1,6 @@
 import Navbar from "@/components/Navbar";
 import SkipToContent from "@/components/SkipToContent";
+import FullPageLoader from "@/components/FullPageLoader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -226,9 +227,11 @@ const Profile = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-muted/20">
-        <Loader2 className="w-12 h-12 text-primary animate-spin" />
-      </div>
+      <FullPageLoader 
+        label="טוען את הפרופיל שלך..." 
+        branded 
+        className="min-h-screen bg-muted/20 flex items-center justify-center"
+      />
     );
   }
 
