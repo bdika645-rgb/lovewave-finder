@@ -1,10 +1,12 @@
 import { lazy, Suspense, useState, useMemo } from "react";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
+import Footer from "@/components/Footer";
 import MemberCard from "@/components/MemberCard";
 import AnimatedSection from "@/components/AnimatedSection";
 import AnimatedCard from "@/components/AnimatedCard";
 import SkipToContent from "@/components/SkipToContent";
+import SEOHead from "@/components/SEOHead";
 import { SkeletonGrid } from "@/components/ui/skeleton-card";
 import { InlineEditable, EditableSection } from "@/components/VisualEditor";
 import { useLandingContent } from "@/contexts/LandingContentContext";
@@ -185,6 +187,11 @@ const Index = () => {
   
   return (
     <div className="min-h-screen" dir="rtl">
+      <SEOHead 
+        title="מצאו את האהבה שלכם"
+        description="Spark - אתר ההיכרויות המוביל בישראל. הצטרפו לאלפי סינגלים ומצאו את ההתאמה המושלמת שלכם עוד היום!"
+        keywords="היכרויות, דייטינג, אהבה, זוגיות, מציאת זוג, ישראל, סינגלים"
+      />
       <SkipToContent />
       <Navbar />
       <main id="main-content">
@@ -446,106 +453,7 @@ const Index = () => {
         </EditableSection>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-foreground py-16" role="contentinfo">
-        <div className="container mx-auto px-6">
-          <div className="grid md:grid-cols-4 gap-8 mb-12">
-            {/* Brand */}
-            <div className="md:col-span-1">
-              <div className="flex items-center gap-2 mb-4">
-                <Heart className="w-7 h-7 text-primary fill-current" aria-hidden="true" />
-                <span className="font-display text-2xl font-bold text-primary-foreground">{nav.brandName}</span>
-              </div>
-              <p className="text-primary-foreground/60 text-sm leading-relaxed">
-                {footer.brandDescription}
-              </p>
-            </div>
-
-            {/* Quick Links */}
-            <nav aria-label="קישורים מהירים">
-              <h4 className="font-display text-lg font-semibold text-primary-foreground mb-4">{footer.quickLinksTitle}</h4>
-              <ul className="flex flex-col gap-3">
-                <li>
-                  <Link to="/members" className="text-primary-foreground/60 hover:text-primary-foreground transition-colors text-sm">
-                    {footer.quickLink1}
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/discover" className="text-primary-foreground/60 hover:text-primary-foreground transition-colors text-sm">
-                    {footer.quickLink2}
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/messages" className="text-primary-foreground/60 hover:text-primary-foreground transition-colors text-sm">
-                    {footer.quickLink3}
-                  </Link>
-                </li>
-              </ul>
-            </nav>
-
-            {/* Account */}
-            <nav aria-label="חשבון">
-              <h4 className="font-display text-lg font-semibold text-primary-foreground mb-4">{footer.accountTitle}</h4>
-              <ul className="flex flex-col gap-3">
-                <li>
-                  <Link to="/login" className="text-primary-foreground/60 hover:text-primary-foreground transition-colors text-sm">
-                    {footer.accountLink1}
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/register" className="text-primary-foreground/60 hover:text-primary-foreground transition-colors text-sm">
-                    {footer.accountLink2}
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/profile" className="text-primary-foreground/60 hover:text-primary-foreground transition-colors text-sm">
-                    {footer.accountLink3}
-                  </Link>
-                </li>
-              </ul>
-            </nav>
-
-            {/* Support */}
-            <nav aria-label="תמיכה">
-              <h4 className="font-display text-lg font-semibold text-primary-foreground mb-4">{footer.supportTitle}</h4>
-              <ul className="flex flex-col gap-3">
-                <li>
-                  <a href="#faq" className="text-right text-primary-foreground/60 hover:text-primary-foreground transition-colors text-sm">
-                    {footer.supportLink1}
-                  </a>
-                </li>
-                <li>
-                  <Link to="/support" className="text-primary-foreground/60 hover:text-primary-foreground transition-colors text-sm">
-                    {footer.supportLink2}
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/terms" className="text-primary-foreground/60 hover:text-primary-foreground transition-colors text-sm">
-                    {footer.supportLink3}
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/privacy" className="text-primary-foreground/60 hover:text-primary-foreground transition-colors text-sm">
-                    {footer.supportLink4}
-                  </Link>
-                </li>
-              </ul>
-            </nav>
-          </div>
-
-          {/* Bottom Bar */}
-          <div className="pt-8 border-t border-primary-foreground/10 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-primary-foreground/50 text-sm">
-              {footer.copyright.replace("{year}", new Date().getFullYear().toString())}
-            </p>
-            <div className="flex items-center gap-4">
-              <span className="text-primary-foreground/40 text-xs">
-                {footer.madeWith}
-              </span>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };
