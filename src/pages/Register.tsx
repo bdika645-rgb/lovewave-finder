@@ -2,13 +2,14 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Heart, Mail, Lock, User, Eye, EyeOff, MapPin, Loader2, Calendar, Camera, Users, GraduationCap, Ruler, Cigarette, Target, ArrowLeft, ArrowRight, Check } from "lucide-react";
+import { Heart, Mail, Lock, User, Eye, EyeOff, MapPin, Loader2, Calendar, Camera, Users, GraduationCap, Ruler, Cigarette, Target, ArrowLeft, ArrowRight, Check, Shield, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { PasswordStrengthMeter } from "@/components/PasswordStrengthMeter";
 import SEOHead from "@/components/SEOHead";
 import FieldError from "@/components/FieldError";
+import FullPageLoader from "@/components/FullPageLoader";
 import PostRegistrationOnboarding from "@/components/PostRegistrationOnboarding";
 import { useFormValidation } from "@/hooks/useFormValidation";
 import {
@@ -213,9 +214,11 @@ const Register = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
+      <FullPageLoader 
+        label="בודק סטטוס..." 
+        branded 
+        className="min-h-screen gradient-hero flex items-center justify-center" 
+      />
     );
   }
 
@@ -237,25 +240,47 @@ const Register = () => {
             <p className="text-primary-foreground/80 mt-2">מצאו את האהבה שלכם</p>
           </div>
 
-          {/* Progress Steps */}
-          <div className="flex items-center justify-center gap-4 mb-6">
-            <div className="flex items-center gap-2">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
+          {/* Trust Badges */}
+          <div className="flex items-center justify-center gap-4 mb-4">
+            <div className="flex items-center gap-1.5 text-primary-foreground/80 text-xs">
+              <Shield className="w-4 h-4" />
+              <span>100% מאובטח</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-primary-foreground/80 text-xs">
+              <Sparkles className="w-4 h-4" />
+              <span>8,000+ זוגות</span>
+            </div>
+          </div>
+
+          {/* Progress Steps - Enhanced */}
+          <div className="flex items-center justify-center gap-3 mb-6">
+            <motion.div 
+              className="flex items-center gap-2"
+              animate={{ scale: step === 1 ? 1.05 : 1 }}
+            >
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all shadow-lg ${
                 step >= 1 ? "bg-white text-primary" : "bg-white/30 text-white"
               }`}>
-                {step > 1 ? <Check className="w-4 h-4" /> : "1"}
+                {step > 1 ? <Check className="w-5 h-5" /> : "1"}
               </div>
-              <span className="text-sm text-primary-foreground/80 hidden sm:block">פרטים בסיסיים</span>
-            </div>
-            <div className="w-8 h-0.5 bg-white/30" />
-            <div className="flex items-center gap-2">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
+              <span className={`text-sm font-medium hidden sm:block ${step === 1 ? "text-white" : "text-primary-foreground/70"}`}>
+                פרטים בסיסיים
+              </span>
+            </motion.div>
+            <div className={`w-12 h-1 rounded-full transition-colors ${step >= 2 ? "bg-white" : "bg-white/30"}`} />
+            <motion.div 
+              className="flex items-center gap-2"
+              animate={{ scale: step === 2 ? 1.05 : 1 }}
+            >
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all shadow-lg ${
                 step >= 2 ? "bg-white text-primary" : "bg-white/30 text-white"
               }`}>
                 2
               </div>
-              <span className="text-sm text-primary-foreground/80 hidden sm:block">פרטים נוספים</span>
-            </div>
+              <span className={`text-sm font-medium hidden sm:block ${step === 2 ? "text-white" : "text-primary-foreground/70"}`}>
+                פרטים נוספים
+              </span>
+            </motion.div>
           </div>
 
           {/* Register Form */}
