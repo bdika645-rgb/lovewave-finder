@@ -11,7 +11,7 @@ import { useLandingContent } from "@/contexts/LandingContentContext";
 import FeaturedMembersFilter, { type FilterType, type SortType } from "@/components/FeaturedMembersFilter";
 
 import { useProfiles } from "@/hooks/useProfiles";
-import { Heart, Shield, Sparkles, Users } from "lucide-react";
+import { Heart, Shield, Sparkles, Users, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
@@ -360,21 +360,39 @@ const Index = () => {
           <FAQSection />
         </Suspense>
 
-        {/* CTA Section - enhanced with glass overlay */}
+        {/* CTA Section - Enhanced with urgency and social proof */}
         <EditableSection sectionName="קריאה לפעולה">
-          <section className="py-32 md:py-40 gradient-primary overflow-hidden relative" aria-labelledby="cta-title">
-            {/* Decorative glass panels */}
+          <section className="py-24 md:py-36 gradient-primary overflow-hidden relative" aria-labelledby="cta-title">
+            {/* Animated background particles */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-              <div className="absolute -top-20 -left-20 w-80 h-80 bg-white/10 rounded-full blur-3xl" />
-              <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
+              <div className="absolute -top-20 -left-20 w-80 h-80 bg-white/10 rounded-full blur-3xl animate-pulse" />
+              <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-white/15 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-white/5 rounded-full blur-[150px]" />
+              {/* Floating hearts decoration */}
+              <div className="absolute top-1/4 left-1/4 opacity-20 animate-bounce" style={{ animationDuration: '3s' }}>
+                <Heart className="w-8 h-8 text-white fill-white" />
+              </div>
+              <div className="absolute bottom-1/3 right-1/4 opacity-15 animate-bounce" style={{ animationDuration: '4s', animationDelay: '1s' }}>
+                <Heart className="w-6 h-6 text-white fill-white" />
+              </div>
             </div>
 
             <AnimatedSection className="container mx-auto px-6 text-center relative z-10">
-              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm mb-10 shadow-xl">
-                <Heart className="w-10 h-10 text-primary-foreground animate-pulse-soft" aria-hidden="true" />
+              {/* Social proof badge */}
+              <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm border border-white/30 px-4 py-2 rounded-full mb-8 animate-pulse">
+                <div className="flex -space-x-2 rtl:space-x-reverse">
+                  <div className="w-6 h-6 rounded-full bg-white/80 border-2 border-white flex items-center justify-center text-xs">👩</div>
+                  <div className="w-6 h-6 rounded-full bg-white/80 border-2 border-white flex items-center justify-center text-xs">👨</div>
+                  <div className="w-6 h-6 rounded-full bg-white/80 border-2 border-white flex items-center justify-center text-xs">👩</div>
+                </div>
+                <span className="text-white/90 text-sm font-medium">+234 נרשמו היום</span>
               </div>
-              <h2 id="cta-title" className="font-display text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-primary-foreground mb-8 tracking-tight drop-shadow-lg">
+
+              <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/20 backdrop-blur-sm mb-8 shadow-2xl ring-4 ring-white/20">
+                <Heart className="w-8 h-8 sm:w-10 sm:h-10 text-primary-foreground animate-pulse" aria-hidden="true" />
+              </div>
+              
+              <h2 id="cta-title" className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-primary-foreground mb-6 tracking-tight drop-shadow-lg">
                 <InlineEditable
                   value={cta.title}
                   onChange={(v) => updateCta("title", v)}
@@ -382,25 +400,47 @@ const Index = () => {
                   as="span"
                 />
               </h2>
+              
               <InlineEditable
                 value={cta.description}
                 onChange={(v) => updateCta("description", v)}
-                className="text-primary-foreground/90 text-lg md:text-xl lg:text-2xl max-w-3xl mx-auto mb-14 leading-relaxed font-medium block"
+                className="text-primary-foreground/90 text-base sm:text-lg md:text-xl lg:text-2xl max-w-2xl mx-auto mb-10 leading-relaxed font-medium block"
                 as="p"
                 multiline
               />
-              <Link to="/register">
-                <Button 
-                  size="xl" 
-                  className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 font-bold shadow-2xl hover:shadow-3xl transition-all btn-lift text-lg px-10"
-                >
-                  <InlineEditable
-                    value={cta.button}
-                    onChange={(v) => updateCta("button", v)}
-                    as="span"
-                  />
-                </Button>
-              </Link>
+
+              {/* Enhanced CTA with urgency */}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <Link to="/register">
+                  <Button 
+                    size="xl" 
+                    className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 font-bold shadow-2xl hover:shadow-3xl transition-all btn-lift text-base sm:text-lg px-8 sm:px-12 py-6 gap-2 group"
+                  >
+                    <Sparkles className="w-5 h-5 group-hover:rotate-12 transition-transform" />
+                    <InlineEditable
+                      value={cta.button}
+                      onChange={(v) => updateCta("button", v)}
+                      as="span"
+                    />
+                  </Button>
+                </Link>
+              </div>
+
+              {/* Trust indicators */}
+              <div className="mt-10 flex flex-wrap items-center justify-center gap-6 text-white/70 text-sm">
+                <div className="flex items-center gap-2">
+                  <Shield className="w-4 h-4" />
+                  <span>100% פרטיות</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Users className="w-4 h-4" />
+                  <span>אלפי זוגות מאושרים</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Star className="w-4 h-4 fill-current" />
+                  <span>4.9 דירוג</span>
+                </div>
+              </div>
             </AnimatedSection>
           </section>
         </EditableSection>
