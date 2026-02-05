@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { motion } from "framer-motion";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { useReports, Report } from "@/hooks/useReports";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -94,10 +95,25 @@ export default function AdminReports() {
     );
   }
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 }
+  };
+
   return (
     <AdminLayout>
-      <div className="space-y-6 sm:space-y-8">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <motion.div 
+        className="space-y-6 sm:space-y-8"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        <motion.div variants={itemVariants} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-foreground">דיווחים ותלונות</h1>
             <p className="text-muted-foreground mt-1 text-sm sm:text-base">ניהול דיווחים על משתמשים ותוכן</p>
@@ -106,10 +122,10 @@ export default function AdminReports() {
             <RefreshCw className="w-4 h-4 ml-2" />
             רענן
           </Button>
-        </div>
+        </motion.div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
+        <motion.div variants={itemVariants} className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
           <StatsCard
             title="סה״כ דיווחים"
             value={stats.total}
@@ -130,10 +146,10 @@ export default function AdminReports() {
             value={stats.dismissed}
             icon={XCircle}
           />
-        </div>
+        </motion.div>
 
         {/* Filters */}
-        <div className="flex items-center gap-4">
+        <motion.div variants={itemVariants} className="flex items-center gap-4">
           <Select value={filterStatus} onValueChange={setFilterStatus}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="סנן לפי סטטוס" />
@@ -146,10 +162,10 @@ export default function AdminReports() {
               <SelectItem value="dismissed">נדחה</SelectItem>
             </SelectContent>
           </Select>
-        </div>
+        </motion.div>
 
         {/* Reports Table */}
-        <div className="bg-card rounded-xl border border-border overflow-hidden">
+        <motion.div variants={itemVariants} className="bg-card rounded-xl border border-border overflow-hidden">
           <div className="p-4 border-b border-border">
             <h3 className="text-lg font-semibold">דיווחים</h3>
           </div>
@@ -232,7 +248,7 @@ export default function AdminReports() {
             </TableBody>
           </Table>
           </div>
-        </div>
+        </motion.div>
 
         {/* Report Details Dialog */}
         <Dialog open={viewDialogOpen} onOpenChange={setViewDialogOpen}>
@@ -312,7 +328,7 @@ export default function AdminReports() {
             )}
           </DialogContent>
         </Dialog>
-      </div>
+      </motion.div>
     </AdminLayout>
   );
 }

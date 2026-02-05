@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { motion } from "framer-motion";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { useAdminSupportTickets } from "@/hooks/useAdminSupportTickets";
 import { 
@@ -47,8 +49,17 @@ import {
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { he } from "date-fns/locale";
-import { useState } from "react";
 import { toast } from "sonner";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
+} as const;
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 300, damping: 24 } }
+} as const;
 
 export default function AdminSupport() {
   const { tickets, loading, updateTicketStatus, deleteTicket } = useAdminSupportTickets();
@@ -104,11 +115,37 @@ export default function AdminSupport() {
   if (loading) {
     return (
       <AdminLayout>
-        <div className="space-y-4">
-          {[...Array(5)].map((_, i) => (
-            <Skeleton key={i} className="h-16 w-full" />
-          ))}
-        </div>
+        <motion.div 
+          className="space-y-6"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <Skeleton className="h-8 w-48 mb-2" />
+              <Skeleton className="h-4 w-64" />
+            </div>
+            <div className="flex items-center gap-4">
+              <Skeleton className="h-6 w-24" />
+              <Skeleton className="h-6 w-24" />
+            </div>
+          </div>
+          <div className="bg-card rounded-xl border overflow-hidden">
+            <div className="p-4 border-b">
+              <Skeleton className="h-5 w-32" />
+            </div>
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="flex items-center gap-4 p-4 border-b last:border-b-0">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-4 w-20" />
+                <Skeleton className="h-6 w-16 rounded-full" />
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-8 w-16" />
+              </div>
+            ))}
+          </div>
+        </motion.div>
       </AdminLayout>
     );
   }
@@ -118,8 +155,13 @@ export default function AdminSupport() {
 
   return (
     <AdminLayout>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
+      <motion.div 
+        className="space-y-6"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        <motion.div variants={itemVariants} className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-foreground">פניות תמיכה</h1>
             <p className="text-muted-foreground">ניהול פניות תמיכה מהמשתמשים</p>
@@ -134,16 +176,27 @@ export default function AdminSupport() {
               <span className="text-sm text-muted-foreground">{inProgressCount} בטיפול</span>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {tickets.length === 0 ? (
-          <div className="text-center py-16 bg-card rounded-xl border" role="status" aria-live="polite">
-            <MessageSquare className="w-12 h-12 text-muted-foreground/50 mx-auto mb-4" aria-hidden="true" />
-            <h3 className="text-lg font-semibold text-foreground mb-2">אין פניות תמיכה</h3>
-            <p className="text-muted-foreground">טרם התקבלו פניות תמיכה</p>
-          </div>
+          <motion.div 
+            variants={itemVariants}
+            className="text-center py-16 bg-card rounded-xl border" 
+            role="status" 
+            aria-live="polite"
+          >
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
+            >
+              <MessageSquare className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" aria-hidden="true" />
+            </motion.div>
+            <h3 className="text-lg font-semibold text-foreground mb-2">אין פניות תמיכה 🎉</h3>
+            <p className="text-muted-foreground">טרם התקבלו פניות תמיכה - מצוין!</p>
+          </motion.div>
         ) : (
-          <div className="bg-card rounded-xl border overflow-hidden">
+          <motion.div variants={itemVariants} className="bg-card rounded-xl border overflow-hidden">
             <Table>
               <caption className="sr-only">טבלת פניות תמיכה</caption>
               <TableHeader>
@@ -273,7 +326,7 @@ export default function AdminSupport() {
                 ))}
               </TableBody>
             </Table>
-          </div>
+          </motion.div>
         )}
 
         <AlertDialog open={!!deleteTicketId} onOpenChange={(open) => !open && setDeleteTicketId(null)}>
@@ -295,7 +348,7 @@ export default function AdminSupport() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-      </div>
+      </motion.div>
     </AdminLayout>
   );
 }
