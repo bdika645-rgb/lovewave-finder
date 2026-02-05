@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { useAppSettings } from "@/hooks/useAppSettings";
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Save, Bell, Shield, Palette, Globe, Loader2 } from "lucide-react";
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
+} as const;
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+} as const;
 export default function AdminSettings() {
   const { settings, loading, saving, updateSettings } = useAppSettings();
   const [localSettings, setLocalSettings] = useState(settings);
@@ -41,14 +51,19 @@ export default function AdminSettings() {
 
   return (
     <AdminLayout>
-      <div className="space-y-8 max-w-4xl">
-        <div>
+      <motion.div 
+        className="space-y-8 max-w-4xl"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        <motion.div variants={itemVariants}>
           <h1 className="text-3xl font-bold text-foreground">הגדרות</h1>
           <p className="text-muted-foreground mt-1">הגדרות כלליות של האפליקציה</p>
-        </div>
+        </motion.div>
 
         {/* General Settings */}
-        <div className="bg-card rounded-xl p-6 border border-border space-y-6">
+        <motion.div variants={itemVariants} className="bg-card rounded-xl p-6 border border-border space-y-6">
           <div className="flex items-center gap-3 mb-4">
             <Globe className="w-5 h-5 text-primary" />
             <h3 className="text-lg font-semibold">הגדרות כלליות</h3>
@@ -83,10 +98,10 @@ export default function AdminSettings() {
               rows={3}
             />
           </div>
-        </div>
+        </motion.div>
 
         {/* Security Settings */}
-        <div className="bg-card rounded-xl p-6 border border-border space-y-6">
+        <motion.div variants={itemVariants} className="bg-card rounded-xl p-6 border border-border space-y-6">
           <div className="flex items-center gap-3 mb-4">
             <Shield className="w-5 h-5 text-primary" />
             <h3 className="text-lg font-semibold">אבטחה</h3>
@@ -115,10 +130,10 @@ export default function AdminSettings() {
               />
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Notification Settings */}
-        <div className="bg-card rounded-xl p-6 border border-border space-y-6">
+        <motion.div variants={itemVariants} className="bg-card rounded-xl p-6 border border-border space-y-6">
           <div className="flex items-center gap-3 mb-4">
             <Bell className="w-5 h-5 text-primary" />
             <h3 className="text-lg font-semibold">התראות</h3>
@@ -147,10 +162,10 @@ export default function AdminSettings() {
               />
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Profile Settings */}
-        <div className="bg-card rounded-xl p-6 border border-border space-y-6">
+        <motion.div variants={itemVariants} className="bg-card rounded-xl p-6 border border-border space-y-6">
           <div className="flex items-center gap-3 mb-4">
             <Palette className="w-5 h-5 text-primary" />
             <h3 className="text-lg font-semibold">הגדרות פרופיל</h3>
@@ -187,10 +202,10 @@ export default function AdminSettings() {
               />
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Save Button */}
-        <div className="flex justify-end">
+        <motion.div variants={itemVariants} className="flex justify-end">
           <Button onClick={handleSave} size="lg" disabled={saving}>
             {saving ? (
               <Loader2 className="w-4 h-4 ml-2 animate-spin" />
@@ -199,8 +214,8 @@ export default function AdminSettings() {
             )}
             שמור הגדרות
           </Button>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </AdminLayout>
   );
 }
