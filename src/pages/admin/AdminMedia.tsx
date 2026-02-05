@@ -1,9 +1,20 @@
 import { useState, useEffect, useCallback } from "react";
+import { motion } from "framer-motion";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Image, RefreshCw, Trash2, Calendar, Search, Grid, List, Eye, User, Filter } from "lucide-react";
 import StatsCard from "@/components/admin/StatsCard";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
+} as const;
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+} as const;
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -202,27 +213,43 @@ export default function AdminMedia() {
   if (loading) {
     return (
       <AdminLayout>
-        <div className="space-y-6">
-          <h1 className="text-3xl font-bold text-foreground">ניהול מדיה</h1>
+        <motion.div 
+          className="space-y-6"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+        >
+          <div>
+            <Skeleton className="h-8 w-40 mb-2" />
+            <Skeleton className="h-4 w-64" />
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[...Array(3)].map((_, i) => (
               <Skeleton key={i} className="h-32 rounded-xl" />
             ))}
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[...Array(8)].map((_, i) => (
+          <div className="flex items-center gap-4">
+            <Skeleton className="h-10 flex-1 max-w-md" />
+            <Skeleton className="h-10 w-[180px]" />
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            {[...Array(10)].map((_, i) => (
               <Skeleton key={i} className="aspect-square rounded-xl" />
             ))}
           </div>
-        </div>
+        </motion.div>
       </AdminLayout>
     );
   }
 
   return (
     <AdminLayout>
-      <div className="space-y-8">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <motion.div 
+        className="space-y-8"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-foreground">ניהול מדיה</h1>
             <p className="text-muted-foreground mt-1">צפייה בכל התמונות במערכת לצורך מודרציה</p>
@@ -231,10 +258,10 @@ export default function AdminMedia() {
             <RefreshCw className="w-4 h-4 ml-2" />
             רענן
           </Button>
-        </div>
+        </motion.div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <StatsCard
             title="תמונות פרופיל"
             value={stats.totalAvatars}
@@ -250,10 +277,10 @@ export default function AdminMedia() {
             value={stats.todayUploads}
             icon={Calendar}
           />
-        </div>
+        </motion.div>
 
         {/* Filters */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+        <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 flex-1">
             <div className="relative flex-1 max-w-md">
               <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
@@ -296,7 +323,7 @@ export default function AdminMedia() {
               <List className="w-4 h-4" />
             </Button>
           </div>
-        </div>
+        </motion.div>
 
         {/* Results count */}
         <div className="text-sm text-muted-foreground">
@@ -498,7 +525,7 @@ export default function AdminMedia() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-      </div>
+      </motion.div>
     </AdminLayout>
   );
 }

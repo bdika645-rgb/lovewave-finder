@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { motion } from "framer-motion";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { useAdminPhotos } from "@/hooks/useAdminPhotos";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -23,6 +24,16 @@ import {
 } from "@/components/ui/dialog";
 import { formatDistanceToNow } from "date-fns";
 import { he } from "date-fns/locale";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
+} as const;
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+} as const;
 
 
 export default function AdminContent() {
@@ -53,27 +64,43 @@ export default function AdminContent() {
   if (loading) {
     return (
       <AdminLayout>
-        <div className="space-y-6">
-          <h1 className="text-3xl font-bold text-foreground">גלריית תמונות</h1>
+        <motion.div 
+          className="space-y-6"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+        >
+          <div>
+            <Skeleton className="h-8 w-40 mb-2" />
+            <Skeleton className="h-4 w-64" />
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {[...Array(2)].map((_, i) => (
               <Skeleton key={i} className="h-32 rounded-xl" />
             ))}
+          </div>
+          <div className="flex items-center gap-4">
+            <Skeleton className="h-10 flex-1 max-w-md" />
+            <Skeleton className="h-10 w-20" />
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[...Array(8)].map((_, i) => (
               <Skeleton key={i} className="aspect-square rounded-xl" />
             ))}
           </div>
-        </div>
+        </motion.div>
       </AdminLayout>
     );
   }
 
   return (
     <AdminLayout>
-      <div className="space-y-8">
-        <div className="flex items-center justify-between">
+      <motion.div 
+        className="space-y-8"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        <motion.div variants={itemVariants} className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-foreground">גלריית תמונות</h1>
             <p className="text-muted-foreground mt-1">צפייה וניהול כל התמונות שהועלו על ידי משתמשים</p>
@@ -82,10 +109,10 @@ export default function AdminContent() {
             <RefreshCw className="w-4 h-4 ml-2" />
             רענן
           </Button>
-        </div>
+        </motion.div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <StatsCard
             title="סה״כ תמונות"
             value={stats.total}
@@ -96,10 +123,10 @@ export default function AdminContent() {
             value={stats.today}
             icon={Calendar}
           />
-        </div>
+        </motion.div>
 
         {/* Search and View Mode */}
-        <div className="flex items-center justify-between gap-4">
+        <motion.div variants={itemVariants} className="flex items-center justify-between gap-4">
           <div className="relative flex-1 max-w-md">
             <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <Input
@@ -129,7 +156,7 @@ export default function AdminContent() {
               <List className="w-4 h-4" />
             </Button>
           </div>
-        </div>
+        </motion.div>
 
         {/* Photos Grid/List */}
         {viewMode === "grid" ? (
@@ -268,7 +295,7 @@ export default function AdminContent() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-      </div>
+      </motion.div>
     </AdminLayout>
   );
 }

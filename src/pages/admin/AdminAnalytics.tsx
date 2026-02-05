@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -15,6 +16,16 @@ import {
 } from "recharts";
 import { format, subDays, startOfDay, addDays } from "date-fns";
 import { he } from "date-fns/locale";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.15 } }
+} as const;
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+} as const;
 
 interface DailyStats {
   date: string;
@@ -101,24 +112,41 @@ export default function AdminAnalytics() {
   if (loading) {
     return (
       <AdminLayout>
-        <div className="space-y-6">
-          <h1 className="text-3xl font-bold text-foreground">סטטיסטיקות</h1>
-          <Skeleton className="h-[400px] rounded-xl" />
-        </div>
+        <motion.div 
+          className="space-y-6"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+        >
+          <div>
+            <Skeleton className="h-8 w-32 mb-2" />
+            <Skeleton className="h-4 w-48" />
+          </div>
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="bg-card rounded-xl p-6 border border-border">
+              <Skeleton className="h-5 w-32 mb-4" />
+              <Skeleton className="h-[280px] rounded-lg" />
+            </div>
+          ))}
+        </motion.div>
       </AdminLayout>
     );
   }
 
   return (
     <AdminLayout>
-      <div className="space-y-6 sm:space-y-8">
-        <div>
+      <motion.div 
+        className="space-y-6 sm:space-y-8"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        <motion.div variants={itemVariants}>
           <h1 className="text-2xl sm:text-3xl font-bold text-foreground">סטטיסטיקות</h1>
           <p className="text-muted-foreground mt-1 text-sm sm:text-base">נתונים מ-30 הימים האחרונים</p>
-        </div>
+        </motion.div>
 
         {/* New Users Chart */}
-        <div className="bg-card rounded-xl p-6 border border-border">
+        <motion.div variants={itemVariants} className="bg-card rounded-xl p-6 border border-border">
           <h3 className="text-lg font-semibold text-foreground mb-4">משתמשים חדשים</h3>
           <ResponsiveContainer width="100%" height={300}>
             <AreaChart data={dailyStats}>
@@ -142,10 +170,10 @@ export default function AdminAnalytics() {
               />
             </AreaChart>
           </ResponsiveContainer>
-        </div>
+        </motion.div>
 
         {/* Matches Chart */}
-        <div className="bg-card rounded-xl p-6 border border-border">
+        <motion.div variants={itemVariants} className="bg-card rounded-xl p-6 border border-border">
           <h3 className="text-lg font-semibold text-foreground mb-4">מאצ'ים חדשים</h3>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={dailyStats}>
@@ -163,16 +191,16 @@ export default function AdminAnalytics() {
                 type="monotone"
                 dataKey="newMatches"
                 name="מאצ'ים"
-                  stroke="hsl(var(--primary))"
+                stroke="hsl(var(--primary))"
                 strokeWidth={2}
-                  dot={{ fill: "hsl(var(--primary))" }}
+                dot={{ fill: "hsl(var(--primary))" }}
               />
             </LineChart>
           </ResponsiveContainer>
-        </div>
+        </motion.div>
 
         {/* Messages Chart */}
-        <div className="bg-card rounded-xl p-6 border border-border">
+        <motion.div variants={itemVariants} className="bg-card rounded-xl p-6 border border-border">
           <h3 className="text-lg font-semibold text-foreground mb-4">הודעות</h3>
           <ResponsiveContainer width="100%" height={300}>
             <AreaChart data={dailyStats}>
@@ -196,8 +224,8 @@ export default function AdminAnalytics() {
               />
             </AreaChart>
           </ResponsiveContainer>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </AdminLayout>
   );
 }
