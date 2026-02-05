@@ -1,10 +1,11 @@
 import { Link, useLocation } from "react-router-dom";
-import { Heart, Menu, X, User, MessageCircle, Search, LogOut, Sparkles, Bell, Eye, Settings, ChevronDown } from "lucide-react";
+import { Heart, Menu, X, User, MessageCircle, Search, LogOut, Sparkles, Eye, Settings, ChevronDown, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 import { useCurrentProfile } from "@/hooks/useCurrentProfile";
+import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { Badge } from "@/components/ui/badge";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import {
@@ -15,6 +16,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { motion, useScroll, useSpring } from "framer-motion";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -24,6 +26,15 @@ const Navbar = () => {
   const { user, signOut } = useAuth();
   const { unreadCount } = useUnreadMessages();
   const { profile } = useCurrentProfile();
+  const { isAdmin } = useAdminAuth();
+
+  // Scroll progress for pages with long content
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001
+  });
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -39,16 +50,25 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     await signOut();
     setIsOpen(false);
-  };
+  }, [signOut]);
 
   const navBgClass = isHome && !isScrolled && !isOpen
     ? "bg-transparent" 
     : "glass-effect shadow-soft";
 
   return (
+    <>
+    {/* Scroll Progress Bar */}
+    {!isHome && (
+      <motion.div
+        className="fixed top-0 left-0 right-0 h-1 bg-primary origin-left z-[60]"
+        style={{ scaleX }}
+      />
+    )}
+    
     <nav 
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${navBgClass}`}
       role="navigation"
@@ -58,9 +78,14 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16 sm:h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group" aria-label="Spark - דף הבית">
-            <Heart className={`w-7 h-7 sm:w-8 sm:h-8 transition-colors ${
-              isHome && !isScrolled ? "text-primary-foreground" : "text-primary"
-            } fill-current group-hover:scale-110 transition-transform`} aria-hidden="true" />
+            <motion.div
+              whileHover={{ scale: 1.1, rotate: 5 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Heart className={`w-7 h-7 sm:w-8 sm:h-8 transition-colors ${
+                isHome && !isScrolled ? "text-primary-foreground" : "text-primary"
+              } fill-current`} aria-hidden="true" />
+            </motion.div>
             <span className={`font-display text-xl sm:text-2xl font-bold ${
               isHome && !isScrolled ? "text-primary-foreground" : "text-foreground"
             }`}>
@@ -167,6 +192,17 @@ const Navbar = () => {
                         הגדרות
                       </Link>
                     </DropdownMenuItem>
+                    {isAdmin && (
+                      <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem asChild>
+                          <Link to="/admin" className="flex items-center gap-2 cursor-pointer text-primary">
+                            <Shield className="w-4 h-4" />
+                            לוח בקרה
+                          </Link>
+                        </DropdownMenuItem>
+                      </>
+                    )}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem 
                       onClick={handleLogout}
@@ -323,6 +359,7 @@ const Navbar = () => {
         )}
       </div>
     </nav>
+    </>
   );
 };
 
