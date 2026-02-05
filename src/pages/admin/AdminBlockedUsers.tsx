@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { motion } from "framer-motion";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { useBlockedUsers } from "@/hooks/useBlockedUsers";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -27,6 +28,16 @@ import {
 } from "@/components/ui/alert-dialog";
 import { formatDistanceToNow } from "date-fns";
 import { he } from "date-fns/locale";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
+} as const;
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+} as const;
 
 export default function AdminBlockedUsers() {
   const { blockedUsers, loading, unblockUser, refetch } = useBlockedUsers();
@@ -70,8 +81,13 @@ export default function AdminBlockedUsers() {
 
   return (
     <AdminLayout>
-      <div className="space-y-8">
-        <div className="flex items-center justify-between">
+      <motion.div 
+        className="space-y-8"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        <motion.div variants={itemVariants} className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-foreground">משתמשים חסומים</h1>
             <p className="text-muted-foreground mt-1">ניהול משתמשים שנחסמו במערכת</p>
@@ -80,10 +96,10 @@ export default function AdminBlockedUsers() {
             <RefreshCw className="w-4 h-4 ml-2" />
             רענן
           </Button>
-        </div>
+        </motion.div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <StatsCard
             title="סה״כ חסומים"
             value={blockedUsers.length}
@@ -94,7 +110,7 @@ export default function AdminBlockedUsers() {
             value={blockedUsers.filter(u => u.blocked_by_admin).length}
             icon={UserX}
           />
-        </div>
+        </motion.div>
 
         {/* Search */}
         <div className="relative max-w-md">
@@ -191,7 +207,7 @@ export default function AdminBlockedUsers() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-      </div>
+      </motion.div>
     </AdminLayout>
   );
 }

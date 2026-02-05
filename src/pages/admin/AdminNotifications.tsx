@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { motion } from "framer-motion";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { useAdminNotifications } from "@/hooks/useAdminNotifications";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -47,6 +48,16 @@ import { Switch } from "@/components/ui/switch";
 import { formatDistanceToNow } from "date-fns";
 import { he } from "date-fns/locale";
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
+} as const;
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+} as const;
+
 export default function AdminNotifications() {
   const { notifications, loading, createNotification, deleteNotification, refetch } = useAdminNotifications();
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -61,28 +72,28 @@ export default function AdminNotifications() {
     switch (type) {
       case "warning":
         return (
-          <Badge variant="outline" className="bg-yellow-500/10 text-yellow-600 border-yellow-500">
+          <Badge variant="outline" className="bg-warning/10 text-warning border-warning">
             <AlertTriangle className="w-3 h-3 ml-1" />
             אזהרה
           </Badge>
         );
       case "success":
         return (
-          <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-500">
+          <Badge variant="outline" className="bg-success/10 text-success border-success">
             <CheckCircle className="w-3 h-3 ml-1" />
             הצלחה
           </Badge>
         );
       case "error":
         return (
-          <Badge variant="outline" className="bg-red-500/10 text-red-600 border-red-500">
+          <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive">
             <AlertTriangle className="w-3 h-3 ml-1" />
             שגיאה
           </Badge>
         );
       default:
         return (
-          <Badge variant="outline" className="bg-blue-500/10 text-blue-600 border-blue-500">
+          <Badge variant="outline" className="bg-primary/10 text-primary border-primary">
             <Info className="w-3 h-3 ml-1" />
             מידע
           </Badge>
@@ -122,8 +133,13 @@ export default function AdminNotifications() {
 
   return (
     <AdminLayout>
-      <div className="space-y-6 sm:space-y-8">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <motion.div 
+        className="space-y-6 sm:space-y-8"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        <motion.div variants={itemVariants} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-foreground">התראות</h1>
             <p className="text-muted-foreground mt-1 text-sm sm:text-base">שלח התראות למשתמשים</p>
@@ -206,7 +222,7 @@ export default function AdminNotifications() {
               </DialogContent>
             </Dialog>
           </div>
-        </div>
+        </motion.div>
 
         {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6">
@@ -297,7 +313,7 @@ export default function AdminNotifications() {
             </TableBody>
           </Table>
         </div>
-      </div>
+      </motion.div>
     </AdminLayout>
   );
 }
