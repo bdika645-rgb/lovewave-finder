@@ -116,30 +116,30 @@ const HeroSection = () => {
         />
 
         {/* Content */}
-        <div className="relative z-10 container mx-auto px-6 text-center">
+        <div className="relative z-10 container mx-auto px-4 sm:px-6 text-center pt-8 sm:pt-0">
           <motion.div
             variants={containerVariants}
             initial="hidden"
             animate="visible"
           >
-            {/* Badge */}
+            {/* Badge - Smaller on mobile */}
             <motion.div 
               variants={scaleVariants}
-              className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 px-4 py-2 rounded-full mb-8"
+              className="inline-flex items-center gap-1.5 sm:gap-2 bg-primary/10 border border-primary/20 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full mb-4 sm:mb-8"
             >
-              <Diamond className="w-4 h-4 text-primary" />
+              <Diamond className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
               <InlineEditable
                 value={hero.badge}
                 onChange={(v) => updateHero("badge", v)}
-                className="text-primary font-semibold text-sm"
+                className="text-primary font-semibold text-xs sm:text-sm"
                 as="span"
               />
             </motion.div>
             
-            {/* Hero Title */}
+            {/* Hero Title - Better mobile sizing */}
             <motion.h1 
               variants={itemVariants}
-              className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-foreground mb-6 leading-tight tracking-tight"
+              className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-foreground mb-4 sm:mb-6 leading-[1.15] sm:leading-tight tracking-tight px-2 sm:px-0"
             >
               <InlineEditable
                 value={hero.titleLine1}
@@ -165,7 +165,7 @@ const HeroSection = () => {
               <InlineEditable
                 value={hero.description}
                 onChange={(v) => updateHero("description", v)}
-                className="font-body text-base sm:text-lg md:text-xl text-muted-foreground max-w-xl mx-auto mb-10 leading-relaxed px-4 block"
+                className="font-body text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground max-w-xl mx-auto mb-6 sm:mb-10 leading-relaxed px-2 sm:px-4 block"
                 as="p"
                 multiline
               />
