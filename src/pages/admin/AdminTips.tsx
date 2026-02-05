@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { motion } from "framer-motion";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -41,6 +42,16 @@ import {
 } from "lucide-react";
 import { useDatingTips, DatingTip } from "@/hooks/useDatingTips";
 import { datingTips as staticTips } from "@/data/members";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
+} as const;
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+} as const;
 
 const CATEGORIES = [
   { value: "פרופיל", label: "פרופיל" },
@@ -133,12 +144,12 @@ export default function AdminTips() {
 
   const getCategoryBadge = (category: string) => {
     const colors: Record<string, string> = {
-      "פרופיל": "bg-blue-500/10 text-blue-600 border-blue-500",
-      "שיחות": "bg-green-500/10 text-green-600 border-green-500",
-      "דייטים": "bg-pink-500/10 text-pink-600 border-pink-500",
-      "מוטיבציה": "bg-yellow-500/10 text-yellow-600 border-yellow-500",
+      "פרופיל": "bg-primary/10 text-primary border-primary",
+      "שיחות": "bg-success/10 text-success border-success",
+      "דייטים": "bg-secondary/10 text-secondary border-secondary",
+      "מוטיבציה": "bg-warning/10 text-warning border-warning",
     };
-    return colors[category] || "bg-gray-500/10 text-gray-600 border-gray-500";
+    return colors[category] || "bg-muted text-muted-foreground border-muted-foreground/30";
   };
 
   if (loading) {
@@ -158,8 +169,13 @@ export default function AdminTips() {
 
   return (
     <AdminLayout>
-      <div className="space-y-6 sm:space-y-8">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <motion.div 
+        className="space-y-6 sm:space-y-8"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        <motion.div variants={itemVariants} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-foreground">טיפים להיכרויות</h1>
             <p className="text-muted-foreground mt-1 text-sm sm:text-base">ניהול טיפים שמוצגים למשתמשים</p>
@@ -247,7 +263,7 @@ export default function AdminTips() {
               </DialogContent>
             </Dialog>
           </div>
-        </div>
+        </motion.div>
 
         {/* Tips List */}
         <div className="space-y-4">
@@ -325,7 +341,7 @@ export default function AdminTips() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-      </div>
+      </motion.div>
     </AdminLayout>
   );
 }

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { motion } from "framer-motion";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -64,6 +65,16 @@ import { he } from "date-fns/locale";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
+} as const;
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+} as const;
 
 interface Campaign {
   id: string;
@@ -367,8 +378,13 @@ export default function AdminCampaigns() {
 
   return (
     <AdminLayout>
-      <div className="space-y-6 sm:space-y-8">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <motion.div 
+        className="space-y-6 sm:space-y-8"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        <motion.div variants={itemVariants} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-foreground">קמפיינים וניוזלטר</h1>
             <p className="text-muted-foreground mt-1 text-sm sm:text-base">ניהול שליחת אימיילים וקמפיינים שיווקיים</p>
@@ -479,7 +495,7 @@ export default function AdminCampaigns() {
               </DialogContent>
             </Dialog>
           </div>
-        </div>
+        </motion.div>
 
         {/* Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-6">
@@ -790,7 +806,7 @@ export default function AdminCampaigns() {
             )}
           </DialogContent>
         </Dialog>
-      </div>
+      </motion.div>
     </AdminLayout>
   );
 }
