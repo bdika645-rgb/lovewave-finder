@@ -273,7 +273,7 @@ const Profile = () => {
         {liveMessage}
       </div>
 
-      <div className="container mx-auto px-6 pt-28 pb-16 max-w-4xl">
+      <div className="container mx-auto px-6 pt-28 pb-24 md:pb-16 max-w-4xl">
         {/* Profile Header */}
         <div className="bg-card rounded-3xl shadow-card overflow-hidden mb-6">
           {/* Cover Image */}

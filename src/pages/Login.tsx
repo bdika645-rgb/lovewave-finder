@@ -226,11 +226,7 @@ const Login = () => {
               <FieldError id="password-error" message={errors.password?.message} />
             </div>
 
-            <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center gap-2">
-                <input id="remember-me" type="checkbox" className="rounded border-border" />
-                <span className="text-muted-foreground">זכור אותי</span>
-              </label>
+            <div className="flex items-center justify-end text-sm">
               <Link 
                 to="/forgot-password" 
                 className="text-primary hover:underline"

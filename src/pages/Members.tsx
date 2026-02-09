@@ -53,7 +53,8 @@ const Members = () => {
   const [ageFrom, setAgeFrom] = useState("");
   const [ageTo, setAgeTo] = useState("");
   const [locationFilter, setLocationFilter] = useState("");
-  const [activeFilters, setActiveFilters] = useState<{ageFrom?: number; ageTo?: number; city?: string}>({});
+  const [genderFilter, setGenderFilter] = useState("");
+  const [activeFilters, setActiveFilters] = useState<{ageFrom?: number; ageTo?: number; city?: string; gender?: string}>({});
 
   // Show all profiles - don't filter by gender
   const { profiles, loading, error, refetch } = useProfiles({
@@ -61,6 +62,7 @@ const Members = () => {
     ageFrom: activeFilters.ageFrom,
     ageTo: activeFilters.ageTo,
     city: activeFilters.city,
+    gender: activeFilters.gender,
     filterByOppositeGender: false,
   });
 
@@ -108,7 +110,7 @@ const Members = () => {
   };
 
   const applyFilters = () => {
-    const filters: {ageFrom?: number; ageTo?: number; city?: string} = {};
+    const filters: {ageFrom?: number; ageTo?: number; city?: string; gender?: string} = {};
     const filterLabels: string[] = [];
     
     if (ageFrom) {
@@ -123,10 +125,14 @@ const Members = () => {
       filters.city = locationFilter;
       filterLabels.push(`מיקום: ${locationFilter}`);
     }
+    if (genderFilter) {
+      filters.gender = genderFilter;
+      filterLabels.push(`מגדר: ${genderFilter === 'male' ? 'גבר' : 'אישה'}`);
+    }
     
     setActiveFilters(filters);
     setShowFilters(false);
-    pagination.goToPage(1); // Reset to first page
+    pagination.goToPage(1);
     
     if (filterLabels.length > 0) {
       toast.success(`הופעלו ${filterLabels.length} פילטרים`);
@@ -139,6 +145,7 @@ const Members = () => {
     setAgeFrom("");
     setAgeTo("");
     setLocationFilter("");
+    setGenderFilter("");
     setActiveFilters({});
     setSearchQuery("");
     pagination.goToPage(1);
@@ -150,6 +157,7 @@ const Members = () => {
     if (activeFilters.ageFrom) labels.push(`גיל מ-${activeFilters.ageFrom}`);
     if (activeFilters.ageTo) labels.push(`גיל עד ${activeFilters.ageTo}`);
     if (activeFilters.city) labels.push(`מיקום: ${activeFilters.city}`);
+    if (activeFilters.gender) labels.push(`מגדר: ${activeFilters.gender === 'male' ? 'גבר' : 'אישה'}`);
     return labels;
   }, [activeFilters]);
 
@@ -234,7 +242,7 @@ const Members = () => {
         />
         <Navbar />
         
-        <main className="container mx-auto px-6 pt-28 pb-16">
+        <main className="container mx-auto px-6 pt-28 pb-24 md:pb-16">
         {/* Header */}
         <header className="text-center mb-12">
           <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
@@ -296,7 +304,7 @@ const Members = () => {
           {/* Filter Panel */}
           {showFilters && (
             <div className="mt-4 p-6 bg-card rounded-2xl shadow-card animate-slide-up" role="region" aria-label="פילטרים">
-              <div className="grid md:grid-cols-3 gap-4">
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div>
                   <label className="text-sm font-medium text-foreground mb-2 block" id="age-label">גיל</label>
                   <div className="flex gap-2" aria-labelledby="age-label">
@@ -329,6 +337,35 @@ const Members = () => {
                       value={locationFilter}
                       onChange={(e) => setLocationFilter(e.target.value)}
                     />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-2 block">מגדר</label>
+                  <div className="flex gap-2" role="radiogroup" aria-label="סינון לפי מגדר">
+                    <button
+                      type="button"
+                      onClick={() => setGenderFilter(genderFilter === "male" ? "" : "male")}
+                      className={`flex-1 h-10 rounded-lg border-2 transition-all text-sm font-medium focus-ring ${
+                        genderFilter === "male" 
+                          ? "border-primary bg-primary/10 text-primary" 
+                          : "border-border hover:border-primary/50 text-muted-foreground"
+                      }`}
+                      aria-pressed={genderFilter === "male"}
+                    >
+                      גבר
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setGenderFilter(genderFilter === "female" ? "" : "female")}
+                      className={`flex-1 h-10 rounded-lg border-2 transition-all text-sm font-medium focus-ring ${
+                        genderFilter === "female" 
+                          ? "border-primary bg-primary/10 text-primary" 
+                          : "border-border hover:border-primary/50 text-muted-foreground"
+                      }`}
+                      aria-pressed={genderFilter === "female"}
+                    >
+                      אישה
+                    </button>
                   </div>
                 </div>
                 <div className="flex items-end">
