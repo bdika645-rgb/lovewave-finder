@@ -10,7 +10,7 @@ import FullPageLoader from "@/components/FullPageLoader";
 import EmptyState from "@/components/EmptyState";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Send, Search, Loader2, MessageCircle, Heart, ChevronRight, SearchX, Mic, Trash2 } from "lucide-react";
+import { Send, Search, Loader2, MessageCircle, Heart, ChevronRight, ChevronDown, SearchX, Mic, Trash2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { he } from "date-fns/locale";
 import { useState, useEffect, useRef, useCallback } from "react";
@@ -34,6 +34,8 @@ const Messages = () => {
   const [conversationFilter, setConversationFilter] = useState<"all" | "unread">("all");
   const [sendingMessage, setSendingMessage] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const [showScrollToBottom, setShowScrollToBottom] = useState(false);
   const [myProfileId, setMyProfileId] = useState<string | null>(null);
 
   const { messages, loading: messagesLoading, sendMessage, markAsRead } = useMessages(selectedConversationId);
@@ -42,10 +44,36 @@ const Messages = () => {
   // Get selected conversation details
   const selectedConversation = conversations.find(c => c.id === selectedConversationId);
 
-  // Scroll to bottom when messages change
+  // Scroll to bottom when messages change (only if near bottom)
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    const container = messagesContainerRef.current;
+    if (!container) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      return;
+    }
+    const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 150;
+    if (isNearBottom) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    } else {
+      setShowScrollToBottom(true);
+    }
   }, [messages]);
+
+  // Track scroll position for scroll-to-bottom button
+  useEffect(() => {
+    const container = messagesContainerRef.current;
+    if (!container) return;
+    const handleScroll = () => {
+      const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 150;
+      setShowScrollToBottom(!isNearBottom);
+    };
+    container.addEventListener('scroll', handleScroll, { passive: true });
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, [selectedConversationId]);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   // Mark messages as read when conversation is selected
   useEffect(() => {
@@ -469,7 +497,8 @@ const Messages = () => {
 
                   {/* Messages */}
                   <div 
-                    className="flex-1 overflow-y-auto p-6 space-y-4 scroll-smooth" 
+                    ref={messagesContainerRef}
+                    className="flex-1 overflow-y-auto p-6 space-y-4 scroll-smooth relative"
                     style={{ WebkitOverflowScrolling: 'touch' }}
                     role="log" 
                     aria-label="הודעות"
@@ -610,6 +639,21 @@ const Messages = () => {
                     })()}
                     <div ref={messagesEndRef} />
                   </div>
+
+                  {/* Scroll to bottom button */}
+                  {showScrollToBottom && messages.length > 0 && (
+                    <div className="relative">
+                      <Button
+                        variant="secondary"
+                        size="icon"
+                        className="absolute bottom-2 left-1/2 -translate-x-1/2 rounded-full shadow-lg z-10 w-10 h-10"
+                        onClick={scrollToBottom}
+                        aria-label="גלול להודעות אחרונות"
+                      >
+                        <ChevronDown className="w-5 h-5" />
+                      </Button>
+                    </div>
+                  )}
 
                   {/* Message Input */}
                   <div className="p-2 md:p-4 border-t border-border">
