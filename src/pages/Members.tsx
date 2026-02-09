@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import MemberCard from "@/components/MemberCard";
@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 
 // Animation variants for staggered card entrance
 const gridContainerVariants = {
@@ -43,11 +43,20 @@ import defaultProfileImage from "@/assets/profiles/profile1.jpg";
 const ITEMS_PER_PAGE = 20;
 
 const Members = () => {
+  const [searchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const { user } = useAuth();
   const { sendLike } = useLikes();
+
+  // Read search query from URL params (e.g. from HeroSearch)
+  useEffect(() => {
+    const urlSearch = searchParams.get("search");
+    if (urlSearch) {
+      setSearchQuery(urlSearch);
+    }
+  }, [searchParams]);
   
   // Filter states
   const [ageFrom, setAgeFrom] = useState("");
