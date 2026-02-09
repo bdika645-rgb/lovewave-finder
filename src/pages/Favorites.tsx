@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import SkipToContent from "@/components/SkipToContent";
@@ -11,6 +11,7 @@ import { useFavorites } from "@/hooks/useFavorites";
 import LazyImage from "@/components/LazyImage";
 import EmptyState from "@/components/EmptyState";
 import { MatchCardSkeleton } from "@/components/MatchCardSkeleton";
+import PullToRefresh from "@/components/PullToRefresh";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface FavoriteProfile {
@@ -29,41 +30,40 @@ const Favorites = () => {
   const [profiles, setProfiles] = useState<FavoriteProfile[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const fetchFavorites = useCallback(async () => {
     if (!profileId) return;
+    setLoading(true);
+    const { data: favs } = await supabase
+      .from("favorites")
+      .select("favorited_id, created_at")
+      .eq("profile_id", profileId)
+      .order("created_at", { ascending: false });
 
-    const fetchFavorites = async () => {
-      const { data: favs } = await supabase
-        .from("favorites")
-        .select("favorited_id, created_at")
-        .eq("profile_id", profileId)
-        .order("created_at", { ascending: false });
-
-      if (!favs || favs.length === 0) {
-        setProfiles([]);
-        setLoading(false);
-        return;
-      }
-
-      const ids = favs.map((f: any) => f.favorited_id);
-      const { data: profilesData } = await supabase
-        .from("profiles")
-        .select("id, name, age, city, avatar_url, is_online, bio")
-        .in("id", ids);
-
-      if (profilesData) {
-        // Preserve order from favorites
-        const profileMap = new Map(profilesData.map(p => [p.id, p]));
-        const ordered = ids
-          .map(id => profileMap.get(id))
-          .filter(Boolean) as FavoriteProfile[];
-        setProfiles(ordered);
-      }
+    if (!favs || favs.length === 0) {
+      setProfiles([]);
       setLoading(false);
-    };
+      return;
+    }
 
-    fetchFavorites();
+    const ids = favs.map((f: any) => f.favorited_id);
+    const { data: profilesData } = await supabase
+      .from("profiles")
+      .select("id, name, age, city, avatar_url, is_online, bio")
+      .in("id", ids);
+
+    if (profilesData) {
+      const profileMap = new Map(profilesData.map(p => [p.id, p]));
+      const ordered = ids
+        .map(id => profileMap.get(id))
+        .filter(Boolean) as FavoriteProfile[];
+      setProfiles(ordered);
+    }
+    setLoading(false);
   }, [profileId]);
+
+  useEffect(() => {
+    fetchFavorites();
+  }, [fetchFavorites]);
 
   const handleRemove = async (id: string) => {
     setProfiles(prev => prev.filter(p => p.id !== id));
@@ -71,7 +71,8 @@ const Favorites = () => {
   };
 
   return (
-    <div className="min-h-screen bg-muted/20" dir="rtl">
+    <PullToRefresh onRefresh={fetchFavorites} className="min-h-screen bg-muted/20" disabled={loading}>
+    <div dir="rtl">
       <SkipToContent />
       <SEOHead title="מועדפים" description="הפרופילים שהוספת למועדפים" />
       <Navbar />
@@ -164,6 +165,7 @@ const Favorites = () => {
         )}
       </main>
     </div>
+    </PullToRefresh>
   );
 };
 
