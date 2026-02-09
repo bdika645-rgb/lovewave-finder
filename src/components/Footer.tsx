@@ -176,6 +176,12 @@ const Footer = () => {
                   {footer.supportLink4}
                 </Link>
               </li>
+              <li>
+                <Link to="/safety" className="text-primary-foreground/60 hover:text-primary transition-colors text-sm flex items-center gap-2 group">
+                  <span className="w-1 h-1 bg-primary rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+                  מרכז בטיחות
+                </Link>
+              </li>
             </ul>
 
             {/* Contact Info */}

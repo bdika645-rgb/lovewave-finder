@@ -5,13 +5,14 @@ import { useLikes } from "@/hooks/useLikes";
 import { useConversations } from "@/hooks/useConversations";
 import { useAuth } from "@/hooks/useAuth";
 import { useCompatibility } from "@/hooks/useCompatibility";
+import { useFavorites } from "@/hooks/useFavorites";
 import Navbar from "@/components/Navbar";
 import SkipToContent from "@/components/SkipToContent";
 import FullPageLoader from "@/components/FullPageLoader";
 import SEOHead from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Heart, MessageCircle, MapPin, ArrowRight, Star, Share2, Loader2, Sparkles, Check, GraduationCap, Ruler, Cigarette, Target, ShieldCheck, ChevronLeft, ChevronRight } from "lucide-react";
+import { Heart, MessageCircle, MapPin, ArrowRight, Star, Share2, Loader2, Sparkles, Check, GraduationCap, Ruler, Cigarette, Target, ShieldCheck, ChevronLeft, ChevronRight, Bookmark } from "lucide-react";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
@@ -28,6 +29,7 @@ const MemberProfile = () => {
   const [messageLoading, setMessageLoading] = useState(false);
   const [photos, setPhotos] = useState<string[]>([]);
   const [activePhotoIndex, setActivePhotoIndex] = useState(0);
+  const { isFavorited, toggleFavorite } = useFavorites();
   
   // Fetch member photos
   useEffect(() => {
@@ -220,7 +222,7 @@ const MemberProfile = () => {
             </div>
 
             {/* Quick Actions */}
-            <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 flex gap-4">
+            <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 flex gap-3">
               <Button
                 variant="pass"
                 size="icon-xl"
@@ -229,6 +231,18 @@ const MemberProfile = () => {
                 aria-label="חזרה"
               >
                 <ArrowRight className="w-6 h-6" />
+              </Button>
+              <Button
+                size="icon-xl"
+                className={`shadow-elevated transition-colors ${
+                  member && isFavorited(member.id) 
+                    ? "bg-yellow-500 text-white hover:bg-yellow-600" 
+                    : "bg-secondary text-secondary-foreground hover:bg-secondary/90"
+                }`}
+                onClick={() => member && toggleFavorite(member.id)}
+                aria-label={member && isFavorited(member.id) ? "הסר מהמועדפים" : "הוסף למועדפים"}
+              >
+                <Bookmark className={`w-6 h-6 ${member && isFavorited(member.id) ? "fill-current" : ""}`} />
               </Button>
               <Button
                 size="icon-xl"

@@ -38,7 +38,8 @@ const Privacy = lazy(() => import("./pages/Privacy"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
-
+const Favorites = lazy(() => import("./pages/Favorites"));
+const SafetyCenter = lazy(() => import("./pages/SafetyCenter"));
 import BottomNavigation from "./components/BottomNavigation";
 import ScrollToTop from "./components/ScrollToTop";
 import CookieConsent from "./components/CookieConsent";
@@ -140,6 +141,11 @@ const App = () => (
                     <Privacy />
                   </Suspense>
                 } />
+                <Route path="/safety" element={
+                  <Suspense fallback={<RouteLoader label="טוען..." />}>
+                    <SafetyCenter />
+                  </Suspense>
+                } />
 
                 {/* Protected Routes */}
                 <Route path="/discover" element={
@@ -201,6 +207,15 @@ const App = () => (
                     <PageErrorBoundary pageName="Settings">
                       <Suspense fallback={<RouteLoader label="טוען הגדרות..." />}>
                         <Settings />
+                      </Suspense>
+                    </PageErrorBoundary>
+                  </ProtectedRoute>
+                } />
+                <Route path="/favorites" element={
+                  <ProtectedRoute>
+                    <PageErrorBoundary pageName="Favorites">
+                      <Suspense fallback={<RouteLoader label="טוען מועדפים..." />}>
+                        <Favorites />
                       </Suspense>
                     </PageErrorBoundary>
                   </ProtectedRoute>
