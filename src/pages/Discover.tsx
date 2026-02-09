@@ -524,8 +524,21 @@ const Discover = () => {
           </div>
           <div className="text-center animate-scale-in">
             <div className="relative mb-8">
-              <div className="flex items-center justify-center gap-4">
-                <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-primary shadow-elevated animate-pulse">
+              <div className="flex items-center justify-center gap-[-8px]">
+                {/* My photo */}
+                <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-primary shadow-elevated z-10 -ml-4">
+                  <img 
+                    src={myProfile?.avatar_url || "/profiles/profile1.jpg"} 
+                    alt="התמונה שלך"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                {/* Heart in the middle */}
+                <div className="w-14 h-14 rounded-full bg-primary flex items-center justify-center z-20 -mx-5 shadow-lg">
+                  <Heart className="w-8 h-8 text-primary-foreground fill-current animate-heart-beat" aria-hidden="true" />
+                </div>
+                {/* Match photo */}
+                <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-secondary shadow-elevated z-10 -mr-4">
                   <img 
                     src={matchedImage} 
                     alt={`תמונת פרופיל של ${matchedName}`}
@@ -533,9 +546,9 @@ const Discover = () => {
                   />
                 </div>
               </div>
-              <Heart className="w-16 h-16 text-primary mx-auto mt-4 fill-current animate-heart-beat" aria-hidden="true" />
               <Sparkles className="w-8 h-8 text-secondary absolute -top-4 -right-4 animate-float" aria-hidden="true" />
               <Sparkles className="w-6 h-6 text-primary absolute -bottom-2 -left-6 animate-float" style={{ animationDelay: "0.5s" }} aria-hidden="true" />
+              <Sparkles className="w-5 h-5 text-secondary absolute top-0 left-0 animate-float" style={{ animationDelay: "1s" }} aria-hidden="true" />
             </div>
             <h1 id="match-title" className="font-display text-5xl font-bold text-gradient mb-4">
               יש התאמה! 🎉
