@@ -53,7 +53,8 @@ const Discover = () => {
     ageTo: null,
     city: "",
     interests: [],
-    relationshipGoal: ""
+    relationshipGoal: "",
+    onlineOnly: false
   });
 
   const { profiles, loading, refetch } = useProfiles({ 
@@ -91,9 +92,9 @@ const Discover = () => {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [showMatchAnimation]);
 
-  // Filter out already liked/passed profiles
+  // Filter out already liked/passed profiles and apply online filter
   const availableProfiles = profiles.filter(
-    (p) => !likedProfiles.has(p.id) && !passedProfiles.has(p.id)
+    (p) => !likedProfiles.has(p.id) && !passedProfiles.has(p.id) && (!filters.onlineOnly || p.is_online)
   );
 
   const currentProfile = availableProfiles[currentIndex];
@@ -584,7 +585,8 @@ const Discover = () => {
                 (filters.ageTo ? 1 : 0) + 
                 (filters.city ? 1 : 0) + 
                 filters.interests.length +
-                (filters.relationshipGoal ? 1 : 0)
+                (filters.relationshipGoal ? 1 : 0) +
+                (filters.onlineOnly ? 1 : 0)
               }
             />
           </div>

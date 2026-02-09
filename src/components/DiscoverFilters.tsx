@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,6 +28,7 @@ export interface DiscoverFiltersState {
   city: string;
   interests: string[];
   relationshipGoal: string;
+  onlineOnly: boolean;
 }
 
 interface DiscoverFiltersProps {
@@ -50,7 +52,8 @@ export function DiscoverFilters({ filters, onFiltersChange, activeFilterCount }:
       ageTo: null,
       city: "",
       interests: [],
-      relationshipGoal: ""
+      relationshipGoal: "",
+      onlineOnly: false
     };
     setLocalFilters(resetFilters);
     onFiltersChange(resetFilters);
@@ -95,6 +98,18 @@ export function DiscoverFilters({ filters, onFiltersChange, activeFilterCount }:
         </SheetHeader>
 
         <div className="space-y-6 mt-6" role="form" aria-label="טופס סינון פרופילים">
+          {/* Online Only */}
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label htmlFor="online-only">מחוברים עכשיו בלבד</Label>
+              <p className="text-xs text-muted-foreground">הצג רק פרופילים מחוברים כרגע</p>
+            </div>
+            <Switch
+              id="online-only"
+              checked={localFilters.onlineOnly}
+              onCheckedChange={(checked) => setLocalFilters(prev => ({ ...prev, onlineOnly: checked }))}
+            />
+          </div>
           {/* Age Range */}
           <fieldset className="space-y-2">
             <legend className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">טווח גילאים</legend>
