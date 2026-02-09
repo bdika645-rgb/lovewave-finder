@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback } from "react";
+import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import MemberCard from "@/components/MemberCard";
 import SEOHead from "@/components/SEOHead";
@@ -16,6 +17,25 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
+
+// Animation variants for staggered card entrance
+const gridContainerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.06, delayChildren: 0.1 }
+  }
+} as const;
+
+const gridItemVariants = {
+  hidden: { opacity: 0, y: 20, scale: 0.95 },
+  visible: { 
+    opacity: 1, 
+    y: 0, 
+    scale: 1,
+    transition: { type: "spring" as const, stiffness: 300, damping: 24 }
+  }
+} as const;
 
 // Default fallback profile image
 import defaultProfileImage from "@/assets/profiles/profile1.jpg";
@@ -377,47 +397,54 @@ const Members = () => {
             {/* Members Grid */}
             {paginatedProfiles.length > 0 ? (
               <>
-                <div className={viewMode === "grid" 
-                  ? "grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" 
-                  : "flex flex-col gap-4"
-                }>
+                <motion.div 
+                  className={viewMode === "grid" 
+                    ? "grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" 
+                    : "flex flex-col gap-4"
+                  }
+                  variants={gridContainerVariants}
+                  initial="hidden"
+                  animate="visible"
+                  key={`${pagination.currentPage}-${viewMode}`}
+                >
                   {paginatedProfiles.map((profile) => (
                     viewMode === "grid" ? (
-                      <MemberCard 
-                        key={profile.id} 
-                        member={{
-                          id: profile.id,
-                          name: profile.name,
-                          age: profile.age,
-                          city: profile.city,
-                          bio: "",
-                          image: profile.avatar_url || defaultProfileImage,
-                          interests: profile.interests || [],
-                          isOnline: profile.is_online || false,
-                          lastActive: undefined,
-                        }}
-                        onLike={() => handleLike(profile.id, profile.name)}
-                        onPass={() => handlePass(profile.name)}
-                      />
-                    ) : (
-                      <Link 
-                        key={profile.id} 
-                        to={`/member/${profile.id}`}
-                        className="flex items-center gap-4 p-4 bg-card rounded-xl border border-border hover:shadow-card transition-shadow focus-ring"
-                      >
-                        <LazyImage 
-                          src={profile.avatar_url || defaultProfileImage} 
-                          alt={profile.name}
-                          className="w-16 h-16 rounded-full"
-                          aspectRatio="square"
+                      <motion.div key={profile.id} variants={gridItemVariants}>
+                        <MemberCard 
+                          member={{
+                            id: profile.id,
+                            name: profile.name,
+                            age: profile.age,
+                            city: profile.city,
+                            bio: "",
+                            image: profile.avatar_url || defaultProfileImage,
+                            interests: profile.interests || [],
+                            isOnline: profile.is_online || false,
+                            lastActive: undefined,
+                          }}
+                          onLike={() => handleLike(profile.id, profile.name)}
+                          onPass={() => handlePass(profile.name)}
                         />
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <h3 className="font-semibold text-foreground truncate">
-                              {profile.name}, {profile.age}
-                            </h3>
-                            {profile.is_online && (
-                              <span className="w-2 h-2 bg-success rounded-full" aria-label="מחובר/ת" />
+                      </motion.div>
+                    ) : (
+                      <motion.div key={profile.id} variants={gridItemVariants}>
+                        <Link 
+                          to={`/member/${profile.id}`}
+                          className="flex items-center gap-4 p-4 bg-card rounded-xl border border-border hover:shadow-card transition-shadow focus-ring"
+                        >
+                          <LazyImage 
+                            src={profile.avatar_url || defaultProfileImage} 
+                            alt={profile.name}
+                            className="w-16 h-16 rounded-full"
+                            aspectRatio="square"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="font-semibold text-foreground truncate">
+                                {profile.name}, {profile.age}
+                              </h3>
+                              {profile.is_online && (
+                                <span className="w-2 h-2 bg-success rounded-full" aria-label="מחובר/ת" />
                             )}
                           </div>
                           <p className="text-sm text-muted-foreground truncate">{profile.city}</p>
@@ -431,9 +458,10 @@ const Members = () => {
                           ))}
                         </div>
                       </Link>
+                      </motion.div>
                     )
                   ))}
-                </div>
+                </motion.div>
 
                 {/* Pagination Controls */}
                 {pagination.totalPages > 1 && (
