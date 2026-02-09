@@ -282,22 +282,40 @@ const Messages = () => {
                     </div>
                   ) : filteredConversations.length === 0 ? (
                     <div className="p-8 text-center text-muted-foreground" role="status" aria-live="polite">
-                      <p className="mb-3">לא נמצאו שיחות</p>
-                      {hasActiveSearch && (
-                        <p className="text-sm mb-4">
-                          נסו שם פרטי או מילת מפתח מההודעה האחרונה.
-                        </p>
-                      )}
-                      {hasActiveSearch && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setSearchQuery("")}
-                          className="mx-auto"
-                          aria-label="נקה חיפוש"
-                        >
-                          נקה חיפוש
-                        </Button>
+                      {conversationFilter === "unread" ? (
+                        <>
+                          <MessageCircle className="w-12 h-12 mx-auto mb-3 opacity-50" aria-hidden="true" />
+                          <p className="mb-2 font-medium">אין הודעות שלא נקראו 🎉</p>
+                          <p className="text-sm mb-4">כל ההודעות נקראו! תוכל/י לחזור לצפייה בכל השיחות.</p>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setConversationFilter("all")}
+                            className="mx-auto"
+                          >
+                            הצג את כל השיחות
+                          </Button>
+                        </>
+                      ) : (
+                        <>
+                          <p className="mb-3">לא נמצאו שיחות</p>
+                          {hasActiveSearch && (
+                            <p className="text-sm mb-4">
+                              נסו שם פרטי או מילת מפתח מההודעה האחרונה.
+                            </p>
+                          )}
+                          {hasActiveSearch && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setSearchQuery("")}
+                              className="mx-auto"
+                              aria-label="נקה חיפוש"
+                            >
+                              נקה חיפוש
+                            </Button>
+                          )}
+                        </>
                       )}
                     </div>
                   ) : (
@@ -486,9 +504,37 @@ const Messages = () => {
                         );
                       }
 
+                      let lastDateLabel = "";
                       return filteredMessages.map((message) => {
                         const isMine = message.sender_id === myProfileId;
+                        
+                        // Date separator logic
+                        const msgDate = new Date(message.created_at);
+                        const today = new Date();
+                        const yesterday = new Date(today);
+                        yesterday.setDate(yesterday.getDate() - 1);
+                        
+                        let dateLabel = "";
+                        if (msgDate.toDateString() === today.toDateString()) {
+                          dateLabel = "היום";
+                        } else if (msgDate.toDateString() === yesterday.toDateString()) {
+                          dateLabel = "אתמול";
+                        } else {
+                          dateLabel = msgDate.toLocaleDateString('he-IL', { day: 'numeric', month: 'long', year: 'numeric' });
+                        }
+                        
+                        const showDateSeparator = dateLabel !== lastDateLabel;
+                        lastDateLabel = dateLabel;
+                        
                         return (
+                          <div key={message.id}>
+                            {showDateSeparator && (
+                              <div className="flex items-center justify-center my-4" aria-label={`הודעות מ-${dateLabel}`}>
+                                <span className="text-xs text-muted-foreground bg-muted px-3 py-1 rounded-full">
+                                  {dateLabel}
+                                </span>
+                              </div>
+                            )}
                           <div
                             key={message.id}
                             className={`flex ${isMine ? "justify-end" : "justify-start"} group`}
@@ -557,6 +603,7 @@ const Messages = () => {
                                 isMine={isMine}
                               />
                             </div>
+                          </div>
                           </div>
                         );
                       });
