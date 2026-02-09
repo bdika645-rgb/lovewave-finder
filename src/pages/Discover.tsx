@@ -72,6 +72,7 @@ const Discover = () => {
   const [matchedImage, setMatchedImage] = useState("");
   const [canUndo, setCanUndo] = useState(false);
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
+  const [showSuperLikeAnim, setShowSuperLikeAnim] = useState(false);
   const [currentProfilePhotos, setCurrentProfilePhotos] = useState<string[]>([]);
   const [currentProfileBio, setCurrentProfileBio] = useState("");
 
@@ -255,6 +256,8 @@ const Discover = () => {
       setTimeout(() => setShowMatchAnimation(false), 4000);
     } else {
       toast.success(`⭐ שלחת סופר לייק ל${currentProfile.name}!`);
+      setShowSuperLikeAnim(true);
+      setTimeout(() => setShowSuperLikeAnim(false), 1200);
     }
 
     goToNext();
@@ -437,6 +440,44 @@ const Discover = () => {
         </div>
       )}
       
+      {/* Super Like Animation */}
+      <AnimatePresence>
+        {showSuperLikeAnim && (
+          <motion.div
+            className="fixed inset-0 z-50 pointer-events-none flex items-center justify-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            {/* Star burst particles */}
+            {[...Array(12)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute"
+                initial={{ scale: 0, x: 0, y: 0, opacity: 1 }}
+                animate={{
+                  scale: [0, 1.5, 0],
+                  x: Math.cos((i * 30 * Math.PI) / 180) * 150,
+                  y: Math.sin((i * 30 * Math.PI) / 180) * 150,
+                  opacity: [1, 1, 0],
+                }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+              >
+                <Star className="w-6 h-6 text-yellow-400 fill-yellow-400" />
+              </motion.div>
+            ))}
+            {/* Central star */}
+            <motion.div
+              initial={{ scale: 0, rotate: 0 }}
+              animate={{ scale: [0, 2, 1.5], rotate: [0, 180, 360] }}
+              transition={{ duration: 0.8, type: "spring", stiffness: 200 }}
+            >
+              <Star className="w-20 h-20 text-yellow-400 fill-yellow-400 drop-shadow-[0_0_30px_rgba(250,204,21,0.8)]" />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Match Animation Overlay with Focus Trap */}
       {showMatchAnimation && (
         <div

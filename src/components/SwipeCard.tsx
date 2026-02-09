@@ -57,6 +57,7 @@ const SwipeCard = ({
     // Check for super like (swipe up)
     if (dragOffset.y < SUPER_LIKE_THRESHOLD && onSuperLike) {
       setSwipeDirection("up");
+      navigator.vibrate?.(50);
       setTimeout(() => {
         onSuperLike();
         setSwipeDirection(null);
@@ -68,6 +69,7 @@ const SwipeCard = ({
     // Check for like (swipe right)
     if (dragOffset.x > SWIPE_THRESHOLD) {
       setSwipeDirection("right");
+      navigator.vibrate?.(30);
       setTimeout(() => {
         onLike();
         setSwipeDirection(null);
@@ -79,6 +81,7 @@ const SwipeCard = ({
     // Check for pass (swipe left)
     if (dragOffset.x < -SWIPE_THRESHOLD) {
       setSwipeDirection("left");
+      navigator.vibrate?.(20);
       setTimeout(() => {
         onPass();
         setSwipeDirection(null);
