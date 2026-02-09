@@ -8,6 +8,7 @@ import { useMatches } from "@/hooks/useMatches";
 import { useAuth } from "@/hooks/useAuth";
 import { useConversations } from "@/hooks/useConversations";
 import { useCurrentProfile } from "@/hooks/useCurrentProfile";
+import ProfileCompletionBanner from "@/components/ProfileCompletionBanner";
 import { calculateCompatibility } from "@/hooks/useCompatibility";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -75,6 +76,7 @@ const Matches = () => {
       <SEOHead title="ההתאמות שלי" description="צפו בהתאמות ההדדיות שלכם והתחילו שיחה עם ההתאמה המושלמת." />
       <Navbar />
       <main id="main-content" className="pt-24 pb-24 md:pb-12 px-4 max-w-6xl mx-auto">
+        <ProfileCompletionBanner />
         {/* Header */}
         <header className="text-center mb-8">
           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full mb-4">

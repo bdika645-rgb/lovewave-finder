@@ -2,6 +2,7 @@ import { useState, useMemo, useCallback, useEffect } from "react";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import MemberCard from "@/components/MemberCard";
+import ProfileCompletionBanner from "@/components/ProfileCompletionBanner";
 import SEOHead from "@/components/SEOHead";
 import LazyImage from "@/components/LazyImage";
 import EmptyState from "@/components/EmptyState";
@@ -260,6 +261,7 @@ const Members = () => {
         <Navbar />
         
         <main className="container mx-auto px-6 pt-28 pb-24 md:pb-16">
+        <ProfileCompletionBanner />
         {/* Header */}
         <header className="text-center mb-12">
           <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
