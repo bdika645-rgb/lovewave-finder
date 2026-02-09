@@ -7,16 +7,40 @@ import EmptyState from "@/components/EmptyState";
 import LazyImage from "@/components/LazyImage";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfileViews } from "@/hooks/useProfileViews";
+import { useLikes } from "@/hooks/useLikes";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Eye, UserPlus, Clock, Heart, Sparkles } from "lucide-react";
+import { Eye, UserPlus, Clock, Heart, Sparkles, Loader2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { he } from "date-fns/locale";
+import { toast } from "sonner";
+import { useState } from "react";
 import { motion } from "framer-motion";
 
 const WhoViewedMe = () => {
   const { user } = useAuth();
   const { views, loading } = useProfileViews();
+  const { sendLike } = useLikes();
+  const [likedIds, setLikedIds] = useState<Set<string>>(new Set());
+  const [likingId, setLikingId] = useState<string | null>(null);
+
+  const handleLike = async (profileId: string, name: string) => {
+    setLikingId(profileId);
+    const { error, isMatch, alreadyLiked } = await sendLike(profileId);
+    setLikingId(null);
+    if (error) {
+      toast.error("שגיאה בשליחת הלייק");
+      return;
+    }
+    setLikedIds(prev => new Set([...prev, profileId]));
+    if (alreadyLiked) {
+      toast.info(`כבר שלחת לייק ל${name}`);
+    } else if (isMatch) {
+      toast.success(`🎉 יש התאמה עם ${name}!`);
+    } else {
+      toast.success(`💕 שלחת לייק ל${name}!`);
+    }
+  };
 
   if (!user) {
     return (
@@ -146,12 +170,21 @@ const WhoViewedMe = () => {
                           צפייה
                         </Button>
                       </Link>
-                      <Link to={`/member/${viewer.id}`} className="flex-1">
-                        <Button variant="hero" className="w-full gap-2 h-10">
+                      <Button
+                        variant="hero"
+                        className="flex-1 gap-2 h-10"
+                        disabled={likedIds.has(viewer.id) || likingId === viewer.id}
+                        onClick={() => handleLike(viewer.id, viewer.name)}
+                      >
+                        {likingId === viewer.id ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : likedIds.has(viewer.id) ? (
+                          <Heart className="w-4 h-4 fill-current" />
+                        ) : (
                           <Heart className="w-4 h-4" />
-                          לייק
-                        </Button>
-                      </Link>
+                        )}
+                        {likedIds.has(viewer.id) ? "נשלח!" : "לייק"}
+                      </Button>
                     </div>
                   </div>
                 </motion.article>

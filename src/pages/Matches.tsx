@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
+import SkipToContent from "@/components/SkipToContent";
+import SEOHead from "@/components/SEOHead";
 import { useMatches } from "@/hooks/useMatches";
 import { useAuth } from "@/hooks/useAuth";
 import { useConversations } from "@/hooks/useConversations";
@@ -53,6 +55,8 @@ const Matches = () => {
   if (!user) {
     return (
       <div className="min-h-screen bg-background" dir="rtl">
+        <SkipToContent />
+        <SEOHead title="התאמות" description="צפו בהתאמות שלכם והתחילו שיחה" />
         <Navbar />
         <div className="pt-24 flex flex-col items-center justify-center gap-4 px-4">
           <Heart className="w-16 h-16 text-muted-foreground" />
@@ -67,6 +71,8 @@ const Matches = () => {
 
   return (
     <div className="min-h-screen bg-background" dir="rtl">
+      <SkipToContent />
+      <SEOHead title="ההתאמות שלי" description="צפו בהתאמות ההדדיות שלכם והתחילו שיחה עם ההתאמה המושלמת." />
       <Navbar />
       <main className="pt-24 pb-24 sm:pb-12 px-4 max-w-6xl mx-auto">
         {/* Header */}

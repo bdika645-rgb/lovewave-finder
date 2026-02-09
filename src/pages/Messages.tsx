@@ -1,4 +1,5 @@
 import Navbar from "@/components/Navbar";
+import SEOHead from "@/components/SEOHead";
 import SkipToContent from "@/components/SkipToContent";
 import TypingIndicator from "@/components/TypingIndicator";
 import IcebreakerButton from "@/components/IcebreakerButton";
@@ -137,6 +138,7 @@ const Messages = () => {
   return (
     <div className="min-h-screen bg-muted/20" dir="rtl">
       <SkipToContent />
+      <SEOHead title="הודעות" description="שוחחו עם ההתאמות שלכם ומצאו את האהבה." />
       <Navbar />
 
       <main id="main-content" className="container mx-auto px-6 pt-24 pb-6">
