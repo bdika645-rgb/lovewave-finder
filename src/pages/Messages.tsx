@@ -21,6 +21,7 @@ import { useMatches } from "@/hooks/useMatches";
 import { useTypingStatus } from "@/hooks/useTypingStatus";
 import { Link } from "react-router-dom";
 import type { Tables } from "@/integrations/supabase/types";
+import { supabase } from "@/integrations/supabase/client";
 
 const Messages = () => {
   const { conversations, loading: conversationsLoading, createOrGetConversation, getMyProfileId, refetch: refetchConversations } = useConversations();
@@ -444,14 +445,12 @@ const Messages = () => {
                                 }`}
                                 onDoubleClick={() => {
                                   if (myProfileId && !isMine) {
-                                    // Quick react with ❤️ on double-tap (like iMessage)
-                                    import("@/integrations/supabase/client").then(({ supabase }) => {
-                                      supabase.from("message_reactions").upsert({
-                                        message_id: message.id,
-                                        profile_id: myProfileId,
-                                        emoji: "❤️",
-                                      }, { onConflict: "message_id,profile_id" });
-                                    });
+                                    supabase.from("message_reactions").upsert({
+                                      message_id: message.id,
+                                      profile_id: myProfileId,
+                                      emoji: "❤️",
+                                    }, { onConflict: "message_id,profile_id" })
+                                    .then(() => toast.success("❤️"));
                                   }
                                 }}
                               >
