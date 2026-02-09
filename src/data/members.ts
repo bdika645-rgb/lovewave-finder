@@ -12,6 +12,7 @@ export interface Member {
   education?: string;
   height?: number;
   lookingFor?: string;
+  isVerified?: boolean;
 }
 
 // Static members removed - app now uses real database profiles

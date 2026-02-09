@@ -50,7 +50,7 @@ const Messages = () => {
   const [deleteMessageId, setDeleteMessageId] = useState<string | null>(null);
   const [replyToMessage, setReplyToMessage] = useState<{ id: string; content: string; senderName: string } | null>(null);
 
-  const { messages, loading: messagesLoading, sendMessage, markAsRead } = useMessages(selectedConversationId);
+  const { messages, loading: messagesLoading, sendMessage, markAsRead, refetch: refetchMessages } = useMessages(selectedConversationId);
   const { othersTyping, setTyping } = useTypingStatus(selectedConversationId, myProfileId);
 
   // Get selected conversation details
@@ -402,7 +402,9 @@ const Messages = () => {
                             <p className={`text-sm truncate max-w-[180px] ${
                               conv.unreadCount > 0 ? "text-foreground font-medium" : "text-muted-foreground"
                             }`}>
-                              {conv.lastMessage?.content || "התחילו לשוחח!"}
+                              {conv.lastMessage 
+                                ? (conv.lastMessage.sender_id === myProfileId ? "אתה: " : "") + conv.lastMessage.content 
+                                : "התחילו לשוחח!"}
                             </p>
                             {conv.unreadCount > 0 && (
                               <span className="bg-primary text-primary-foreground text-xs min-w-[20px] h-5 px-1.5 rounded-full flex items-center justify-center animate-scale-in" aria-label={`${conv.unreadCount} הודעות שלא נקראו`}>
@@ -814,6 +816,8 @@ const Messages = () => {
                   toast.error("שגיאה במחיקת ההודעה");
                 } else {
                   toast.success("ההודעה נמחקה");
+                  refetchMessages();
+                  refetchConversations();
                 }
                 setDeleteMessageId(null);
               }}
