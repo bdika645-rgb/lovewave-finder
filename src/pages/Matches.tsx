@@ -74,7 +74,7 @@ const Matches = () => {
       <SkipToContent />
       <SEOHead title="ההתאמות שלי" description="צפו בהתאמות ההדדיות שלכם והתחילו שיחה עם ההתאמה המושלמת." />
       <Navbar />
-      <main className="pt-24 pb-24 sm:pb-12 px-4 max-w-6xl mx-auto">
+      <main className="pt-24 pb-24 md:pb-12 px-4 max-w-6xl mx-auto">
         {/* Header */}
         <header className="text-center mb-8">
           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full mb-4">

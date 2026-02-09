@@ -315,7 +315,7 @@ const Discover = () => {
           description="מצאו את ההתאמה המושלמת שלכם עם מנגנון הסוויפ החכם של Spark."
         />
         <Navbar />
-        <main id="main-content" className="container mx-auto px-6 pt-28 pb-16 flex items-center justify-center min-h-[calc(100vh-80px)]">
+        <main id="main-content" className="container mx-auto px-6 pt-28 pb-24 md:pb-16 flex items-center justify-center min-h-[calc(100vh-80px)]">
           <EmptyState
             icon={<Heart className="w-10 h-10" />}
             title="התחברו כדי להתחיל"
@@ -351,7 +351,7 @@ const Discover = () => {
         <SkipToContent />
         <SEOHead title="גלו התאמות" />
         <Navbar />
-        <main id="main-content" className="container mx-auto px-6 pt-28 pb-16 flex items-center justify-center min-h-[calc(100vh-80px)]">
+        <main id="main-content" className="container mx-auto px-6 pt-28 pb-24 md:pb-16 flex items-center justify-center min-h-[calc(100vh-80px)]">
           <EmptyState
             icon={<Sparkles className="w-12 h-12" />}
             title="עברתם על כל הפרופילים! 🎉"
@@ -512,7 +512,7 @@ const Discover = () => {
         />
       )}
 
-      <div className="container mx-auto px-6 pt-28 pb-16">
+      <div className="container mx-auto px-6 pt-28 pb-24 md:pb-16">
         {/* Header with Filters */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-4 mb-4">
