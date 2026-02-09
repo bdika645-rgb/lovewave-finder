@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
-import { MessageCircle, Users, Clock, RefreshCw, Trash2, Eye } from "lucide-react";
+import { MessageCircle, Users, Clock, RefreshCw, Trash2, Eye, Download } from "lucide-react";
 import StatsCard from "@/components/admin/StatsCard";
 
 const containerVariants = {
@@ -183,10 +183,36 @@ export default function AdminMessages() {
             <h1 className="text-2xl sm:text-3xl font-bold text-foreground">הודעות</h1>
             <p className="text-muted-foreground mt-1">מעקב אחר הודעות במערכת</p>
           </div>
-          <Button variant="outline" onClick={() => fetchData()}>
-            <RefreshCw className="w-4 h-4 ml-2" />
-            רענן
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                const csvContent = [
+                  ["שולח", "תוכן", "סטטוס", "תאריך"].join(","),
+                  ...messages.map(m => [
+                    m.sender?.name || "לא ידוע",
+                    `"${m.content.replace(/"/g, '""')}"`,
+                    m.is_read ? "נקרא" : "חדש",
+                    new Date(m.created_at).toLocaleDateString('he-IL')
+                  ].join(","))
+                ].join("\n");
+                const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = "messages.csv";
+                link.click();
+                toast.success("הקובץ הורד בהצלחה");
+              }}
+              disabled={messages.length === 0}
+            >
+              <Download className="w-4 h-4 ml-2" />
+              ייצא
+            </Button>
+            <Button variant="outline" onClick={() => fetchData()}>
+              <RefreshCw className="w-4 h-4 ml-2" />
+              רענן
+            </Button>
+          </div>
         </motion.div>
 
         <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">

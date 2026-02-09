@@ -10,7 +10,7 @@ import FullPageLoader from "@/components/FullPageLoader";
 import EmptyState from "@/components/EmptyState";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Send, Search, Loader2, MessageCircle, Heart, ChevronRight, SearchX, Mic } from "lucide-react";
+import { Send, Search, Loader2, MessageCircle, Heart, ChevronRight, SearchX, Mic, Trash2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { he } from "date-fns/locale";
 import { useState, useEffect, useRef, useCallback } from "react";
@@ -31,6 +31,7 @@ const Messages = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [chatSearchQuery, setChatSearchQuery] = useState("");
   const [showChatSearch, setShowChatSearch] = useState(false);
+  const [conversationFilter, setConversationFilter] = useState<"all" | "unread">("all");
   const [sendingMessage, setSendingMessage] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [myProfileId, setMyProfileId] = useState<string | null>(null);
@@ -104,10 +105,45 @@ const Messages = () => {
     setTyping(true);
   };
 
-  const filteredConversations = conversations.filter(conv =>
-    conv.otherProfile?.name?.includes(searchQuery) || 
-    conv.lastMessage?.content?.includes(searchQuery)
-  );
+  const filteredConversations = conversations.filter(conv => {
+    const matchesSearch = conv.otherProfile?.name?.includes(searchQuery) || 
+      conv.lastMessage?.content?.includes(searchQuery);
+    const matchesFilter = conversationFilter === "all" || conv.unreadCount > 0;
+    return matchesSearch && matchesFilter;
+  });
+  
+  const unreadCount = conversations.reduce((acc, c) => acc + c.unreadCount, 0);
+
+  // Keyboard navigation (J/K like Gmail, Arrow keys)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Only when not typing in an input
+      if ((e.target as HTMLElement).tagName === 'INPUT' || (e.target as HTMLElement).tagName === 'TEXTAREA') {
+        return;
+      }
+      
+      const currentIndex = filteredConversations.findIndex(c => c.id === selectedConversationId);
+      
+      if (e.key === 'j' || e.key === 'ArrowDown') {
+        e.preventDefault();
+        const nextIndex = currentIndex < filteredConversations.length - 1 ? currentIndex + 1 : currentIndex;
+        if (filteredConversations[nextIndex]) {
+          setSelectedConversationId(filteredConversations[nextIndex].id);
+        }
+      } else if (e.key === 'k' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        const prevIndex = currentIndex > 0 ? currentIndex - 1 : 0;
+        if (filteredConversations[prevIndex]) {
+          setSelectedConversationId(filteredConversations[prevIndex].id);
+        }
+      } else if (e.key === 'Escape' && selectedConversationId) {
+        setSelectedConversationId(null);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedConversationId, filteredConversations]);
 
   const hasActiveSearch = searchQuery.trim().length > 0;
 
@@ -172,8 +208,29 @@ const Messages = () => {
             <div className="flex flex-col md:grid md:grid-cols-[320px_1fr] lg:grid-cols-[360px_1fr] h-full">
               {/* Conversations List */}
               <div className={`border-l border-border ${selectedConversationId ? 'hidden md:block' : 'block'}`}>
-                <div className="p-4 border-b border-border">
-                  <h2 className="font-display text-lg md:text-xl font-bold text-foreground mb-4">שיחות</h2>
+                <div className="p-4 border-b border-border space-y-3">
+                  <h2 className="font-display text-lg md:text-xl font-bold text-foreground">שיחות</h2>
+                  
+                  {/* Filter Tabs - Like WhatsApp */}
+                  <div className="flex gap-2">
+                    <Button 
+                      variant={conversationFilter === "all" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setConversationFilter("all")}
+                      className="rounded-full text-sm h-8"
+                    >
+                      הכל
+                    </Button>
+                    <Button 
+                      variant={conversationFilter === "unread" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setConversationFilter("unread")}
+                      className="rounded-full text-sm h-8"
+                    >
+                      לא נקראו {unreadCount > 0 && `(${unreadCount})`}
+                    </Button>
+                  </div>
+                  
                   <div className="relative">
                     <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
                     <Input 
@@ -471,6 +528,28 @@ const Messages = () => {
                                     />
                                   )}
                                 </div>
+                                {/* Delete button for own messages */}
+                                {isMine && (
+                                  <button
+                                    onClick={async () => {
+                                      if (!confirm("האם למחוק את ההודעה?")) return;
+                                      const { error } = await supabase
+                                        .from("messages")
+                                        .delete()
+                                        .eq("id", message.id)
+                                        .eq("sender_id", myProfileId);
+                                      if (error) {
+                                        toast.error("שגיאה במחיקת ההודעה");
+                                      } else {
+                                        toast.success("ההודעה נמחקה");
+                                      }
+                                    }}
+                                    className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-destructive/10 rounded text-destructive"
+                                    aria-label="מחק הודעה"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </button>
+                                )}
                               </div>
                               <MessageReaction
                                 messageId={message.id}
