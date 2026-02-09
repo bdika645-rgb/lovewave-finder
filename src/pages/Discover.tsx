@@ -468,7 +468,7 @@ const Discover = () => {
                 }}
                 transition={{ duration: 0.8, ease: "easeOut" }}
               >
-                <Star className="w-6 h-6 text-yellow-400 fill-yellow-400" />
+                <Star className="w-6 h-6 text-secondary fill-secondary" />
               </motion.div>
             ))}
             {/* Central star */}
@@ -477,7 +477,7 @@ const Discover = () => {
               animate={{ scale: [0, 2, 1.5], rotate: [0, 180, 360] }}
               transition={{ duration: 0.8, type: "spring", stiffness: 200 }}
             >
-              <Star className="w-20 h-20 text-yellow-400 fill-yellow-400 drop-shadow-[0_0_30px_rgba(250,204,21,0.8)]" />
+              <Star className="w-20 h-20 text-secondary fill-secondary drop-shadow-lg" />
             </motion.div>
           </motion.div>
         )}

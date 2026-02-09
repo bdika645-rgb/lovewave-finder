@@ -35,13 +35,13 @@ export function NotificationBell() {
   const getTypeColor = (type: string) => {
     switch (type) {
       case 'match':
-        return 'bg-pink-100 dark:bg-pink-900/20';
+        return 'bg-primary/10';
       case 'super_like':
-        return 'bg-yellow-100 dark:bg-yellow-900/20';
+        return 'bg-secondary/10';
       case 'like':
-        return 'bg-red-100 dark:bg-red-900/20';
+        return 'bg-destructive/10';
       case 'message':
-        return 'bg-blue-100 dark:bg-blue-900/20';
+        return 'bg-accent';
       default:
         return 'bg-muted';
     }
