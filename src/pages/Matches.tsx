@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import SkipToContent from "@/components/SkipToContent";
 import SEOHead from "@/components/SEOHead";
 import { useMatches } from "@/hooks/useMatches";
+import PullToRefresh from "@/components/PullToRefresh";
 import { useAuth } from "@/hooks/useAuth";
 import { useConversations } from "@/hooks/useConversations";
 import { useCurrentProfile } from "@/hooks/useCurrentProfile";
@@ -14,6 +15,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Heart, MessageCircle, Loader2, Users, Sparkles } from "lucide-react";
 import { toast } from "sonner";
+import { formatDistanceToNow } from "date-fns";
+import { he } from "date-fns/locale";
 import { MatchCardSkeleton } from "@/components/MatchCardSkeleton";
 
 // Animation variants
@@ -37,7 +40,7 @@ const cardVariants = {
 const Matches = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { matches, loading } = useMatches();
+  const { matches, loading, refetch } = useMatches();
   const { createOrGetConversation } = useConversations();
   const { profile: currentProfile } = useCurrentProfile();
   const [filter, setFilter] = useState<"all" | "new">("all");
@@ -71,7 +74,8 @@ const Matches = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background" dir="rtl">
+    <PullToRefresh onRefresh={async () => { await refetch(); }} className="min-h-screen bg-background" disabled={loading}>
+    <div dir="rtl">
       <SkipToContent />
       <SEOHead title="ההתאמות שלי" description="צפו בהתאמות ההדדיות שלכם והתחילו שיחה עם ההתאמה המושלמת." />
       <Navbar />
@@ -220,13 +224,19 @@ const Matches = () => {
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" aria-hidden="true" />
                       
-                      {/* Online indicator */}
-                      {profile.is_online && (
+                      {/* Online/Last seen indicator */}
+                      {profile.is_online ? (
                         <div className="absolute bottom-16 right-4 flex items-center gap-1.5 bg-card/90 backdrop-blur-sm px-2 py-1 rounded-full">
                           <span className="w-2 h-2 bg-success rounded-full animate-pulse" />
-                          <span className="text-xs font-medium">מחובר/ת עכשיו</span>
+                          <span className="text-xs font-medium text-success">מחובר/ת עכשיו</span>
                         </div>
-                      )}
+                      ) : profile.last_seen ? (
+                        <div className="absolute bottom-16 right-4 flex items-center gap-1.5 bg-card/90 backdrop-blur-sm px-2 py-1 rounded-full">
+                          <span className="text-xs text-muted-foreground">
+                            נצפה {formatDistanceToNow(new Date(profile.last_seen), { addSuffix: true, locale: he })}
+                          </span>
+                        </div>
+                      ) : null}
                       
                       <div className="absolute bottom-4 right-4 left-4 text-white">
                         <h3 className="font-display text-xl font-bold drop-shadow-lg">
@@ -286,6 +296,7 @@ const Matches = () => {
         )}
       </main>
     </div>
+    </PullToRefresh>
   );
 };
 
