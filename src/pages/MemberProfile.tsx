@@ -225,15 +225,18 @@ const MemberProfile = () => {
                 variant="pass"
                 size="icon-xl"
                 className="shadow-elevated"
-                onClick={handleShare}
+                onClick={() => navigate(-1)}
+                aria-label="חזרה"
               >
-                <Share2 className="w-6 h-6" />
+                <ArrowRight className="w-6 h-6" />
               </Button>
               <Button
                 size="icon-xl"
-                className="bg-secondary text-secondary-foreground shadow-elevated"
+                className="bg-secondary text-secondary-foreground shadow-elevated hover:bg-secondary/90"
+                onClick={handleShare}
+                aria-label="שתף פרופיל"
               >
-                <Star className="w-6 h-6" />
+                <Share2 className="w-6 h-6" />
               </Button>
               <Button
                 variant="like"

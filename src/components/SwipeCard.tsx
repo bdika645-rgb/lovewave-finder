@@ -205,7 +205,7 @@ const SwipeCard = ({
         className={`relative bg-card rounded-3xl overflow-hidden shadow-elevated cursor-grab active:cursor-grabbing transition-transform focus-ring ${
           isDragging ? '' : 'duration-300'
         }`}
-        style={{ transform: getCardTransform(), touchAction: "pan-y" }}
+        style={{ transform: getCardTransform(), touchAction: "none" }}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
