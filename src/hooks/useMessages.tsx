@@ -39,7 +39,7 @@ export function useMessages(conversationId: string | null) {
     }
   }, [conversationId]);
 
-  const sendMessage = async (content: string): Promise<{ error: Error | null }> => {
+  const sendMessage = async (content: string, replyTo?: string): Promise<{ error: Error | null }> => {
     // Block action during impersonation
     if (!guardAction('send_message', 'לשלוח הודעות')) {
       return { error: new Error('Action blocked during impersonation') };
@@ -61,6 +61,7 @@ export function useMessages(conversationId: string | null) {
           conversation_id: conversationId,
           sender_id: myProfileId,
           content: content.trim(),
+          ...(replyTo ? { reply_to: replyTo } : {}),
         });
 
       if (error) throw error;
