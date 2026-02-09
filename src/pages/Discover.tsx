@@ -12,6 +12,7 @@ import FullPageLoader from "@/components/FullPageLoader";
 import { useProfiles } from "@/hooks/useProfiles";
 import { useLikes } from "@/hooks/useLikes";
 import { useAuth } from "@/hooks/useAuth";
+import { useCurrentProfile } from "@/hooks/useCurrentProfile";
 import { useActionHistory } from "@/hooks/useActionHistory";
 import { useConfetti } from "@/hooks/useConfetti";
 import { Button } from "@/components/ui/button";
@@ -44,6 +45,7 @@ const cardEntranceVariants = {
 
 const Discover = () => {
   const { user } = useAuth();
+  const { profile: myProfile } = useCurrentProfile();
   
   // Filters state
   const [filters, setFilters] = useState<DiscoverFiltersState>({
@@ -653,6 +655,7 @@ const Discover = () => {
                     onUndo={handleUndo}
                     onReport={() => setReportDialogOpen(true)}
                     canUndo={canUndo}
+                    myCity={myProfile?.city}
                   />
                 </motion.div>
               )}
