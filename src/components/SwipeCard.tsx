@@ -1,8 +1,9 @@
 import { useState, useRef, useCallback } from "react";
-import { Heart, X, Star, MapPin, ChevronLeft, ChevronRight, Undo2, Flag, Verified } from "lucide-react";
+import { Heart, X, Star, MapPin, ChevronLeft, ChevronRight, Undo2, Flag, Verified, Navigation } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { Member } from "@/data/members";
+import { getCityDistance, formatDistance } from "@/lib/cityDistance";
 
 interface SwipeCardProps {
   member: Member & { isVerified?: boolean };
@@ -13,6 +14,7 @@ interface SwipeCardProps {
   onReport?: () => void;
   images?: string[];
   canUndo?: boolean;
+  myCity?: string;
 }
 
 const SwipeCard = ({ 
@@ -23,7 +25,8 @@ const SwipeCard = ({
   onUndo, 
   onReport, 
   images,
-  canUndo = false 
+  canUndo = false,
+  myCity
 }: SwipeCardProps) => {
   const [swipeDirection, setSwipeDirection] = useState<"left" | "right" | "up" | null>(null);
   const [imageIndex, setImageIndex] = useState(0);
@@ -338,6 +341,16 @@ const SwipeCard = ({
             <p className="flex items-center gap-2 text-primary-foreground/80 mb-4">
               <MapPin className="w-5 h-5" />
               {member.city}
+              {(() => {
+                const dist = formatDistance(getCityDistance(myCity, member.city));
+                return dist && dist !== "באותה עיר" ? (
+                  <span className="flex items-center gap-1 text-sm opacity-80">
+                    · <Navigation className="w-3.5 h-3.5" /> {dist}
+                  </span>
+                ) : dist === "באותה עיר" ? (
+                  <span className="text-sm opacity-80">· באותה עיר 📍</span>
+                ) : null;
+              })()}
             </p>
             <p className="text-primary-foreground/90 text-lg mb-4 line-clamp-2">
               {member.bio}
