@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Heart, Menu, X, User, MessageCircle, Search, LogOut, Sparkles, Eye, Settings, ChevronDown, Shield } from "lucide-react";
+import { Heart, Menu, X, User, MessageCircle, Search, LogOut, Sparkles, Eye, Settings, ChevronDown, Shield, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/hooks/useAuth";
@@ -187,6 +187,12 @@ const Navbar = () => {
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
+                      <Link to="/favorites" className="flex items-center gap-2 cursor-pointer">
+                        <Star className="w-4 h-4" />
+                        מועדפים
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
                       <Link to="/settings" className="flex items-center gap-2 cursor-pointer">
                         <Settings className="w-4 h-4" />
                         הגדרות
@@ -322,6 +328,16 @@ const Navbar = () => {
                      >
                        <Eye className="w-5 h-5 text-primary" />
                        מי צפה בי
+                     </Link>
+                   </li>
+                   <li>
+                     <Link 
+                       to="/favorites" 
+                       className="font-body text-foreground py-3 px-4 rounded-lg hover:bg-accent transition-colors flex items-center gap-3"
+                       aria-current={location.pathname === "/favorites" ? "page" : undefined}
+                     >
+                       <Star className="w-5 h-5 text-primary" />
+                       מועדפים
                      </Link>
                    </li>
                    <li>
