@@ -73,6 +73,7 @@ const Discover = () => {
   const [canUndo, setCanUndo] = useState(false);
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
   const [currentProfilePhotos, setCurrentProfilePhotos] = useState<string[]>([]);
+  const [currentProfileBio, setCurrentProfileBio] = useState("");
 
   // Allow closing match overlay with ESC
   useEffect(() => {
@@ -93,30 +94,40 @@ const Discover = () => {
 
   const currentProfile = availableProfiles[currentIndex];
 
-  // Fetch photos for current profile
+  // Fetch photos and bio for current profile
   useEffect(() => {
-    const fetchPhotos = async () => {
+    const fetchProfileDetails = async () => {
       if (!currentProfile) {
         setCurrentProfilePhotos([]);
+        setCurrentProfileBio("");
         return;
       }
 
-      const { data } = await supabase
-        .from('photos')
-        .select('url')
-        .eq('profile_id', currentProfile.id)
-        .order('display_order', { ascending: true });
+      const [photosRes, profileRes] = await Promise.all([
+        supabase
+          .from('photos')
+          .select('url')
+          .eq('profile_id', currentProfile.id)
+          .order('display_order', { ascending: true }),
+        supabase
+          .from('profiles')
+          .select('bio, looking_for, relationship_goal')
+          .eq('id', currentProfile.id)
+          .single(),
+      ]);
 
-      if (data && data.length > 0) {
-        setCurrentProfilePhotos(data.map(p => p.url));
+      if (photosRes.data && photosRes.data.length > 0) {
+        setCurrentProfilePhotos(photosRes.data.map(p => p.url));
       } else if (currentProfile.avatar_url) {
         setCurrentProfilePhotos([currentProfile.avatar_url]);
       } else {
         setCurrentProfilePhotos(["/profiles/profile1.jpg"]);
       }
+
+      setCurrentProfileBio(profileRes.data?.bio || "");
     };
 
-    fetchPhotos();
+    fetchProfileDetails();
   }, [currentProfile?.id]);
 
   const goToNext = useCallback(() => {
@@ -588,7 +599,7 @@ const Discover = () => {
                       name: currentProfile.name,
                       age: currentProfile.age,
                       city: currentProfile.city,
-                      bio: "",
+                      bio: currentProfileBio,
                       image: currentProfile.avatar_url || "/profiles/profile1.jpg",
                       interests: currentProfile.interests || [],
                       isOnline: currentProfile.is_online || false,
