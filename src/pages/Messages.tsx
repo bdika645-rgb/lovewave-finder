@@ -9,6 +9,16 @@ import MessageReaction from "@/components/MessageReaction";
 import FullPageLoader from "@/components/FullPageLoader";
 import EmptyState from "@/components/EmptyState";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Send, Search, Loader2, MessageCircle, Heart, ChevronRight, ChevronDown, SearchX, Mic, Trash2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
@@ -37,6 +47,7 @@ const Messages = () => {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const [showScrollToBottom, setShowScrollToBottom] = useState(false);
   const [myProfileId, setMyProfileId] = useState<string | null>(null);
+  const [deleteMessageId, setDeleteMessageId] = useState<string | null>(null);
 
   const { messages, loading: messagesLoading, sendMessage, markAsRead } = useMessages(selectedConversationId);
   const { othersTyping, setTyping } = useTypingStatus(selectedConversationId, myProfileId);
@@ -90,8 +101,12 @@ const Messages = () => {
   }, [getMyProfileId]);
 
   // Handle typing indicator
-  const handleMessageChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleMessageChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setMessageText(e.target.value);
+    // Auto-resize textarea
+    const textarea = e.target;
+    textarea.style.height = 'auto';
+    textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
     if (e.target.value.length > 0) {
       setTyping(true);
     }
@@ -613,19 +628,7 @@ const Messages = () => {
                             {/* Delete button - outside the bubble */}
                             {isMine && (
                               <button
-                                onClick={async () => {
-                                  if (!confirm("האם למחוק את ההודעה?")) return;
-                                  const { error } = await supabase
-                                    .from("messages")
-                                    .delete()
-                                    .eq("id", message.id)
-                                    .eq("sender_id", myProfileId);
-                                  if (error) {
-                                    toast.error("שגיאה במחיקת ההודעה");
-                                  } else {
-                                    toast.success("ההודעה נמחקה");
-                                  }
-                                }}
+                                onClick={() => setDeleteMessageId(message.id)}
                                 className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 hover:bg-destructive/10 rounded-full text-muted-foreground hover:text-destructive mb-1"
                                 aria-label="מחק הודעה"
                               >
@@ -662,14 +665,20 @@ const Messages = () => {
                         onSelect={handleIcebreakerSelect}
                         disabled={sendingMessage}
                       />
-                      <Input
+                      <textarea
                         placeholder="כתבו הודעה..."
                         value={messageText}
                         onChange={handleMessageChange}
-                        onKeyDown={(e) => e.key === "Enter" && handleSend()}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && !e.shiftKey) {
+                            e.preventDefault();
+                            handleSend();
+                          }
+                        }}
                         onBlur={() => setTyping(false)}
-                        className="flex-1 h-10 md:h-12 rounded-full bg-muted/50 border-none text-sm md:text-base"
+                        className="flex-1 min-h-[40px] md:min-h-[48px] max-h-[120px] rounded-2xl bg-muted/50 border-none text-sm md:text-base px-4 py-2.5 resize-none focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
                         aria-label="כתיבת הודעה"
+                        rows={1}
                       />
                       {messageText.trim() ? (
                         <Button 
@@ -723,6 +732,40 @@ const Messages = () => {
           )}
         </div>
       </main>
+
+      {/* Delete Message Confirmation Dialog */}
+      <AlertDialog open={!!deleteMessageId} onOpenChange={() => setDeleteMessageId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>האם למחוק את ההודעה?</AlertDialogTitle>
+            <AlertDialogDescription>
+              פעולה זו תמחק את ההודעה לצמיתות. לא ניתן לבטל פעולה זו.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>ביטול</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive hover:bg-destructive/90"
+              onClick={async () => {
+                if (!deleteMessageId) return;
+                const { error } = await supabase
+                  .from("messages")
+                  .delete()
+                  .eq("id", deleteMessageId)
+                  .eq("sender_id", myProfileId);
+                if (error) {
+                  toast.error("שגיאה במחיקת ההודעה");
+                } else {
+                  toast.success("ההודעה נמחקה");
+                }
+                setDeleteMessageId(null);
+              }}
+            >
+              מחק
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
