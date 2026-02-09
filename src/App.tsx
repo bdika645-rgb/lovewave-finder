@@ -17,6 +17,7 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import SkipToContent from "@/components/SkipToContent";
 import FullPageLoader from "@/components/FullPageLoader";
 import ImpersonationBanner from "@/components/ImpersonationBanner";
+import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 
 // Pages (lazy to improve TTI on first load)
 import Index from "./pages/Index";
@@ -67,6 +68,12 @@ const RouteLoader = ({ label }: { label?: string }) => (
   <FullPageLoader label={label ?? "טוען..."} className="min-h-screen bg-background flex items-center justify-center" />
 );
 
+/** Invisible component that tracks online status */
+const OnlineTracker = () => {
+  useOnlineStatus();
+  return null;
+};
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -87,6 +94,7 @@ const App = () => (
             <ImpersonationProvider>
               <LandingContentProvider>
                 <TooltipProvider>
+                  <OnlineTracker />
                   <ImpersonationBanner />
                   <SkipToContent />
                   <Toaster />
