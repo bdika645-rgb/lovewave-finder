@@ -4,7 +4,7 @@ import Navbar from "@/components/Navbar";
 import SkipToContent from "@/components/SkipToContent";
 import SEOHead from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
-import { Star, Heart, Trash2, MapPin, Loader2 } from "lucide-react";
+import { Star, Trash2, MapPin } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useMyProfileId } from "@/hooks/useMyProfileId";
 import { useFavorites } from "@/hooks/useFavorites";
