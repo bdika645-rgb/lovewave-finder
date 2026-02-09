@@ -77,6 +77,7 @@ const Discover = () => {
   const [showSuperLikeAnim, setShowSuperLikeAnim] = useState(false);
   const [currentProfilePhotos, setCurrentProfilePhotos] = useState<string[]>([]);
   const [currentProfileBio, setCurrentProfileBio] = useState("");
+  const [currentProfileVerified, setCurrentProfileVerified] = useState(false);
 
   // Allow closing match overlay with ESC
   useEffect(() => {
@@ -103,6 +104,7 @@ const Discover = () => {
       if (!currentProfile) {
         setCurrentProfilePhotos([]);
         setCurrentProfileBio("");
+        setCurrentProfileVerified(false);
         return;
       }
 
@@ -114,7 +116,7 @@ const Discover = () => {
           .order('display_order', { ascending: true }),
         supabase
           .from('profiles')
-          .select('bio, looking_for, relationship_goal')
+          .select('bio, looking_for, relationship_goal, is_verified')
           .eq('id', currentProfile.id)
           .single(),
       ]);
@@ -128,6 +130,7 @@ const Discover = () => {
       }
 
       setCurrentProfileBio(profileRes.data?.bio || "");
+      setCurrentProfileVerified(profileRes.data?.is_verified || false);
     };
 
     fetchProfileDetails();
@@ -646,7 +649,7 @@ const Discover = () => {
                       image: currentProfile.avatar_url || "/profiles/profile1.jpg",
                       interests: currentProfile.interests || [],
                       isOnline: currentProfile.is_online || false,
-                      isVerified: false,
+                      isVerified: currentProfileVerified,
                     }}
                     images={currentProfilePhotos}
                     onLike={handleLike}
@@ -656,6 +659,7 @@ const Discover = () => {
                     onReport={() => setReportDialogOpen(true)}
                     canUndo={canUndo}
                     myCity={myProfile?.city}
+                    myInterests={myProfile?.interests || []}
                   />
                 </motion.div>
               )}

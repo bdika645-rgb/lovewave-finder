@@ -1,4 +1,5 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
+import { getCityDistance, formatDistance } from "@/lib/cityDistance";
 import { useProfileById } from "@/hooks/useProfiles";
 import { useCurrentProfile } from "@/hooks/useCurrentProfile";
 import { useLikes } from "@/hooks/useLikes";
@@ -355,6 +356,14 @@ const MemberProfile = () => {
                   <p className="flex items-center gap-2 text-muted-foreground mt-2">
                     <MapPin className="w-5 h-5" />
                     {member.city}
+                    {(() => {
+                      const dist = formatDistance(getCityDistance(currentUserProfile?.city, member.city));
+                      return dist && dist !== "באותה עיר" ? (
+                        <span className="text-sm opacity-80">· {dist}</span>
+                      ) : dist === "באותה עיר" ? (
+                        <span className="text-sm opacity-80">· באותה עיר 📍</span>
+                      ) : null;
+                    })()}
                   </p>
                 </div>
               </div>

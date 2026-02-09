@@ -15,6 +15,7 @@ interface SwipeCardProps {
   images?: string[];
   canUndo?: boolean;
   myCity?: string;
+  myInterests?: string[];
 }
 
 const SwipeCard = ({ 
@@ -26,7 +27,8 @@ const SwipeCard = ({
   onReport, 
   images,
   canUndo = false,
-  myCity
+  myCity,
+  myInterests = []
 }: SwipeCardProps) => {
   const [swipeDirection, setSwipeDirection] = useState<"left" | "right" | "up" | null>(null);
   const [imageIndex, setImageIndex] = useState(0);
@@ -356,14 +358,20 @@ const SwipeCard = ({
               {member.bio}
             </p>
             <div className="flex flex-wrap gap-2">
-              {member.interests.slice(0, 4).map((interest) => (
-                <Badge 
-                  key={interest} 
-                  className="bg-primary-foreground/20 text-primary-foreground border-none backdrop-blur-sm"
-                >
-                  {interest}
-                </Badge>
-              ))}
+              {member.interests.slice(0, 4).map((interest) => {
+                const isShared = myInterests.length > 0 && myInterests.includes(interest);
+                return (
+                  <Badge 
+                    key={interest} 
+                    className={isShared 
+                      ? "bg-primary/30 text-primary-foreground border border-primary-foreground/30 backdrop-blur-sm" 
+                      : "bg-primary-foreground/20 text-primary-foreground border-none backdrop-blur-sm"
+                    }
+                  >
+                    {isShared && "✨ "}{interest}
+                  </Badge>
+                );
+              })}
               {member.interests.length > 4 && (
                 <Badge className="bg-primary-foreground/20 text-primary-foreground border-none backdrop-blur-sm">
                   +{member.interests.length - 4}

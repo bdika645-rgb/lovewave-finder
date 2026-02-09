@@ -566,7 +566,7 @@ const Messages = () => {
                             )}
                           <div
                             key={message.id}
-                            className={`flex ${isMine ? "justify-end" : "justify-start"} group`}
+                            className={`flex items-end gap-1 ${isMine ? "justify-end flex-row-reverse" : "justify-start"} group`}
                           >
                             <div className="max-w-[70%]">
                               <div
@@ -603,28 +603,6 @@ const Messages = () => {
                                     />
                                   )}
                                 </div>
-                                {/* Delete button for own messages */}
-                                {isMine && (
-                                  <button
-                                    onClick={async () => {
-                                      if (!confirm("האם למחוק את ההודעה?")) return;
-                                      const { error } = await supabase
-                                        .from("messages")
-                                        .delete()
-                                        .eq("id", message.id)
-                                        .eq("sender_id", myProfileId);
-                                      if (error) {
-                                        toast.error("שגיאה במחיקת ההודעה");
-                                      } else {
-                                        toast.success("ההודעה נמחקה");
-                                      }
-                                    }}
-                                    className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-destructive/10 rounded text-destructive"
-                                    aria-label="מחק הודעה"
-                                  >
-                                    <Trash2 className="w-4 h-4" />
-                                  </button>
-                                )}
                               </div>
                               <MessageReaction
                                 messageId={message.id}
@@ -632,6 +610,28 @@ const Messages = () => {
                                 isMine={isMine}
                               />
                             </div>
+                            {/* Delete button - outside the bubble */}
+                            {isMine && (
+                              <button
+                                onClick={async () => {
+                                  if (!confirm("האם למחוק את ההודעה?")) return;
+                                  const { error } = await supabase
+                                    .from("messages")
+                                    .delete()
+                                    .eq("id", message.id)
+                                    .eq("sender_id", myProfileId);
+                                  if (error) {
+                                    toast.error("שגיאה במחיקת ההודעה");
+                                  } else {
+                                    toast.success("ההודעה נמחקה");
+                                  }
+                                }}
+                                className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 hover:bg-destructive/10 rounded-full text-muted-foreground hover:text-destructive mb-1"
+                                aria-label="מחק הודעה"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            )}
                           </div>
                           </div>
                         );
