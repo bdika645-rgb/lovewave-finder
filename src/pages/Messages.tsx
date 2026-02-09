@@ -10,7 +10,9 @@ import FullPageLoader from "@/components/FullPageLoader";
 import EmptyState from "@/components/EmptyState";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Send, Search, Loader2, MessageCircle, Heart, ChevronRight } from "lucide-react";
+import { Send, Search, Loader2, MessageCircle, Heart, ChevronRight, SearchX } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
+import { he } from "date-fns/locale";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { toast } from "sonner";
 import { useConversations } from "@/hooks/useConversations";
@@ -26,6 +28,8 @@ const Messages = () => {
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
   const [messageText, setMessageText] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [chatSearchQuery, setChatSearchQuery] = useState("");
+  const [showChatSearch, setShowChatSearch] = useState(false);
   const [sendingMessage, setSendingMessage] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [myProfileId, setMyProfileId] = useState<string | null>(null);
@@ -323,13 +327,29 @@ const Messages = () => {
                         <div className="text-sm text-muted-foreground">
                           {othersTyping.length > 0 ? (
                             <TypingIndicator />
+                          ) : selectedConversation.otherProfile?.is_online ? (
+                            <span className="text-success font-medium">מחובר/ת עכשיו</span>
+                          ) : selectedConversation.otherProfile?.last_seen ? (
+                            <span>נצפה {formatDistanceToNow(new Date(selectedConversation.otherProfile.last_seen), { addSuffix: true, locale: he })}</span>
                           ) : (
-                            selectedConversation.otherProfile?.is_online ? "מחובר/ת" : "לא מחובר/ת"
+                            "לא מחובר/ת"
                           )}
                         </div>
                       </div>
                     </div>
                     <div className="flex items-center gap-1 md:gap-2 shrink-0">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => {
+                          setShowChatSearch(!showChatSearch);
+                          if (showChatSearch) setChatSearchQuery("");
+                        }}
+                        aria-label="חיפוש בשיחה"
+                        className="rounded-full"
+                      >
+                        <Search className="w-4 h-4" />
+                      </Button>
                       <ConversationMenu
                         conversationId={selectedConversationId!}
                         otherProfileId={selectedConversation.otherProfile?.id || ''}
@@ -345,6 +365,31 @@ const Messages = () => {
                       />
                     </div>
                   </div>
+
+                  {/* In-chat search bar */}
+                  {showChatSearch && (
+                    <div className="px-4 py-2 border-b border-border bg-muted/30 flex items-center gap-2">
+                      <Search className="w-4 h-4 text-muted-foreground shrink-0" aria-hidden="true" />
+                      <Input
+                        placeholder="חיפוש בשיחה..."
+                        value={chatSearchQuery}
+                        onChange={(e) => setChatSearchQuery(e.target.value)}
+                        className="h-8 bg-transparent border-none text-sm"
+                        aria-label="חיפוש בתוך השיחה"
+                        autoFocus
+                      />
+                      {chatSearchQuery && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setChatSearchQuery("")}
+                          className="h-6 px-2 text-xs"
+                        >
+                          נקה
+                        </Button>
+                      )}
+                    </div>
+                  )}
 
                   {/* Messages */}
                   <div 
@@ -369,8 +414,21 @@ const Messages = () => {
                           טיפ: נסו משפט פתיחה קצר או השתמשו בכפתור השאלה (Icebreaker).
                         </p>
                       </div>
-                    ) : (
-                      messages.map((message) => {
+                    ) : (() => {
+                      const filteredMessages = chatSearchQuery.trim()
+                        ? messages.filter(m => m.content.toLowerCase().includes(chatSearchQuery.toLowerCase()))
+                        : messages;
+                      
+                      if (filteredMessages.length === 0 && chatSearchQuery.trim()) {
+                        return (
+                          <div className="flex flex-col items-center justify-center h-full text-center">
+                            <SearchX className="w-10 h-10 text-muted-foreground/50 mb-2" aria-hidden="true" />
+                            <p className="text-muted-foreground text-sm">לא נמצאו הודעות עבור "{chatSearchQuery}"</p>
+                          </div>
+                        );
+                      }
+
+                      return filteredMessages.map((message) => {
                         const isMine = message.sender_id === myProfileId;
                         return (
                           <div
@@ -411,8 +469,8 @@ const Messages = () => {
                             </div>
                           </div>
                         );
-                      })
-                    )}
+                      });
+                    })()}
                     <div ref={messagesEndRef} />
                   </div>
 
