@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, Users, Heart, MessageCircle, User, LogIn } from "lucide-react";
+import { Home, Users, Heart, MessageCircle, User, LogIn, Compass } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 import { cn } from "@/lib/utils";
@@ -188,7 +188,7 @@ const BottomNavigation = () => {
     if (user) {
       return [
         { path: "/", icon: Home, label: "בית" },
-        { path: "/members", icon: Users, label: "פרופילים" },
+        { path: "/discover", icon: Compass, label: "גלו" },
         { path: "/matches", icon: Heart, label: "התאמות" },
         { path: "/messages", icon: MessageCircle, label: "הודעות", badge: unreadCount },
         { path: "/profile", icon: User, label: "פרופיל" },
