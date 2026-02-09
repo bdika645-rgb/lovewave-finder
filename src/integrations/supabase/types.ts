@@ -561,6 +561,44 @@ export type Database = {
           },
         ]
       }
+      profile_prompts: {
+        Row: {
+          created_at: string
+          display_order: number
+          id: string
+          profile_id: string
+          prompt_answer: string
+          prompt_question: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          profile_id: string
+          prompt_answer: string
+          prompt_question: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          profile_id?: string
+          prompt_answer?: string
+          prompt_question?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_prompts_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profile_views: {
         Row: {
           id: string

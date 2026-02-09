@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Heart, MessageCircle, MapPin, ArrowRight, Star, Share2, Loader2, Sparkles, Check, GraduationCap, Ruler, Cigarette, Target, ShieldCheck, ChevronLeft, ChevronRight, Bookmark, Clock } from "lucide-react";
 import ImageLightbox from "@/components/ImageLightbox";
+import ProfilePromptsDisplay from "@/components/ProfilePromptsDisplay";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -429,6 +430,9 @@ const MemberProfile = () => {
                   </div>
                 </div>
               )}
+
+              {/* Profile Prompts */}
+              <ProfilePromptsDisplay profileId={member.id} />
 
               {member.interests && member.interests.length > 0 && (
                 <div className="mb-8">
