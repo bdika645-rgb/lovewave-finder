@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import SkipToContent from "@/components/SkipToContent";
 import SEOHead from "@/components/SEOHead";
-import FullPageLoader from "@/components/FullPageLoader";
+import { MatchCardSkeleton } from "@/components/MatchCardSkeleton";
 import EmptyState from "@/components/EmptyState";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -143,7 +143,7 @@ const WhoLikedMe = () => {
       />
       <Navbar />
       
-      <main id="main-content" className="pt-24 pb-24 sm:pb-12 px-4 max-w-6xl mx-auto">
+      <main id="main-content" className="pt-24 pb-24 md:pb-12 px-4 max-w-6xl mx-auto">
         {/* Header - Enhanced */}
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
@@ -164,11 +164,10 @@ const WhoLikedMe = () => {
         </motion.div>
 
         {loading ? (
-          <FullPageLoader 
-            label="מחפשים מי אהב אותך..." 
-            branded 
-            className="min-h-[50vh] bg-transparent flex items-center justify-center" 
-          />
+          <div role="status" aria-label="טוען לייקים" aria-live="polite" aria-busy="true">
+            <span className="sr-only">טוען לייקים...</span>
+            <MatchCardSkeleton count={4} />
+          </div>
         ) : likers.length === 0 ? (
           <EmptyState
             icon={<Heart className="w-12 h-12" />}

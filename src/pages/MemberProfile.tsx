@@ -142,7 +142,7 @@ const MemberProfile = () => {
       />
       <Navbar />
 
-      <main id="main-content" className="container mx-auto px-6 pt-28 pb-16">
+      <main id="main-content" className="container mx-auto px-6 pt-28 pb-24 md:pb-16">
         {/* Back Button */}
         <Link 
           to="/members" 

@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import SkipToContent from "@/components/SkipToContent";
 import SEOHead from "@/components/SEOHead";
-import FullPageLoader from "@/components/FullPageLoader";
+import { MatchCardSkeleton } from "@/components/MatchCardSkeleton";
 import EmptyState from "@/components/EmptyState";
 import LazyImage from "@/components/LazyImage";
 import { useAuth } from "@/hooks/useAuth";
@@ -68,7 +68,7 @@ const WhoViewedMe = () => {
       />
       <Navbar />
       
-      <main id="main-content" className="pt-24 pb-24 sm:pb-12 px-4 max-w-6xl mx-auto">
+      <main id="main-content" className="pt-24 pb-24 md:pb-12 px-4 max-w-6xl mx-auto">
         {/* Header - Enhanced */}
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
@@ -89,11 +89,10 @@ const WhoViewedMe = () => {
         </motion.div>
 
         {loading ? (
-          <FullPageLoader 
-            label="מחפשים מי צפה בך..." 
-            branded 
-            className="min-h-[50vh] bg-transparent flex items-center justify-center" 
-          />
+          <div role="status" aria-label="טוען צפיות" aria-live="polite" aria-busy="true">
+            <span className="sr-only">טוען צפיות...</span>
+            <MatchCardSkeleton count={4} />
+          </div>
         ) : views.length === 0 ? (
           <EmptyState
             icon={<Eye className="w-12 h-12" />}

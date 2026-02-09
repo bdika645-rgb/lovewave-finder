@@ -141,7 +141,7 @@ const Messages = () => {
       <SEOHead title="הודעות" description="שוחחו עם ההתאמות שלכם ומצאו את האהבה." />
       <Navbar />
 
-      <main id="main-content" className="container mx-auto px-6 pt-24 pb-6">
+      <main id="main-content" className="container mx-auto px-6 pt-24 pb-24 md:pb-6">
         <h1 className="sr-only">הודעות</h1>
         <div className="bg-card rounded-3xl shadow-card overflow-hidden h-[calc(100vh-120px)]">
           {hasNoConversationsOrMatches ? (
