@@ -144,7 +144,7 @@ const Settings = () => {
         {notificationsStatus || privacyStatus}
       </div>
 
-      <main id="main-content" className="container mx-auto px-6 pt-28 pb-16 max-w-2xl">
+      <main id="main-content" className="container mx-auto px-6 pt-28 pb-24 md:pb-16 max-w-2xl">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
           <Button 

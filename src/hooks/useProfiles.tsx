@@ -11,6 +11,7 @@ interface UseProfilesOptions {
   ageFrom?: number;
   ageTo?: number;
   city?: string;
+  gender?: string;
   excludeCurrentUser?: boolean;
   filterByOppositeGender?: boolean;
 }
@@ -48,7 +49,7 @@ export function useProfiles(options: UseProfilesOptions = {}) {
     // Otherwise proceed with fetch
     fetchProfiles();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [options.search, options.ageFrom, options.ageTo, options.city, user, currentUserGender, options.filterByOppositeGender, options.excludeCurrentUser]);
+  }, [options.search, options.ageFrom, options.ageTo, options.city, options.gender, user, currentUserGender, options.filterByOppositeGender, options.excludeCurrentUser]);
 
   const fetchProfiles = async () => {
     try {
@@ -81,6 +82,9 @@ export function useProfiles(options: UseProfilesOptions = {}) {
       }
       if (options.city) {
         query = query.ilike('city', `%${options.city}%`);
+      }
+      if (options.gender) {
+        query = query.eq('gender', options.gender);
       }
       if (options.search) {
         query = query.or(`name.ilike.%${options.search}%,city.ilike.%${options.search}%`);
