@@ -11,10 +11,11 @@ import FullPageLoader from "@/components/FullPageLoader";
 import SEOHead from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Heart, MessageCircle, MapPin, ArrowRight, Star, Share2, Loader2, Sparkles, Check, GraduationCap, Ruler, Cigarette, Target, ShieldCheck } from "lucide-react";
+import { Heart, MessageCircle, MapPin, ArrowRight, Star, Share2, Loader2, Sparkles, Check, GraduationCap, Ruler, Cigarette, Target, ShieldCheck, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { supabase } from "@/integrations/supabase/client";
 
 const MemberProfile = () => {
   const { id } = useParams();
@@ -25,7 +26,25 @@ const MemberProfile = () => {
   const { createOrGetConversation } = useConversations();
   const { user } = useAuth();
   const [messageLoading, setMessageLoading] = useState(false);
+  const [photos, setPhotos] = useState<string[]>([]);
+  const [activePhotoIndex, setActivePhotoIndex] = useState(0);
   
+  // Fetch member photos
+  useEffect(() => {
+    if (!id) return;
+    const fetchPhotos = async () => {
+      const { data } = await supabase
+        .from('photos')
+        .select('url')
+        .eq('profile_id', id)
+        .order('display_order', { ascending: true });
+      if (data && data.length > 0) {
+        setPhotos(data.map(p => p.url));
+      }
+    };
+    fetchPhotos();
+  }, [id]);
+
   // Calculate compatibility score
   const compatibility = useCompatibility(currentUserProfile as any, member as any);
 
@@ -111,7 +130,8 @@ const MemberProfile = () => {
     }
   };
 
-  const imageUrl = member.avatar_url || "/profiles/profile1.jpg";
+  const allImages = photos.length > 0 ? photos : [member.avatar_url || "/profiles/profile1.jpg"];
+  const currentImage = allImages[activePhotoIndex] || allImages[0];
 
   return (
     <div className="min-h-screen bg-muted/20" dir="rtl">
@@ -134,15 +154,62 @@ const MemberProfile = () => {
         </Link>
 
         <div className="grid lg:grid-cols-2 gap-8">
-          {/* Image Section */}
+          {/* Image Section with Gallery */}
           <div className="relative">
-            <div className="aspect-[3/4] rounded-3xl overflow-hidden shadow-elevated">
+            <div className="aspect-[3/4] rounded-3xl overflow-hidden shadow-elevated relative">
               <img 
-                src={imageUrl} 
-                alt={member.name} 
-                className="w-full h-full object-cover"
+                src={currentImage} 
+                alt={`${member.name} - תמונה ${activePhotoIndex + 1}`} 
+                className="w-full h-full object-cover transition-opacity duration-300"
               />
               <div className="absolute inset-0 gradient-overlay opacity-30" />
+              
+              {/* Photo Navigation Dots */}
+              {allImages.length > 1 && (
+                <div className="absolute top-4 left-4 right-4 flex gap-1">
+                  {allImages.map((_, i) => (
+                    <button 
+                      key={i}
+                      onClick={() => setActivePhotoIndex(i)}
+                      className={`flex-1 h-1.5 rounded-full transition-all ${
+                        i === activePhotoIndex ? "bg-white" : "bg-white/40"
+                      }`}
+                      aria-label={`תמונה ${i + 1}`}
+                    />
+                  ))}
+                </div>
+              )}
+
+              {/* Photo Navigation Arrows */}
+              {allImages.length > 1 && (
+                <>
+                  {activePhotoIndex > 0 && (
+                    <button
+                      onClick={() => setActivePhotoIndex(i => i - 1)}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center bg-card/70 backdrop-blur-sm rounded-full hover:bg-card/90 transition-colors"
+                      aria-label="תמונה קודמת"
+                    >
+                      <ChevronRight className="w-5 h-5 text-foreground" />
+                    </button>
+                  )}
+                  {activePhotoIndex < allImages.length - 1 && (
+                    <button
+                      onClick={() => setActivePhotoIndex(i => i + 1)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center bg-card/70 backdrop-blur-sm rounded-full hover:bg-card/90 transition-colors"
+                      aria-label="תמונה הבאה"
+                    >
+                      <ChevronLeft className="w-5 h-5 text-foreground" />
+                    </button>
+                  )}
+                </>
+              )}
+
+              {/* Photo Counter */}
+              {allImages.length > 1 && (
+                <div className="absolute bottom-4 left-4 bg-card/70 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium text-foreground">
+                  {activePhotoIndex + 1} / {allImages.length}
+                </div>
+              )}
               
               {member.is_online && (
                 <div className="absolute top-6 right-6 flex items-center gap-2 glass-effect px-4 py-2 rounded-full">
