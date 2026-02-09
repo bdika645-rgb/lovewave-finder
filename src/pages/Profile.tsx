@@ -16,6 +16,7 @@ import { useCurrentProfile } from "@/hooks/useCurrentProfile";
 import { useProfileStats } from "@/hooks/useProfileStats";
 import { useUnsavedChangesWarning } from "@/hooks/useUnsavedChangesWarning";
 import PhotoUpload from "@/components/PhotoUpload";
+import ProfilePromptsEditor from "@/components/ProfilePromptsEditor";
 import PhotoGallery from "@/components/PhotoGallery";
 import ProfileCompletenessMeter from "@/components/ProfileCompletenessMeter";
 import {
@@ -445,6 +446,11 @@ const Profile = () => {
                   </Button>
                 </div>
               )}
+            </div>
+
+            {/* Profile Prompts Editor */}
+            <div className="bg-card rounded-2xl p-6 shadow-card">
+              <ProfilePromptsEditor max={3} />
             </div>
 
             {/* Basic Info */}
