@@ -1,5 +1,7 @@
 import { memo, useState } from "react";
-import { Heart, X, MapPin, Sparkles, Check, Target } from "lucide-react";
+import { Heart, X, MapPin, Sparkles, Check, Target, Clock } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
+import { he } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
@@ -89,7 +91,7 @@ const MemberCard = memo(({ member, onLike, onPass }: MemberCardProps) => {
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
             
             {/* Online Status - Enhanced */}
-            {member.isOnline && (
+            {member.isOnline ? (
               <div 
                 className="absolute top-3 right-3 flex items-center gap-1.5 bg-card/95 backdrop-blur-md px-2.5 py-1.5 rounded-full shadow-lg border border-success/20"
                 role="status"
@@ -98,7 +100,18 @@ const MemberCard = memo(({ member, onLike, onPass }: MemberCardProps) => {
                 <span className="w-2.5 h-2.5 bg-success rounded-full animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.5)]" aria-hidden="true" />
                 <span className="text-xs font-semibold text-success">מחובר/ת</span>
               </div>
-            )}
+            ) : member.lastActive ? (
+              <div 
+                className="absolute top-3 right-3 flex items-center gap-1.5 bg-card/95 backdrop-blur-md px-2.5 py-1.5 rounded-full shadow-lg"
+                role="status"
+                aria-label={`פעיל/ה לאחרונה ${formatDistanceToNow(new Date(member.lastActive), { addSuffix: true, locale: he })}`}
+              >
+                <Clock className="w-3 h-3 text-muted-foreground" aria-hidden="true" />
+                <span className="text-xs text-muted-foreground">
+                  {formatDistanceToNow(new Date(member.lastActive), { addSuffix: true, locale: he })}
+                </span>
+              </div>
+            ) : null}
 
             {/* Verified Badge */}
             {member.interests && member.interests.length >= 3 && (

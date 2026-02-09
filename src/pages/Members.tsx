@@ -63,6 +63,7 @@ const Members = () => {
   const [ageTo, setAgeTo] = useState("");
   const [locationFilter, setLocationFilter] = useState("");
   const [genderFilter, setGenderFilter] = useState("");
+  const [onlineOnly, setOnlineOnly] = useState(false);
   const [activeFilters, setActiveFilters] = useState<{ageFrom?: number; ageTo?: number; city?: string; gender?: string}>({});
 
   // Show all profiles - don't filter by gender
@@ -81,13 +82,19 @@ const Members = () => {
     toast.success("הפרופילים עודכנו!");
   }, [refetch]);
 
+  // Apply online filter client-side
+  const filteredProfiles = useMemo(() => {
+    if (!onlineOnly) return profiles;
+    return profiles.filter(p => p.is_online);
+  }, [profiles, onlineOnly]);
+
   // Pagination
   const pagination = usePagination({
-    totalItems: profiles.length,
+    totalItems: filteredProfiles.length,
     itemsPerPage: ITEMS_PER_PAGE,
   });
 
-  const paginatedProfiles = pagination.paginatedItems(profiles);
+  const paginatedProfiles = pagination.paginatedItems(filteredProfiles);
 
   const handleLike = async (memberId: string, memberName: string) => {
     if (!user) {
@@ -155,6 +162,7 @@ const Members = () => {
     setAgeTo("");
     setLocationFilter("");
     setGenderFilter("");
+    setOnlineOnly(false);
     setActiveFilters({});
     setSearchQuery("");
     pagination.goToPage(1);
@@ -409,10 +417,24 @@ const Members = () => {
         {!loading && !error && (
           <>
             {/* Results Count & View Toggle */}
-            <div className="flex items-center justify-between mb-6">
-              <p className="text-muted-foreground">
-                נמצאו <span className="font-semibold text-foreground">{profiles.length}</span> פרופילים
-              </p>
+             <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
+              <div className="flex items-center gap-3">
+                <p className="text-muted-foreground">
+                  נמצאו <span className="font-semibold text-foreground">{filteredProfiles.length}</span> פרופילים
+                </p>
+                <Button
+                  variant={onlineOnly ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => {
+                    setOnlineOnly(!onlineOnly);
+                    pagination.goToPage(1);
+                  }}
+                  className="gap-1.5 text-xs"
+                >
+                  <span className={`w-2 h-2 rounded-full ${onlineOnly ? "bg-primary-foreground" : "bg-success"} animate-pulse`} />
+                  מחוברים עכשיו
+                </Button>
+              </div>
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-1 bg-muted rounded-lg p-1" role="group" aria-label="בחר תצוגה">
                   <Button
