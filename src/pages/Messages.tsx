@@ -5,6 +5,7 @@ import TypingIndicator from "@/components/TypingIndicator";
 import IcebreakerButton from "@/components/IcebreakerButton";
 import ReadReceipt from "@/components/ReadReceipt";
 import ConversationMenu from "@/components/ConversationMenu";
+import MessageReaction from "@/components/MessageReaction";
 import FullPageLoader from "@/components/FullPageLoader";
 import EmptyState from "@/components/EmptyState";
 import { Button } from "@/components/ui/button";
@@ -374,32 +375,39 @@ const Messages = () => {
                         return (
                           <div
                             key={message.id}
-                            className={`flex ${isMine ? "justify-end" : "justify-start"}`}
+                            className={`flex ${isMine ? "justify-end" : "justify-start"} group`}
                           >
-                            <div
-                              className={`max-w-[70%] px-4 py-3 rounded-2xl ${
-                                isMine
-                                  ? "gradient-primary text-primary-foreground rounded-br-sm"
-                                  : "bg-muted text-foreground rounded-bl-sm"
-                              }`}
-                            >
-                              <p>{message.content}</p>
-                              <div className={`flex items-center gap-1 mt-1 ${
-                                isMine ? "justify-end" : ""
-                              }`}>
-                                <span className={`text-xs ${
-                                  isMine ? "text-primary-foreground/70" : "text-muted-foreground"
+                            <div className="max-w-[70%]">
+                              <div
+                                className={`px-4 py-3 rounded-2xl ${
+                                  isMine
+                                    ? "gradient-primary text-primary-foreground rounded-br-sm"
+                                    : "bg-muted text-foreground rounded-bl-sm"
+                                }`}
+                              >
+                                <p>{message.content}</p>
+                                <div className={`flex items-center gap-1 mt-1 ${
+                                  isMine ? "justify-end" : ""
                                 }`}>
-                                  {formatTime(message.created_at)}
-                                </span>
-                                {isMine && (
-                                  <ReadReceipt 
-                                    isRead={message.is_read || false} 
-                                    readAt={message.read_at || undefined}
-                                    className={isMine ? "text-primary-foreground/70" : ""}
-                                  />
-                                )}
+                                  <span className={`text-xs ${
+                                    isMine ? "text-primary-foreground/70" : "text-muted-foreground"
+                                  }`}>
+                                    {formatTime(message.created_at)}
+                                  </span>
+                                  {isMine && (
+                                    <ReadReceipt 
+                                      isRead={message.is_read || false} 
+                                      readAt={message.read_at || undefined}
+                                      className={isMine ? "text-primary-foreground/70" : ""}
+                                    />
+                                  )}
+                                </div>
                               </div>
+                              <MessageReaction
+                                messageId={message.id}
+                                myProfileId={myProfileId}
+                                isMine={isMine}
+                              />
                             </div>
                           </div>
                         );

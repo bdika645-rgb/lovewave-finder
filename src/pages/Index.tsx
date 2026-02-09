@@ -303,20 +303,30 @@ const Index = () => {
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
                   {filteredProfiles.map((profile, index) => (
                     <AnimatedCard key={profile.id} index={index}>
-                      <MemberCard 
-                        member={{
-                          id: profile.id,
-                          name: profile.name,
-                          age: profile.age,
-                          city: profile.city,
-                          bio: 'bio' in profile ? (profile.bio as string) || "" : "",
-                          image: 'avatar_url' in profile 
-                            ? (profile.avatar_url as string) || demoProfile1 
-                            : (profile as any).image || demoProfile1,
-                          interests: profile.interests || [],
-                          isOnline: 'is_online' in profile ? (profile.is_online as boolean) || false : (profile as any).isOnline || false,
-                        }}
-                      />
+                      <div className="relative">
+                        {/* "New" badge for profiles updated in last 3 days */}
+                        {'updated_at' in profile && new Date(profile.updated_at as string) > new Date(Date.now() - 3 * 24 * 60 * 60 * 1000) && (
+                          <div className="absolute top-2 left-2 z-10">
+                            <span className="bg-gradient-to-r from-primary to-secondary text-primary-foreground text-[10px] font-bold px-2 py-0.5 rounded-full shadow-lg animate-pulse">
+                              חדש! ✨
+                            </span>
+                          </div>
+                        )}
+                        <MemberCard 
+                          member={{
+                            id: profile.id,
+                            name: profile.name,
+                            age: profile.age,
+                            city: profile.city,
+                            bio: 'bio' in profile ? (profile.bio as string) || "" : "",
+                            image: 'avatar_url' in profile 
+                              ? (profile.avatar_url as string) || demoProfile1 
+                              : (profile as any).image || demoProfile1,
+                            interests: profile.interests || [],
+                            isOnline: 'is_online' in profile ? (profile.is_online as boolean) || false : (profile as any).isOnline || false,
+                          }}
+                        />
+                      </div>
                     </AnimatedCard>
                   ))}
                 </div>
