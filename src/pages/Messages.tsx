@@ -10,7 +10,7 @@ import FullPageLoader from "@/components/FullPageLoader";
 import EmptyState from "@/components/EmptyState";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Send, Search, Loader2, MessageCircle, Heart, ChevronRight, SearchX } from "lucide-react";
+import { Send, Search, Loader2, MessageCircle, Heart, ChevronRight, SearchX, Mic } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { he } from "date-fns/locale";
 import { useState, useEffect, useRef, useCallback } from "react";
@@ -437,11 +437,23 @@ const Messages = () => {
                           >
                             <div className="max-w-[70%]">
                               <div
-                                className={`px-4 py-3 rounded-2xl ${
+                                className={`px-4 py-3 rounded-2xl select-none ${
                                   isMine
                                     ? "gradient-primary text-primary-foreground rounded-br-sm"
                                     : "bg-muted text-foreground rounded-bl-sm"
                                 }`}
+                                onDoubleClick={() => {
+                                  if (myProfileId && !isMine) {
+                                    // Quick react with ❤️ on double-tap (like iMessage)
+                                    import("@/integrations/supabase/client").then(({ supabase }) => {
+                                      supabase.from("message_reactions").upsert({
+                                        message_id: message.id,
+                                        profile_id: myProfileId,
+                                        emoji: "❤️",
+                                      }, { onConflict: "message_id,profile_id" });
+                                    });
+                                  }
+                                }}
                               >
                                 <p>{message.content}</p>
                                 <div className={`flex items-center gap-1 mt-1 ${
@@ -490,19 +502,31 @@ const Messages = () => {
                         className="flex-1 h-10 md:h-12 rounded-full bg-muted/50 border-none text-sm md:text-base"
                         aria-label="כתיבת הודעה"
                       />
-                      <Button 
-                        variant="hero" 
-                        size="icon"
-                        onClick={handleSend}
-                        disabled={!messageText.trim() || sendingMessage}
-                        aria-label="שליחת הודעה"
-                      >
-                        {sendingMessage ? (
-                          <Loader2 className="w-5 h-5 animate-spin" />
-                        ) : (
-                          <Send className="w-5 h-5 rotate-180" />
-                        )}
-                      </Button>
+                      {messageText.trim() ? (
+                        <Button 
+                          variant="hero" 
+                          size="icon"
+                          onClick={handleSend}
+                          disabled={sendingMessage}
+                          aria-label="שליחת הודעה"
+                        >
+                          {sendingMessage ? (
+                            <Loader2 className="w-5 h-5 animate-spin" />
+                          ) : (
+                            <Send className="w-5 h-5 rotate-180" />
+                          )}
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="rounded-full text-muted-foreground"
+                          onClick={() => toast.info("הודעות קוליות - בקרוב! 🎤")}
+                          aria-label="הודעה קולית (בקרוב)"
+                        >
+                          <Mic className="w-5 h-5" />
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </div>

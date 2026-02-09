@@ -13,6 +13,7 @@ import SEOHead from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Heart, MessageCircle, MapPin, ArrowRight, Star, Share2, Loader2, Sparkles, Check, GraduationCap, Ruler, Cigarette, Target, ShieldCheck, ChevronLeft, ChevronRight, Bookmark } from "lucide-react";
+import ImageLightbox from "@/components/ImageLightbox";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
@@ -29,6 +30,7 @@ const MemberProfile = () => {
   const [messageLoading, setMessageLoading] = useState(false);
   const [photos, setPhotos] = useState<string[]>([]);
   const [activePhotoIndex, setActivePhotoIndex] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
   const { isFavorited, toggleFavorite } = useFavorites();
   
   // Fetch member photos
@@ -162,7 +164,8 @@ const MemberProfile = () => {
               <img 
                 src={currentImage} 
                 alt={`${member.name} - תמונה ${activePhotoIndex + 1}`} 
-                className="w-full h-full object-cover transition-opacity duration-300"
+                className="w-full h-full object-cover transition-opacity duration-300 cursor-pointer"
+                onClick={() => setLightboxOpen(true)}
               />
               <div className="absolute inset-0 gradient-overlay opacity-30" />
               
@@ -221,7 +224,15 @@ const MemberProfile = () => {
               )}
             </div>
 
-            {/* Quick Actions */}
+            {/* Photo Lightbox */}
+            <ImageLightbox
+              images={allImages}
+              initialIndex={activePhotoIndex}
+              open={lightboxOpen}
+              onClose={() => setLightboxOpen(false)}
+              alt={member.name}
+            />
+
             <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 flex gap-3">
               <Button
                 variant="pass"
