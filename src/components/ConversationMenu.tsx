@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { MoreVertical, Trash2, Ban, Flag, Volume, VolumeX, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -28,6 +28,7 @@ interface ConversationMenuProps {
   otherProfileName: string;
   onConversationDeleted?: () => void;
   onUserBlocked?: () => void;
+  onReport?: () => void;
 }
 
 const ConversationMenu = ({
@@ -36,12 +37,31 @@ const ConversationMenu = ({
   otherProfileName,
   onConversationDeleted,
   onUserBlocked,
+  onReport,
 }: ConversationMenuProps) => {
   const { guardAction } = useImpersonationGuard();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showBlockDialog, setShowBlockDialog] = useState(false);
   const [loading, setLoading] = useState(false);
   const [muted, setMuted] = useState(false);
+  const [myProfileId, setMyProfileId] = useState<string | null>(null);
+
+  // Load mute state on mount
+  useEffect(() => {
+    const loadMuteState = async () => {
+      const { data: pid } = await supabase.rpc('get_my_profile_id');
+      if (!pid) return;
+      setMyProfileId(pid);
+      const { data } = await supabase
+        .from('conversation_participants')
+        .select('is_muted')
+        .eq('conversation_id', conversationId)
+        .eq('profile_id', pid)
+        .maybeSingle();
+      if (data) setMuted(data.is_muted ?? false);
+    };
+    loadMuteState();
+  }, [conversationId]);
 
   const handleDeleteConversation = async () => {
     setLoading(true);
@@ -107,14 +127,27 @@ const ConversationMenu = ({
     }
   };
 
-  const handleMuteToggle = () => {
-    setMuted(!muted);
-    toast.success(muted ? 'התראות הופעלו' : 'התראות הושתקו לשיחה זו');
+  const handleMuteToggle = async () => {
+    const newMuted = !muted;
+    setMuted(newMuted);
+    
+    if (myProfileId) {
+      await supabase
+        .from('conversation_participants')
+        .update({ is_muted: newMuted })
+        .eq('conversation_id', conversationId)
+        .eq('profile_id', myProfileId);
+    }
+    
+    toast.success(newMuted ? 'התראות הושתקו לשיחה זו' : 'התראות הופעלו');
   };
 
   const handleReport = () => {
-    // Navigate to report - we'll use the ReportDialog component
-    toast.info('פתח את הפרופיל כדי לדווח');
+    if (onReport) {
+      onReport();
+    } else {
+      toast.info('פתח את הפרופיל כדי לדווח');
+    }
   };
 
   return (
