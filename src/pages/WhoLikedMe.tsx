@@ -143,7 +143,7 @@ const WhoLikedMe = () => {
       />
       <Navbar />
       
-      <main id="main-content" className="pt-24 pb-12 px-4 max-w-6xl mx-auto">
+      <main id="main-content" className="pt-24 pb-24 sm:pb-12 px-4 max-w-6xl mx-auto">
         {/* Header - Enhanced */}
         <motion.div 
           initial={{ opacity: 0, y: -20 }}

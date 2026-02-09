@@ -291,32 +291,19 @@ const Discover = () => {
     toast.success("הפרופילים אופסו!");
   };
 
-  // Keyboard shortcuts
+  // Keyboard shortcut for Ctrl+Z undo only (arrow keys handled by SwipeCard)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!currentProfile || !user) return;
       
-      switch (e.key) {
-        case 'ArrowRight':
-          handleLike();
-          break;
-        case 'ArrowLeft':
-          handlePass();
-          break;
-        case 'ArrowUp':
-          handleSuperLike();
-          break;
-        case 'z':
-          if (e.ctrlKey || e.metaKey) {
-            handleUndo();
-          }
-          break;
+      if (e.key === 'z' && (e.ctrlKey || e.metaKey)) {
+        handleUndo();
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentProfile, user, handleLike, handlePass, handleSuperLike, handleUndo]);
+  }, [currentProfile, user, handleUndo]);
 
   // Not logged in state
   if (!user) {

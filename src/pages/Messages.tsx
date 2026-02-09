@@ -434,7 +434,7 @@ const Messages = () => {
                         {sendingMessage ? (
                           <Loader2 className="w-5 h-5 animate-spin" />
                         ) : (
-                          <Send className="w-5 h-5" />
+                          <Send className="w-5 h-5 rotate-180" />
                         )}
                       </Button>
                     </div>
