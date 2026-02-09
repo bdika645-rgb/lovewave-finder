@@ -1,5 +1,6 @@
 import Navbar from "@/components/Navbar";
 import SkipToContent from "@/components/SkipToContent";
+import SEOHead from "@/components/SEOHead";
 import FullPageLoader from "@/components/FullPageLoader";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -136,6 +137,7 @@ const Settings = () => {
   return (
     <div className="min-h-screen bg-muted/20" dir="rtl">
       <SkipToContent />
+      <SEOHead title="הגדרות" description="נהל את הגדרות החשבון, התראות ופרטיות שלך." />
       <Navbar />
 
       <div className="sr-only" aria-live="polite" aria-atomic="true">
