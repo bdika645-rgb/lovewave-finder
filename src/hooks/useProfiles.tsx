@@ -4,6 +4,7 @@ import { useAuth } from './useAuth';
 import type { Tables } from '@/integrations/supabase/types';
 
 type Profile = Tables<'profiles_public'>;
+type FullProfile = Tables<'profiles'>;
 
 interface UseProfilesOptions {
   search?: string;
@@ -100,27 +101,62 @@ export function useProfiles(options: UseProfilesOptions = {}) {
 }
 
 export function useProfileById(id: string) {
-  const [profile, setProfile] = useState<Profile | null>(null);
+  const [profile, setProfile] = useState<FullProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
 
   useEffect(() => {
     if (id) {
       fetchProfile();
     }
-  }, [id]);
+  }, [id, user]);
 
   const fetchProfile = async () => {
     try {
       setLoading(true);
+      
+      // Try full profile table first (RLS will control visibility)
+      if (user) {
+        const { data, error: fullError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', id)
+          .single();
+
+        if (!fullError && data) {
+          setProfile(data);
+          return;
+        }
+      }
+
+      // Fallback to public view
       const { data, error } = await supabase
         .from('profiles_public')
-        .select('id, name, age, city, avatar_url, interests, is_visible, is_online, updated_at, gender')
+        .select('*')
         .eq('id', id)
         .single();
 
       if (error) throw error;
-      setProfile(data);
+      // Map public profile to full profile shape with nulls for missing fields
+      setProfile({
+        ...data,
+        bio: null,
+        education: null,
+        height: null,
+        smoking: null,
+        relationship_goal: null,
+        looking_for: null,
+        is_verified: null,
+        is_blocked: null,
+        is_demo: null,
+        blocked_at: null,
+        blocked_by: null,
+        blocked_reason: null,
+        last_seen: null,
+        user_id: null,
+        created_at: data.updated_at,
+      } as FullProfile);
     } catch (err) {
       setError((err as Error).message);
     } finally {
