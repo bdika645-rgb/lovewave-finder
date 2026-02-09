@@ -60,8 +60,8 @@ const MemberCard = memo(({ member, onLike, onPass }: MemberCardProps) => {
                 animate={{ scale: 1 }}
                 className={`w-20 h-20 rounded-full flex items-center justify-center ${
                   actionFeedback === "like" 
-                    ? "bg-success text-white" 
-                    : "bg-muted-foreground/80 text-white"
+                    ? "bg-success text-success-foreground" 
+                    : "bg-muted-foreground/80 text-primary-foreground"
                 }`}
               >
                 {actionFeedback === "like" ? (

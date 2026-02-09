@@ -232,7 +232,7 @@ const MemberProfile = () => {
                       key={i}
                       onClick={() => setActivePhotoIndex(i)}
                       className={`flex-1 h-1.5 rounded-full transition-all ${
-                        i === activePhotoIndex ? "bg-white" : "bg-white/40"
+                        i === activePhotoIndex ? "bg-primary-foreground" : "bg-primary-foreground/40"
                       }`}
                       aria-label={`תמונה ${i + 1}`}
                     />
@@ -317,7 +317,7 @@ const MemberProfile = () => {
                 size="icon-xl"
                 className={`shadow-elevated transition-colors ${
                   member && isFavorited(member.id) 
-                    ? "bg-yellow-500 text-white hover:bg-yellow-600" 
+                    ? "bg-secondary text-secondary-foreground hover:bg-secondary/90" 
                     : "bg-secondary text-secondary-foreground hover:bg-secondary/90"
                 }`}
                 onClick={() => member && toggleFavorite(member.id)}
