@@ -6,6 +6,7 @@ import SEOHead from "@/components/SEOHead";
 import { MatchCardSkeleton } from "@/components/MatchCardSkeleton";
 import EmptyState from "@/components/EmptyState";
 import { useAuth } from "@/hooks/useAuth";
+import PullToRefresh from "@/components/PullToRefresh";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -135,7 +136,8 @@ const WhoLikedMe = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background" dir="rtl">
+    <PullToRefresh onRefresh={async () => { await fetchLikers(); }} className="min-h-screen bg-background" disabled={loading}>
+    <div dir="rtl">
       <SkipToContent />
       <SEOHead 
         title="מי עשה לי לייק" 
@@ -269,6 +271,7 @@ const WhoLikedMe = () => {
         )}
       </main>
     </div>
+    </PullToRefresh>
   );
 };
 
