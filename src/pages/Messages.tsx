@@ -20,7 +20,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
-import { Send, Search, Loader2, MessageCircle, Heart, ChevronRight, ChevronDown, SearchX, Mic, Trash2 } from "lucide-react";
+import { Send, Search, Loader2, MessageCircle, Heart, ChevronRight, ChevronDown, SearchX, Mic, Trash2, Reply, X } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { he } from "date-fns/locale";
 import { useState, useEffect, useRef, useCallback } from "react";
@@ -48,6 +48,7 @@ const Messages = () => {
   const [showScrollToBottom, setShowScrollToBottom] = useState(false);
   const [myProfileId, setMyProfileId] = useState<string | null>(null);
   const [deleteMessageId, setDeleteMessageId] = useState<string | null>(null);
+  const [replyToMessage, setReplyToMessage] = useState<{ id: string; content: string; senderName: string } | null>(null);
 
   const { messages, loading: messagesLoading, sendMessage, markAsRead } = useMessages(selectedConversationId);
   const { othersTyping, setTyping } = useTypingStatus(selectedConversationId, myProfileId);
@@ -117,7 +118,7 @@ const Messages = () => {
     
     setTyping(false);
     setSendingMessage(true);
-    const { error } = await sendMessage(messageText);
+    const { error } = await sendMessage(messageText, replyToMessage?.id);
     setSendingMessage(false);
 
     if (error) {
@@ -126,11 +127,14 @@ const Messages = () => {
     }
 
     setMessageText("");
+    setReplyToMessage(null);
     refetchConversations();
   };
 
   const handleSelectConversation = (convId: string) => {
     setSelectedConversationId(convId);
+    setReplyToMessage(null);
+    setMessageText("");
   };
 
   const startConversationFromMatch = async (profileId: string) => {
@@ -601,7 +605,27 @@ const Messages = () => {
                                   }
                                 }}
                               >
-                                <p>{message.content}</p>
+                                {/* Reply quote */}
+                                {(message as any).reply_to && (() => {
+                                  const repliedMsg = messages.find(m => m.id === (message as any).reply_to);
+                                  if (!repliedMsg) return null;
+                                  const isRepliedMine = repliedMsg.sender_id === myProfileId;
+                                  return (
+                                    <div className={`mb-2 px-3 py-1.5 rounded-lg text-xs border-r-2 ${
+                                      isMine 
+                                        ? "bg-primary-foreground/10 border-primary-foreground/40" 
+                                        : "bg-foreground/5 border-primary/40"
+                                    }`}>
+                                      <p className={`font-medium mb-0.5 ${isMine ? "text-primary-foreground/80" : "text-primary"}`}>
+                                        {isRepliedMine ? "אתה" : selectedConversation?.otherProfile.name}
+                                      </p>
+                                      <p className={`line-clamp-2 ${isMine ? "text-primary-foreground/60" : "text-muted-foreground"}`}>
+                                        {repliedMsg.content}
+                                      </p>
+                                    </div>
+                                  );
+                                })()}
+                                <p className="whitespace-pre-wrap">{message.content}</p>
                                 <div className={`flex items-center gap-1 mt-1 ${
                                   isMine ? "justify-end" : ""
                                 }`}>
@@ -625,16 +649,29 @@ const Messages = () => {
                                 isMine={isMine}
                               />
                             </div>
-                            {/* Delete button - outside the bubble */}
-                            {isMine && (
+                            {/* Action buttons - outside the bubble */}
+                            <div className={`flex ${isMine ? "flex-row-reverse" : "flex-row"} gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity mb-1`}>
                               <button
-                                onClick={() => setDeleteMessageId(message.id)}
-                                className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 hover:bg-destructive/10 rounded-full text-muted-foreground hover:text-destructive mb-1"
-                                aria-label="מחק הודעה"
+                                onClick={() => setReplyToMessage({
+                                  id: message.id,
+                                  content: message.content,
+                                  senderName: isMine ? "אתה" : (selectedConversation?.otherProfile.name || ""),
+                                })}
+                                className="p-1.5 hover:bg-muted rounded-full text-muted-foreground hover:text-foreground"
+                                aria-label="השב להודעה"
                               >
-                                <Trash2 className="w-3.5 h-3.5" />
+                                <Reply className="w-3.5 h-3.5" />
                               </button>
-                            )}
+                              {isMine && (
+                                <button
+                                  onClick={() => setDeleteMessageId(message.id)}
+                                  className="p-1.5 hover:bg-destructive/10 rounded-full text-muted-foreground hover:text-destructive"
+                                  aria-label="מחק הודעה"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              )}
+                            </div>
                           </div>
                           </div>
                         );
@@ -655,6 +692,26 @@ const Messages = () => {
                       >
                         <ChevronDown className="w-5 h-5" />
                       </Button>
+                    </div>
+                  )}
+
+                  {/* Reply Preview */}
+                  {replyToMessage && (
+                    <div className="px-3 md:px-4 pt-2 border-t border-border">
+                      <div className="flex items-center gap-2 bg-muted/60 rounded-xl px-3 py-2">
+                        <div className="w-1 h-8 rounded-full bg-primary shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-medium text-primary">{replyToMessage.senderName}</p>
+                          <p className="text-xs text-muted-foreground line-clamp-1">{replyToMessage.content}</p>
+                        </div>
+                        <button
+                          onClick={() => setReplyToMessage(null)}
+                          className="p-1 hover:bg-muted rounded-full shrink-0"
+                          aria-label="בטל תגובה"
+                        >
+                          <X className="w-4 h-4 text-muted-foreground" />
+                        </button>
+                      </div>
                     </div>
                   )}
 
