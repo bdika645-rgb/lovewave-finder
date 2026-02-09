@@ -524,7 +524,7 @@ const Discover = () => {
           </div>
           <div className="text-center animate-scale-in">
             <div className="relative mb-8">
-              <div className="flex items-center justify-center gap-[-8px]">
+              <div className="flex items-center justify-center">
                 {/* My photo */}
                 <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-primary shadow-elevated z-10 -ml-4">
                   <img 
