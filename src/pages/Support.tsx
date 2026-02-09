@@ -293,6 +293,7 @@ const Support = () => {
                         placeholder="פרטו את הבקשה או השאלה שלכם..."
                         rows={6}
                         required
+                        maxLength={500}
                         className="resize-none"
                       />
                       <p className="text-xs text-muted-foreground mt-2">

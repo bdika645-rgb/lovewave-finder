@@ -1,5 +1,6 @@
 import Navbar from "@/components/Navbar";
 import SkipToContent from "@/components/SkipToContent";
+import SEOHead from "@/components/SEOHead";
 import FullPageLoader from "@/components/FullPageLoader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -265,6 +266,7 @@ const Profile = () => {
   return (
     <div className="min-h-screen bg-muted/20" dir="rtl">
       <SkipToContent />
+      <SEOHead title="הפרופיל שלי" description="צפה וערוך את הפרופיל שלך." />
       <Navbar />
 
       <div className="sr-only" aria-live="polite" aria-atomic="true">

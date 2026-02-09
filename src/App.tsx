@@ -90,7 +90,7 @@ const App = () => (
                   <Toaster />
                   <Sonner />
                   <BrowserRouter>
-                  <main id="main-content">
+                  <div>
               <Routes>
                 {/* Public Routes */}
                 <Route path="/" element={<Index />} />
@@ -335,7 +335,7 @@ const App = () => (
               </Routes>
               <BottomNavigation />
               <ScrollToTop />
-              </main>
+              </div>
             </BrowserRouter>
           </TooltipProvider>
           </LandingContentProvider>
