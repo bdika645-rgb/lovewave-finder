@@ -6,13 +6,14 @@ import { useConversations } from "@/hooks/useConversations";
 import { useAuth } from "@/hooks/useAuth";
 import { useCompatibility } from "@/hooks/useCompatibility";
 import { useFavorites } from "@/hooks/useFavorites";
+import { useProfileViews } from "@/hooks/useProfileViews";
 import Navbar from "@/components/Navbar";
 import SkipToContent from "@/components/SkipToContent";
 import FullPageLoader from "@/components/FullPageLoader";
 import SEOHead from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Heart, MessageCircle, MapPin, ArrowRight, Star, Share2, Loader2, Sparkles, Check, GraduationCap, Ruler, Cigarette, Target, ShieldCheck, ChevronLeft, ChevronRight, Bookmark } from "lucide-react";
+import { Heart, MessageCircle, MapPin, ArrowRight, Star, Share2, Loader2, Sparkles, Check, GraduationCap, Ruler, Cigarette, Target, ShieldCheck, ChevronLeft, ChevronRight, Bookmark, Clock } from "lucide-react";
 import ImageLightbox from "@/components/ImageLightbox";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
@@ -32,8 +33,16 @@ const MemberProfile = () => {
   const [activePhotoIndex, setActivePhotoIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const { isFavorited, toggleFavorite } = useFavorites();
+  const { recordView } = useProfileViews();
   const [showDoubleTapHeart, setShowDoubleTapHeart] = useState(false);
   const lastTapRef = useState({ time: 0 })[0];
+
+  // Record profile view
+  useEffect(() => {
+    if (id && user) {
+      recordView(id);
+    }
+  }, [id, user, recordView]);
   
   // Fetch member photos
   useEffect(() => {
@@ -260,12 +269,27 @@ const MemberProfile = () => {
                 </div>
               )}
               
-              {member.is_online && (
+              {member.is_online ? (
                 <div className="absolute top-6 right-6 flex items-center gap-2 glass-effect px-4 py-2 rounded-full">
                   <span className="w-3 h-3 bg-success rounded-full animate-pulse" />
                   <span className="font-medium text-foreground">מחובר/ת עכשיו</span>
                 </div>
-              )}
+              ) : member.last_seen ? (
+                <div className="absolute top-6 right-6 flex items-center gap-2 glass-effect px-4 py-2 rounded-full">
+                  <Clock className="w-3.5 h-3.5 text-muted-foreground" />
+                  <span className="font-medium text-muted-foreground text-sm">
+                    {(() => {
+                      const diff = Date.now() - new Date(member.last_seen).getTime();
+                      const mins = Math.floor(diff / 60000);
+                      if (mins < 60) return `פעיל/ה לפני ${mins} דקות`;
+                      const hours = Math.floor(mins / 60);
+                      if (hours < 24) return `פעיל/ה לפני ${hours} שעות`;
+                      const days = Math.floor(hours / 24);
+                      return `פעיל/ה לפני ${days} ימים`;
+                    })()}
+                  </span>
+                </div>
+              ) : null}
             </div>
 
             {/* Photo Lightbox */}
