@@ -11,7 +11,7 @@ import FullPageLoader from "@/components/FullPageLoader";
 import SEOHead from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Heart, MessageCircle, MapPin, ArrowRight, Star, Share2, Loader2, Sparkles, Check } from "lucide-react";
+import { Heart, MessageCircle, MapPin, ArrowRight, Star, Share2, Loader2, Sparkles, Check, GraduationCap, Ruler, Cigarette, Target, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 import { motion } from "framer-motion";
@@ -195,15 +195,77 @@ const MemberProfile = () => {
                 </div>
               </div>
 
+              {/* Verified Badge */}
+              {member.is_verified && (
+                <div className="flex items-center gap-2 mb-4 bg-success/10 text-success px-4 py-2 rounded-xl w-fit">
+                  <ShieldCheck className="w-5 h-5" />
+                  <span className="font-medium text-sm">פרופיל מאומת</span>
+                </div>
+              )}
+
               <div className="mb-8">
                 <h3 className="font-display text-lg font-semibold text-foreground mb-3">
                   קצת עליי
                 </h3>
                 <p className="text-muted-foreground leading-relaxed text-lg">
-                  {/* bio intentionally not exposed in public profiles */}
-                  עדיין אין תיאור ציבורי.
+                  {member.bio || "עדיין אין תיאור ציבורי."}
                 </p>
               </div>
+
+              {/* Details Grid */}
+              {(member.education || member.height || member.smoking || member.relationship_goal) && (
+                <div className="mb-8">
+                  <h3 className="font-display text-lg font-semibold text-foreground mb-3">
+                    פרטים נוספים
+                  </h3>
+                  <div className="grid grid-cols-2 gap-3">
+                    {member.education && (
+                      <div className="flex items-center gap-2 bg-muted/50 rounded-xl p-3">
+                        <GraduationCap className="w-4 h-4 text-primary" />
+                        <div>
+                          <p className="text-xs text-muted-foreground">השכלה</p>
+                          <p className="text-sm font-medium text-foreground">{member.education}</p>
+                        </div>
+                      </div>
+                    )}
+                    {member.height && (
+                      <div className="flex items-center gap-2 bg-muted/50 rounded-xl p-3">
+                        <Ruler className="w-4 h-4 text-primary" />
+                        <div>
+                          <p className="text-xs text-muted-foreground">גובה</p>
+                          <p className="text-sm font-medium text-foreground">{member.height} ס"מ</p>
+                        </div>
+                      </div>
+                    )}
+                    {member.smoking && (
+                      <div className="flex items-center gap-2 bg-muted/50 rounded-xl p-3">
+                        <Cigarette className="w-4 h-4 text-primary" />
+                        <div>
+                          <p className="text-xs text-muted-foreground">עישון</p>
+                          <p className="text-sm font-medium text-foreground">
+                            {member.smoking === 'no' ? 'לא מעשן/ת' :
+                             member.smoking === 'sometimes' ? 'לפעמים' :
+                             member.smoking === 'yes' ? 'מעשן/ת' : member.smoking}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                    {member.relationship_goal && (
+                      <div className="flex items-center gap-2 bg-muted/50 rounded-xl p-3">
+                        <Target className="w-4 h-4 text-primary" />
+                        <div>
+                          <p className="text-xs text-muted-foreground">מחפש/ת</p>
+                          <p className="text-sm font-medium text-foreground">
+                            {member.relationship_goal === 'serious' ? 'קשר רציני' :
+                             member.relationship_goal === 'casual' ? 'הכרויות' :
+                             member.relationship_goal === 'friendship' ? 'חברות' : member.relationship_goal}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {member.interests && member.interests.length > 0 && (
                 <div className="mb-8">

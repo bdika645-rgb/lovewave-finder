@@ -40,6 +40,7 @@ const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 
 import BottomNavigation from "./components/BottomNavigation";
+import ScrollToTop from "./components/ScrollToTop";
 
 // Admin Pages (also lazy)
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
@@ -333,6 +334,7 @@ const App = () => (
                 } />
               </Routes>
               <BottomNavigation />
+              <ScrollToTop />
               </main>
             </BrowserRouter>
           </TooltipProvider>

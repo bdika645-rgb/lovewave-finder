@@ -16,6 +16,7 @@ import { useProfileStats } from "@/hooks/useProfileStats";
 import { useUnsavedChangesWarning } from "@/hooks/useUnsavedChangesWarning";
 import PhotoUpload from "@/components/PhotoUpload";
 import PhotoGallery from "@/components/PhotoGallery";
+import ProfileCompletenessMeter from "@/components/ProfileCompletenessMeter";
 import {
   Select,
   SelectContent,
@@ -706,6 +707,9 @@ const Profile = () => {
                 </div>
               )}
             </div>
+
+            {/* Profile Completeness */}
+            <ProfileCompletenessMeter profile={profile} />
 
             {/* Quick Actions */}
             <div className="bg-card rounded-2xl p-6 shadow-card">
