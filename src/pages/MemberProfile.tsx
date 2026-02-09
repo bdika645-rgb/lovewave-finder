@@ -16,7 +16,7 @@ import { Heart, MessageCircle, MapPin, ArrowRight, Star, Share2, Loader2, Sparkl
 import ImageLightbox from "@/components/ImageLightbox";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 
 const MemberProfile = () => {
@@ -32,6 +32,8 @@ const MemberProfile = () => {
   const [activePhotoIndex, setActivePhotoIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const { isFavorited, toggleFavorite } = useFavorites();
+  const [showDoubleTapHeart, setShowDoubleTapHeart] = useState(false);
+  const lastTapRef = useState({ time: 0 })[0];
   
   // Fetch member photos
   useEffect(() => {
@@ -74,6 +76,26 @@ const MemberProfile = () => {
       </div>
     );
   }
+
+  const handleDoubleTap = () => {
+    const now = Date.now();
+    if (now - lastTapRef.time < 350) {
+      // Double tap detected
+      setShowDoubleTapHeart(true);
+      navigator.vibrate?.(30);
+      handleLike();
+      setTimeout(() => setShowDoubleTapHeart(false), 1000);
+    } else {
+      // Single tap - open lightbox after delay only if no double tap
+      lastTapRef.time = now;
+      setTimeout(() => {
+        if (Date.now() - lastTapRef.time >= 340) {
+          setLightboxOpen(true);
+        }
+      }, 350);
+    }
+    lastTapRef.time = now;
+  };
 
   const handleLike = async () => {
     if (!user) {
@@ -164,10 +186,32 @@ const MemberProfile = () => {
               <img 
                 src={currentImage} 
                 alt={`${member.name} - תמונה ${activePhotoIndex + 1}`} 
-                className="w-full h-full object-cover transition-opacity duration-300 cursor-pointer"
-                onClick={() => setLightboxOpen(true)}
+                className="w-full h-full object-cover transition-opacity duration-300 cursor-pointer select-none"
+                onClick={handleDoubleTap}
+                draggable={false}
               />
-              <div className="absolute inset-0 gradient-overlay opacity-30" />
+              <div className="absolute inset-0 gradient-overlay opacity-30 pointer-events-none" />
+
+              {/* Double-tap heart animation */}
+              <AnimatePresence>
+                {showDoubleTapHeart && (
+                  <motion.div
+                    className="absolute inset-0 flex items-center justify-center pointer-events-none z-20"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    <motion.div
+                      initial={{ scale: 0, rotate: -15 }}
+                      animate={{ scale: [0, 1.4, 1.1], rotate: [-15, 10, 0] }}
+                      exit={{ scale: 0, opacity: 0 }}
+                      transition={{ duration: 0.5, type: "spring", stiffness: 300 }}
+                    >
+                      <Heart className="w-24 h-24 text-primary fill-primary drop-shadow-lg" />
+                    </motion.div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
               
               {/* Photo Navigation Dots */}
               {allImages.length > 1 && (
