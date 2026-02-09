@@ -302,36 +302,40 @@ const Navbar = () => {
                 )}
               </Link>
                </li>
-               <li>
-              <Link 
-                to="/who-liked-me" 
-                className="font-body text-foreground py-3 px-4 rounded-lg hover:bg-accent transition-colors flex items-center gap-3"
-                 aria-current={location.pathname === "/who-liked-me" ? "page" : undefined}
-              >
-                <Heart className="w-5 h-5 text-primary fill-primary" />
-                מי לייק אותי
-              </Link>
-               </li>
-               <li>
-              <Link 
-                to="/who-viewed-me" 
-                className="font-body text-foreground py-3 px-4 rounded-lg hover:bg-accent transition-colors flex items-center gap-3"
-                 aria-current={location.pathname === "/who-viewed-me" ? "page" : undefined}
-              >
-                <Eye className="w-5 h-5 text-primary" />
-                מי צפה בי
-              </Link>
-               </li>
-               <li>
-              <Link 
-                to="/profile" 
-                className="font-body text-foreground py-3 px-4 rounded-lg hover:bg-accent transition-colors flex items-center gap-3"
-                 aria-current={location.pathname === "/profile" ? "page" : undefined}
-              >
-                <User className="w-5 h-5 text-primary" />
-                הפרופיל שלי
-              </Link>
-               </li>
+               {user && (
+                 <>
+                   <li>
+                     <Link 
+                       to="/who-liked-me" 
+                       className="font-body text-foreground py-3 px-4 rounded-lg hover:bg-accent transition-colors flex items-center gap-3"
+                       aria-current={location.pathname === "/who-liked-me" ? "page" : undefined}
+                     >
+                       <Heart className="w-5 h-5 text-primary fill-primary" />
+                       מי לייק אותי
+                     </Link>
+                   </li>
+                   <li>
+                     <Link 
+                       to="/who-viewed-me" 
+                       className="font-body text-foreground py-3 px-4 rounded-lg hover:bg-accent transition-colors flex items-center gap-3"
+                       aria-current={location.pathname === "/who-viewed-me" ? "page" : undefined}
+                     >
+                       <Eye className="w-5 h-5 text-primary" />
+                       מי צפה בי
+                     </Link>
+                   </li>
+                   <li>
+                     <Link 
+                       to="/profile" 
+                       className="font-body text-foreground py-3 px-4 rounded-lg hover:bg-accent transition-colors flex items-center gap-3"
+                       aria-current={location.pathname === "/profile" ? "page" : undefined}
+                     >
+                       <User className="w-5 h-5 text-primary" />
+                       הפרופיל שלי
+                     </Link>
+                   </li>
+                 </>
+               )}
               
               <li role="separator" aria-hidden="true" className="my-2 border-t border-border" />
               
