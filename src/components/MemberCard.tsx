@@ -1,5 +1,5 @@
 import { memo, useState } from "react";
-import { Heart, X, MapPin, Sparkles, Check } from "lucide-react";
+import { Heart, X, MapPin, Sparkles, Check, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
@@ -139,6 +139,18 @@ const MemberCard = memo(({ member, onLike, onPass }: MemberCardProps) => {
             <p className="text-muted-foreground text-xs sm:text-sm line-clamp-2 mb-3">
               {member.bio}
             </p>
+          )}
+
+          {/* Looking For Badge */}
+          {member.lookingFor && (
+            <div className="flex items-center gap-1.5 mb-3 text-xs text-muted-foreground">
+              <Target className="w-3.5 h-3.5 text-primary" aria-hidden="true" />
+              <span>
+                {member.lookingFor === 'serious' ? 'מחפש/ת קשר רציני' :
+                 member.lookingFor === 'casual' ? 'מחפש/ת הכרויות' :
+                 member.lookingFor === 'friendship' ? 'מחפש/ת חברות' : member.lookingFor}
+              </span>
+            </div>
           )}
 
           {/* Interests */}
