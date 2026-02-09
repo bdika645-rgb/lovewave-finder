@@ -207,7 +207,7 @@ const HeroSearch = () => {
                 onClick={() => setIsOpen(false)}
                 className="block p-4 text-center text-primary font-medium hover:bg-primary/10 transition-colors border-t border-border/50"
               >
-                הצג את כל התוצאות →
+                הצג את כל התוצאות ←
               </Link>
             )}
           </motion.div>

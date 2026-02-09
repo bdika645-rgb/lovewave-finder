@@ -94,7 +94,7 @@ const Support = () => {
       />
       <Navbar />
       
-      <main id="main-content" className="pt-24 pb-16 px-4">
+      <main id="main-content" className="pt-24 pb-24 md:pb-16 px-4">
         <div className="max-w-5xl mx-auto">
           {/* Header - Enhanced */}
           <motion.div 
@@ -315,7 +315,7 @@ const Support = () => {
                         </>
                       ) : (
                         <>
-                          <Send className="w-5 h-5" />
+                          <Send className="w-5 h-5 rotate-180" />
                           שלחו הודעה
                         </>
                       )}
