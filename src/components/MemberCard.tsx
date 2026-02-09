@@ -114,7 +114,7 @@ const MemberCard = memo(({ member, onLike, onPass }: MemberCardProps) => {
             ) : null}
 
             {/* Verified Badge */}
-            {member.interests && member.interests.length >= 3 && (
+            {member.isVerified && (
               <div className="absolute top-3 left-3">
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -123,7 +123,7 @@ const MemberCard = memo(({ member, onLike, onPass }: MemberCardProps) => {
                     </div>
                   </TooltipTrigger>
                   <TooltipContent side="bottom">
-                    <p>פרופיל מושלם</p>
+                    <p>פרופיל מאומת ✓</p>
                   </TooltipContent>
                 </Tooltip>
               </div>

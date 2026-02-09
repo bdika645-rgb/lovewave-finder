@@ -119,6 +119,18 @@ export function useMessages(conversationId: string | null) {
           setMessages(prev => [...prev, payload.new as Message]);
         }
       )
+      .on(
+        'postgres_changes',
+        {
+          event: 'DELETE',
+          schema: 'public',
+          table: 'messages',
+          filter: `conversation_id=eq.${conversationId}`,
+        },
+        (payload) => {
+          setMessages(prev => prev.filter(m => m.id !== (payload.old as any).id));
+        }
+      )
       .subscribe();
 
     return () => {
