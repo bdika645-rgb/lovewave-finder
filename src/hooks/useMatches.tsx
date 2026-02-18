@@ -89,14 +89,24 @@ export function useMatches() {
   useEffect(() => {
     fetchMatches();
 
-    // Realtime: auto-refresh when new match is created
     if (!user) return;
+
+    // Realtime: auto-refresh when new match is created or deleted
     const channel = supabase
       .channel('matches-realtime')
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'matches' },
         () => { fetchMatches(); }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'DELETE', schema: 'public', table: 'matches' },
+        (payload) => {
+          // Optimistically remove from local state without full refetch
+          const deletedId = (payload.old as Match).id;
+          setMatches(prev => prev.filter(m => m.id !== deletedId));
+        }
       )
       .subscribe();
 
