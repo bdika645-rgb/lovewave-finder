@@ -94,15 +94,17 @@ const Messages = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  // Mark messages as read when conversation is selected
+  // Mark messages as read only when:
+  // 1. A new conversation is selected, OR
+  // 2. New unread messages from others arrive in the active conversation
+  const lastSeenConvRef = useRef<string | null>(null);
   useEffect(() => {
-    if (selectedConversationId && messages.length > 0) {
-      markAsRead();
-      // Refetch conversations to update unread counts
-      const timer = setTimeout(() => refetchConversations(), 500);
-      return () => clearTimeout(timer);
-    }
-  }, [selectedConversationId, messages.length, markAsRead, refetchConversations]);
+    if (!selectedConversationId || messages.length === 0) return;
+    const hasUnread = messages.some(m => !m.is_read && m.sender_id !== myProfileId);
+    if (!hasUnread && lastSeenConvRef.current === selectedConversationId) return;
+    lastSeenConvRef.current = selectedConversationId;
+    markAsRead();
+  }, [selectedConversationId, messages, myProfileId, markAsRead]);
 
   useEffect(() => {
     getMyProfileId().then(setMyProfileId);
@@ -130,7 +132,7 @@ const Messages = () => {
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const handleSend = async () => {
+  const handleSend = useCallback(async () => {
     if (!messageText.trim() || !selectedConversationId || sendingMessage) return;
     
     setTyping(false);
@@ -145,12 +147,13 @@ const Messages = () => {
 
     setMessageText("");
     setReplyToMessage(null);
-    // Reset textarea height
+    // Reset textarea height safely
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.minHeight = '';
     }
-    refetchConversations();
-  };
+    // No need to call refetchConversations — realtime handles the update
+  }, [messageText, selectedConversationId, sendingMessage, sendMessage, replyToMessage, setTyping]);
 
   const handleSelectConversation = (convId: string) => {
     // Stop typing indicator when switching conversations

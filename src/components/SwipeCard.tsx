@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Heart, X, Star, MapPin, ChevronLeft, ChevronRight, Undo2, Flag, Verified, Navigation } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -36,6 +36,13 @@ const SwipeCard = ({
   const [isDragging, setIsDragging] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const startPos = useRef({ x: 0, y: 0 });
+
+  // Reset image index when member/images change (new profile shown)
+  useEffect(() => {
+    setImageIndex(0);
+    setDragOffset({ x: 0, y: 0 });
+    setSwipeDirection(null);
+  }, [member.id]);
 
   // Use provided images or fallback to member image
   const allImages = images && images.length > 0 ? images : [member.image];
