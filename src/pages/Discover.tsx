@@ -336,6 +336,7 @@ const Discover = () => {
     setPassedProfiles(new Set());
     setCurrentIndex(0);
     setCanUndo(false);
+    preloadCache.clear();
     refetch();
     toast.success("הפרופילים אופסו!");
   };

@@ -53,36 +53,38 @@ export function useUnreadMessages() {
   useEffect(() => {
     fetchUnreadCount();
 
-    // Subscribe to new messages
-    if (!user) return;
+    // Refetch when tab becomes visible (user returns to app)
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') fetchUnreadCount();
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
+    if (!user) {
+      return () => {
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+      };
+    }
+
+    // Subscribe to new messages
     const scheduleRefetch = () => {
       if (refetchTimeoutRef.current) {
         window.clearTimeout(refetchTimeoutRef.current);
       }
       refetchTimeoutRef.current = window.setTimeout(() => {
         fetchUnreadCount();
-      }, 250);
+      }, 300);
     };
 
     const channel = supabase
       .channel('unread-messages')
       .on(
         'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'messages',
-        },
+        { event: 'INSERT', schema: 'public', table: 'messages' },
         () => scheduleRefetch()
       )
       .on(
         'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'messages',
-        },
+        { event: 'UPDATE', schema: 'public', table: 'messages' },
         () => scheduleRefetch()
       )
       .subscribe();
@@ -92,6 +94,7 @@ export function useUnreadMessages() {
         window.clearTimeout(refetchTimeoutRef.current);
         refetchTimeoutRef.current = null;
       }
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       supabase.removeChannel(channel);
     };
   }, [fetchUnreadCount, user]);

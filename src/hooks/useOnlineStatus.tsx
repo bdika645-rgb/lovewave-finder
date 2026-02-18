@@ -35,12 +35,8 @@ export function useOnlineStatus() {
       setOnline(!document.hidden);
     };
 
-    // Handle beforeunload
+    // Handle beforeunload — just call setOnline directly (async best-effort)
     const handleUnload = () => {
-      // Use sendBeacon for reliable offline signal
-      const url = `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/profiles?user_id=eq.${user.id}`;
-      const body = JSON.stringify({ is_online: false, last_seen: new Date().toISOString() });
-      navigator.sendBeacon?.(url); // May not work with auth, fallback below
       setOnline(false);
     };
 

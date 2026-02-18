@@ -162,6 +162,15 @@ export function useNotifications() {
 
   useEffect(() => {
     fetchNotifications();
+
+    // Refetch notifications when tab becomes visible (user returns to app)
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchNotifications();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, [fetchNotifications]);
 
   // Subscribe to realtime updates

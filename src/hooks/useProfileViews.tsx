@@ -82,16 +82,20 @@ export function useProfileViews() {
 
       if (!myProfile || myProfile.id === profileId) return;
 
-      // Insert view (will fail silently if duplicate for today)
+      // Upsert view — prevent duplicates per day using ON CONFLICT via view_date unique constraint
       await supabase
         .from('profile_views')
-        .insert({
-          profile_id: profileId,
-          viewer_id: myProfile.id,
-        });
-    } catch (error) {
-      // Silently fail for duplicate views
-      console.log('View already recorded for today');
+        .upsert(
+          {
+            profile_id: profileId,
+            viewer_id: myProfile.id,
+            view_date: new Date().toISOString().split('T')[0],
+            viewed_at: new Date().toISOString(),
+          },
+          { onConflict: 'profile_id,viewer_id,view_date', ignoreDuplicates: true }
+        );
+    } catch {
+      // Silently fail
     }
   }, [user]);
 
