@@ -22,6 +22,24 @@ export function useNotifications() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
+  // Persist read state in localStorage
+  const getReadIds = useCallback((): Set<string> => {
+    try {
+      const stored = localStorage.getItem(`read-notifs-${user?.id}`);
+      return stored ? new Set(JSON.parse(stored)) : new Set();
+    } catch { return new Set(); }
+  }, [user?.id]);
+
+  const saveReadId = useCallback((id: string) => {
+    try {
+      const readIds = getReadIds();
+      readIds.add(id);
+      // Keep only last 200 IDs to avoid bloat
+      const arr = Array.from(readIds).slice(-200);
+      localStorage.setItem(`read-notifs-${user?.id}`, JSON.stringify(arr));
+    } catch { /* ignore */ }
+  }, [user?.id, getReadIds]);
+
   const fetchNotifications = useCallback(async () => {
     if (!profile) {
       setNotifications([]);
@@ -129,14 +147,18 @@ export function useNotifications() {
       // Sort by date
       notifs.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
-      setNotifications(notifs);
-      setUnreadCount(notifs.filter(n => !n.read).length);
+      // Apply persisted read state
+      const readIds = getReadIds();
+      const notifsWithRead = notifs.map(n => ({ ...n, read: readIds.has(n.id) }));
+      
+      setNotifications(notifsWithRead);
+      setUnreadCount(notifsWithRead.filter(n => !n.read).length);
     } catch (error) {
       console.error('Error fetching notifications:', error);
     } finally {
       setLoading(false);
     }
-  }, [profile]);
+  }, [profile, getReadIds]);
 
   useEffect(() => {
     fetchNotifications();
@@ -186,16 +208,20 @@ export function useNotifications() {
   }, [profile, fetchNotifications]);
 
   const markAsRead = useCallback((notificationId: string) => {
+    saveReadId(notificationId);
     setNotifications(prev => 
       prev.map(n => n.id === notificationId ? { ...n, read: true } : n)
     );
     setUnreadCount(prev => Math.max(0, prev - 1));
-  }, []);
+  }, [saveReadId]);
 
   const markAllAsRead = useCallback(() => {
-    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+    setNotifications(prev => {
+      prev.forEach(n => { if (!n.read) saveReadId(n.id); });
+      return prev.map(n => ({ ...n, read: true }));
+    });
     setUnreadCount(0);
-  }, []);
+  }, [saveReadId]);
 
   return {
     notifications,

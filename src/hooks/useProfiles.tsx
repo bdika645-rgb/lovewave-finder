@@ -58,7 +58,8 @@ export function useProfiles(options: UseProfilesOptions = {}) {
         .from('profiles_public')
         .select('id, name, age, city, avatar_url, interests, is_visible, is_online, updated_at, gender')
         .eq('is_visible', true)
-        .order('updated_at', { ascending: false });
+        .order('updated_at', { ascending: false })
+        .limit(500);
 
       // Exclude current user's profile if logged in AND explicitly requested
       if (user && options.excludeCurrentUser === true) {
@@ -93,7 +94,22 @@ export function useProfiles(options: UseProfilesOptions = {}) {
       const { data, error } = await query;
 
       if (error) throw error;
-      setProfiles(data || []);
+
+      // Smart sort: online first, then with avatar, then by updated_at
+      const sorted = (data || []).sort((a, b) => {
+        // Online profiles first
+        if (a.is_online && !b.is_online) return -1;
+        if (!a.is_online && b.is_online) return 1;
+        // With avatar second
+        if (a.avatar_url && !b.avatar_url) return -1;
+        if (!a.avatar_url && b.avatar_url) return 1;
+        // With interests third
+        if ((a.interests?.length || 0) > (b.interests?.length || 0)) return -1;
+        if ((a.interests?.length || 0) < (b.interests?.length || 0)) return 1;
+        return 0;
+      });
+
+      setProfiles(sorted);
     } catch (err) {
       setError((err as Error).message);
     } finally {

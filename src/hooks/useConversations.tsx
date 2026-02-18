@@ -69,12 +69,13 @@ export function useConversations() {
           .select('*')
           .in('id', conversationIds)
           .order('updated_at', { ascending: false }),
-        // Get last messages for each conversation
+        // Get last messages for each conversation (limited per conversation)
         supabase
           .from('messages')
           .select('*')
           .in('conversation_id', conversationIds)
-          .order('created_at', { ascending: false }),
+          .order('created_at', { ascending: false })
+          .limit(conversationIds.length * 50),
       ]);
 
       if (allParticipantsRes.error) throw allParticipantsRes.error;

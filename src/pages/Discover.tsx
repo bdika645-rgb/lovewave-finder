@@ -59,6 +59,7 @@ const Discover = () => {
 
   const { profiles, loading, refetch } = useProfiles({ 
     filterByOppositeGender: true,
+    excludeCurrentUser: true,
     ageFrom: filters.ageFrom || undefined,
     ageTo: filters.ageTo || undefined,
     city: filters.city || undefined,
@@ -245,7 +246,7 @@ const Discover = () => {
     await recordAction(currentProfile.id, 'super_like');
     setCanUndo(true);
 
-    // Check for match
+    // Check for match - did the other person already like ME?
     const { data: mutualLike } = await supabase
       .from('likes')
       .select('id')
@@ -253,7 +254,14 @@ const Discover = () => {
       .eq('liked_id', profile.id)
       .maybeSingle();
 
-    if (mutualLike) {
+    // Also check reverse - did I already like them before?
+    const { data: reverseMutual } = await supabase
+      .from('matches')
+      .select('id')
+      .or(`and(profile1_id.eq.${profile.id},profile2_id.eq.${currentProfile.id}),and(profile1_id.eq.${currentProfile.id},profile2_id.eq.${profile.id})`)
+      .maybeSingle();
+
+    if (mutualLike || reverseMutual) {
       setMatchedName(currentProfile.name);
       setMatchedImage(currentProfile.avatar_url || "/profiles/profile1.jpg");
       setShowMatchAnimation(true);

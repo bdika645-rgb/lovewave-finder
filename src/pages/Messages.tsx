@@ -1,4 +1,5 @@
 import Navbar from "@/components/Navbar";
+import ReportDialog from "@/components/ReportDialog";
 import SEOHead from "@/components/SEOHead";
 import SkipToContent from "@/components/SkipToContent";
 import TypingIndicator from "@/components/TypingIndicator";
@@ -29,14 +30,17 @@ import { useConversations } from "@/hooks/useConversations";
 import { useMessages } from "@/hooks/useMessages";
 import { useMatches } from "@/hooks/useMatches";
 import { useTypingStatus } from "@/hooks/useTypingStatus";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import type { Tables } from "@/integrations/supabase/types";
 import { supabase } from "@/integrations/supabase/client";
 
 const Messages = () => {
+  const location = useLocation();
   const { conversations, loading: conversationsLoading, createOrGetConversation, getMyProfileId, refetch: refetchConversations } = useConversations();
   const { matches, loading: matchesLoading } = useMatches();
-  const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
+  const [selectedConversationId, setSelectedConversationId] = useState<string | null>(
+    (location.state as any)?.conversationId || null
+  );
   const [messageText, setMessageText] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [chatSearchQuery, setChatSearchQuery] = useState("");
@@ -49,6 +53,8 @@ const Messages = () => {
   const [myProfileId, setMyProfileId] = useState<string | null>(null);
   const [deleteMessageId, setDeleteMessageId] = useState<string | null>(null);
   const [replyToMessage, setReplyToMessage] = useState<{ id: string; content: string; senderName: string } | null>(null);
+  const [reportProfileId, setReportProfileId] = useState<string | null>(null);
+  const [reportProfileName, setReportProfileName] = useState<string>("");
 
   const { messages, loading: messagesLoading, sendMessage, markAsRead, refetch: refetchMessages } = useMessages(selectedConversationId);
   const { othersTyping, setTyping } = useTypingStatus(selectedConversationId, myProfileId);
@@ -113,6 +119,8 @@ const Messages = () => {
     }
   }, [setTyping]);
 
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
   const handleSend = async () => {
     if (!messageText.trim() || !selectedConversationId || sendingMessage) return;
     
@@ -128,6 +136,10 @@ const Messages = () => {
 
     setMessageText("");
     setReplyToMessage(null);
+    // Reset textarea height
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+    }
     refetchConversations();
   };
 
@@ -203,13 +215,16 @@ const Messages = () => {
     const date = new Date(dateString);
     const now = new Date();
     const diff = now.getTime() - date.getTime();
+    const minutes = Math.floor(diff / (1000 * 60));
     const hours = Math.floor(diff / (1000 * 60 * 60));
     const days = Math.floor(hours / 24);
 
-    if (hours < 1) return "עכשיו";
-    if (hours < 24) return `לפני ${hours} שעות`;
+    if (minutes < 1) return "עכשיו";
+    if (minutes < 60) return `לפני ${minutes} דק'`;
+    if (hours < 24) return date.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
     if (days === 1) return "אתמול";
-    return date.toLocaleDateString('he-IL');
+    if (days < 7) return date.toLocaleDateString('he-IL', { weekday: 'short' });
+    return date.toLocaleDateString('he-IL', { day: 'numeric', month: 'numeric' });
   };
 
   if (conversationsLoading || matchesLoading) {
@@ -487,6 +502,10 @@ const Messages = () => {
                           setSelectedConversationId(null);
                           refetchConversations();
                         }}
+                        onReport={() => {
+                          setReportProfileId(selectedConversation.otherProfile?.id || null);
+                          setReportProfileName(selectedConversation.otherProfile?.name || '');
+                        }}
                       />
                     </div>
                   </div>
@@ -725,6 +744,7 @@ const Messages = () => {
                         disabled={sendingMessage}
                       />
                       <textarea
+                        ref={textareaRef}
                         placeholder="כתבו הודעה..."
                         value={messageText}
                         onChange={handleMessageChange}
@@ -827,6 +847,16 @@ const Messages = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Report Dialog */}
+      {reportProfileId && (
+        <ReportDialog
+          open={!!reportProfileId}
+          onOpenChange={(open) => { if (!open) setReportProfileId(null); }}
+          profileId={reportProfileId}
+          profileName={reportProfileName}
+        />
+      )}
     </div>
   );
 };
