@@ -144,10 +144,10 @@ const MemberProfile = () => {
     setMessageLoading(false);
     
     if (conversationId) {
-      navigate("/messages");
+      navigate("/messages", { state: { conversationId } });
       toast.success("נפתח צ'אט עם " + member!.name);
     } else {
-      toast.error("שגיאה בפתיחת הצ'אט");
+      toast.error("שגיאה בפתיחת הצ'אט. ייתכן שאין עדיין התאמה הדדית.");
     }
   };
 
