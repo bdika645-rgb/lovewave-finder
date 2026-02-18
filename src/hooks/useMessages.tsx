@@ -27,10 +27,12 @@ export function useMessages(conversationId: string | null) {
         .from('messages')
         .select('*')
         .eq('conversation_id', conversationId)
-        .order('created_at', { ascending: true });
+        .order('created_at', { ascending: false })
+        .limit(200);
 
       if (error) throw error;
-      setMessages(data || []);
+      // Reverse to get chronological order (oldest first for display)
+      setMessages((data || []).reverse());
     } catch (err) {
       console.error('Error fetching messages:', err);
       setError((err as Error).message);
@@ -81,10 +83,12 @@ export function useMessages(conversationId: string | null) {
   const markAsRead = useCallback(async () => {
     if (!conversationId || !profileId) return;
 
-    // Mark all messages from other users as read
+    const now = new Date().toISOString();
+
+    // Mark all messages from other users as read, also update read_at timestamp
     const { error } = await supabase
       .from('messages')
-      .update({ is_read: true })
+      .update({ is_read: true, read_at: now })
       .eq('conversation_id', conversationId)
       .neq('sender_id', profileId)
       .eq('is_read', false);
@@ -92,7 +96,7 @@ export function useMessages(conversationId: string | null) {
     if (!error) {
       // Update local state to reflect read status
       setMessages(prev => prev.map(msg => 
-        msg.sender_id !== profileId ? { ...msg, is_read: true } : msg
+        msg.sender_id !== profileId ? { ...msg, is_read: true, read_at: now } : msg
       ));
     }
   }, [conversationId, profileId]);

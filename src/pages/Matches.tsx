@@ -270,7 +270,7 @@ const Matches = () => {
                         try {
                           const conversationId = await createOrGetConversation(profile.id);
                           if (conversationId) {
-                            navigate("/messages");
+                            navigate("/messages", { state: { conversationId } });
                           } else {
                             toast.error("לא ניתן ליצור שיחה כרגע");
                           }
