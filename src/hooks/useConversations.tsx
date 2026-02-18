@@ -109,7 +109,10 @@ export function useConversations() {
           if (!otherProfile) return null;
 
           const conversationMessages = messages?.filter((m) => m.conversation_id === conv.id) || [];
+          // Sort by created_at descending to get latest first
+          conversationMessages.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
           const lastMessage = conversationMessages[0];
+          // Count unread from loaded batch - accurate because we load last 50 per conv
           const unreadCount = conversationMessages.filter(
             (m) => !m.is_read && m.sender_id !== myProfileId
           ).length;
@@ -155,7 +158,25 @@ export function useConversations() {
 
   useEffect(() => {
     fetchConversations();
-  }, [fetchConversations]);
+
+    // Realtime: refresh conversations list on new message or conversation update
+    if (!user) return;
+    const channel = supabase
+      .channel('conversations-list-realtime')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'messages' },
+        () => { fetchConversations(); }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'messages' },
+        () => { fetchConversations(); }
+      )
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [fetchConversations, user]);
 
   return { conversations, loading, error, refetch: fetchConversations, createOrGetConversation, getMyProfileId };
 }

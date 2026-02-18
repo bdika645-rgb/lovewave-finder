@@ -95,19 +95,31 @@ export function useProfiles(options: UseProfilesOptions = {}) {
 
       if (error) throw error;
 
-      // Smart sort: online first, then with avatar, then by updated_at
-      const sorted = (data || []).sort((a, b) => {
-        // Online profiles first
-        if (a.is_online && !b.is_online) return -1;
-        if (!a.is_online && b.is_online) return 1;
-        // With avatar second
-        if (a.avatar_url && !b.avatar_url) return -1;
-        if (!a.avatar_url && b.avatar_url) return 1;
-        // With interests third
-        if ((a.interests?.length || 0) > (b.interests?.length || 0)) return -1;
-        if ((a.interests?.length || 0) < (b.interests?.length || 0)) return 1;
-        return 0;
-      });
+      const raw = data || [];
+
+      // Smart sort with slight randomization to avoid same profiles always on top:
+      // 1. Online with avatar  2. Online without avatar  3. Offline with avatar  4. Rest
+      // Within same tier, shuffle gently using a seeded offset based on time (changes each ~5 min)
+      const seed = Math.floor(Date.now() / (5 * 60 * 1000));
+      const pseudoRandom = (id: string, index: number) =>
+        ((id.charCodeAt(0) + seed + index) % 100) / 100;
+
+      const tier = (p: typeof raw[0], i: number) => {
+        let base = 0;
+        if (p.is_online && p.avatar_url) base = 300;
+        else if (p.is_online) base = 200;
+        else if (p.avatar_url) base = 100;
+        // Add interest bonus
+        base += Math.min((p.interests?.length || 0) * 5, 40);
+        // Add gentle jitter
+        base += pseudoRandom(p.id, i) * 30;
+        return base;
+      };
+
+      const sorted = raw
+        .map((p, i) => ({ p, score: tier(p, i) }))
+        .sort((a, b) => b.score - a.score)
+        .map(({ p }) => p);
 
       setProfiles(sorted);
     } catch (err) {

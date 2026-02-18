@@ -80,6 +80,10 @@ const Discover = () => {
   const [currentProfilePhotos, setCurrentProfilePhotos] = useState<string[]>([]);
   const [currentProfileBio, setCurrentProfileBio] = useState("");
   const [currentProfileVerified, setCurrentProfileVerified] = useState(false);
+  // Preload cache: profileId -> { photos, bio, verified }
+  const preloadCache = useState<Map<string, { photos: string[]; bio: string; verified: boolean }>>(
+    () => new Map()
+  )[0];
 
   // Allow closing match overlay with ESC
   useEffect(() => {
@@ -100,42 +104,59 @@ const Discover = () => {
 
   const currentProfile = availableProfiles[currentIndex];
 
-  // Fetch photos and bio for current profile
+  // Helper: fetch and cache profile details
+  const fetchAndCacheProfile = useCallback(async (profileId: string, avatarUrl: string | null) => {
+    if (preloadCache.has(profileId)) return;
+
+    const [photosRes, profileRes] = await Promise.all([
+      supabase
+        .from('photos')
+        .select('url')
+        .eq('profile_id', profileId)
+        .order('display_order', { ascending: true }),
+      supabase
+        .from('profiles')
+        .select('bio, looking_for, relationship_goal, is_verified')
+        .eq('id', profileId)
+        .single(),
+    ]);
+
+    const photos = photosRes.data && photosRes.data.length > 0
+      ? photosRes.data.map(p => p.url)
+      : avatarUrl ? [avatarUrl] : ["/profiles/profile1.jpg"];
+
+    preloadCache.set(profileId, {
+      photos,
+      bio: profileRes.data?.bio || "",
+      verified: profileRes.data?.is_verified || false,
+    });
+  }, [preloadCache]);
+
+  // Fetch current profile details + preload next profile
   useEffect(() => {
-    const fetchProfileDetails = async () => {
-      if (!currentProfile) {
-        setCurrentProfilePhotos([]);
-        setCurrentProfileBio("");
-        setCurrentProfileVerified(false);
-        return;
+    if (!currentProfile) {
+      setCurrentProfilePhotos([]);
+      setCurrentProfileBio("");
+      setCurrentProfileVerified(false);
+      return;
+    }
+
+    const load = async () => {
+      await fetchAndCacheProfile(currentProfile.id, currentProfile.avatar_url);
+      const cached = preloadCache.get(currentProfile.id)!;
+      setCurrentProfilePhotos(cached.photos);
+      setCurrentProfileBio(cached.bio);
+      setCurrentProfileVerified(cached.verified);
+
+      // Preload the next profile silently
+      const nextProfile = availableProfiles[currentIndex + 1];
+      if (nextProfile) {
+        fetchAndCacheProfile(nextProfile.id, nextProfile.avatar_url);
       }
-
-      const [photosRes, profileRes] = await Promise.all([
-        supabase
-          .from('photos')
-          .select('url')
-          .eq('profile_id', currentProfile.id)
-          .order('display_order', { ascending: true }),
-        supabase
-          .from('profiles')
-          .select('bio, looking_for, relationship_goal, is_verified')
-          .eq('id', currentProfile.id)
-          .single(),
-      ]);
-
-      if (photosRes.data && photosRes.data.length > 0) {
-        setCurrentProfilePhotos(photosRes.data.map(p => p.url));
-      } else if (currentProfile.avatar_url) {
-        setCurrentProfilePhotos([currentProfile.avatar_url]);
-      } else {
-        setCurrentProfilePhotos(["/profiles/profile1.jpg"]);
-      }
-
-      setCurrentProfileBio(profileRes.data?.bio || "");
-      setCurrentProfileVerified(profileRes.data?.is_verified || false);
     };
 
-    fetchProfileDetails();
+    load();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentProfile?.id]);
 
   const goToNext = useCallback(() => {

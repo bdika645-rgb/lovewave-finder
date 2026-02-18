@@ -88,7 +88,20 @@ export function useMatches() {
 
   useEffect(() => {
     fetchMatches();
-  }, [fetchMatches]);
+
+    // Realtime: auto-refresh when new match is created
+    if (!user) return;
+    const channel = supabase
+      .channel('matches-realtime')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'matches' },
+        () => { fetchMatches(); }
+      )
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [fetchMatches, user]);
 
   return { matches, loading, error, refetch: fetchMatches };
 }
