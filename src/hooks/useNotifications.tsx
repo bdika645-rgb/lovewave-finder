@@ -84,24 +84,34 @@ export function useNotifications() {
       ]);
 
       const notifs: Notification[] = [];
+      const allProfileIds = new Set<string>();
+
+      // Collect all profile IDs that we need
+      if (matchesResult.data) {
+        matchesResult.data.forEach(m => {
+          allProfileIds.add(m.profile1_id === profile.id ? m.profile2_id : m.profile1_id);
+        });
+      }
+      if (likesResult.data) {
+        likesResult.data.forEach(l => allProfileIds.add(l.liker_id));
+      }
+
+      // Fetch ALL needed profiles in ONE query
+      const profileIds = Array.from(allProfileIds);
+      const profileMap = new Map<string, { id: string; name: string; avatar_url: string | null }>();
+      if (profileIds.length > 0) {
+        const { data: allProfiles } = await supabase
+          .from('profiles')
+          .select('id, name, avatar_url')
+          .in('id', profileIds);
+        allProfiles?.forEach(p => profileMap.set(p.id, p));
+      }
 
       // Process matches
       if (matchesResult.data) {
-        const otherProfileIds = matchesResult.data.map(m => 
-          m.profile1_id === profile.id ? m.profile2_id : m.profile1_id
-        );
-
-        const { data: matchProfiles } = await supabase
-          .from('profiles')
-          .select('id, name, avatar_url')
-          .in('id', otherProfileIds);
-
-        const profileMap = new Map(matchProfiles?.map(p => [p.id, p]) || []);
-
         matchesResult.data.forEach(match => {
           const otherId = match.profile1_id === profile.id ? match.profile2_id : match.profile1_id;
           const otherProfile = profileMap.get(otherId);
-          
           notifs.push({
             id: `match-${match.id}`,
             type: 'match',
@@ -118,18 +128,8 @@ export function useNotifications() {
 
       // Process likes
       if (likesResult.data) {
-        const likerIds = likesResult.data.map(l => l.liker_id);
-
-        const { data: likerProfiles } = await supabase
-          .from('profiles')
-          .select('id, name, avatar_url')
-          .in('id', likerIds);
-
-        const profileMap = new Map(likerProfiles?.map(p => [p.id, p]) || []);
-
         likesResult.data.forEach(like => {
           const likerProfile = profileMap.get(like.liker_id);
-          
           notifs.push({
             id: `like-${like.id}`,
             type: like.is_super ? 'super_like' : 'like',

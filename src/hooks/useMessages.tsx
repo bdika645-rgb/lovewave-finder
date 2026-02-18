@@ -41,21 +41,16 @@ export function useMessages(conversationId: string | null) {
     }
   }, [conversationId]);
 
-  const sendMessage = async (content: string, replyTo?: string): Promise<{ error: Error | null }> => {
-    // Block action during impersonation
+  const sendMessage = useCallback(async (content: string, replyTo?: string): Promise<{ error: Error | null }> => {
     if (!guardAction('send_message', 'לשלוח הודעות')) {
       return { error: new Error('Action blocked during impersonation') };
     }
-
     if (!conversationId || !content.trim()) {
       return { error: new Error('Invalid message or conversation') };
     }
-
     try {
-      const myProfileId = await getMyProfileId();
-      if (!myProfileId) {
-        return { error: new Error('Profile not found') };
-      }
+      const myProfileId = profileId || await getMyProfileId();
+      if (!myProfileId) return { error: new Error('Profile not found') };
 
       const { error } = await supabase
         .from('messages')
@@ -68,8 +63,8 @@ export function useMessages(conversationId: string | null) {
 
       if (error) throw error;
 
-      // Update conversation updated_at
-      await supabase
+      // Update conversation timestamp in parallel (fire-and-forget)
+      supabase
         .from('conversations')
         .update({ updated_at: new Date().toISOString() })
         .eq('id', conversationId);
@@ -78,7 +73,7 @@ export function useMessages(conversationId: string | null) {
     } catch (err) {
       return { error: err as Error };
     }
-  };
+  }, [conversationId, profileId, getMyProfileId, guardAction]);
 
   const markAsRead = useCallback(async () => {
     if (!conversationId || !profileId) return;
