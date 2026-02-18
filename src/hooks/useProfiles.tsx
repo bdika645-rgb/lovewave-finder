@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import type { Tables } from '@/integrations/supabase/types';
@@ -41,17 +41,7 @@ export function useProfiles(options: UseProfilesOptions = {}) {
     fetchCurrentUserGender();
   }, [user, options.filterByOppositeGender]);
 
-  useEffect(() => {
-    // If we explicitly want to filter by opposite gender AND user is logged in AND we haven't fetched gender yet - wait
-    if (options.filterByOppositeGender === true && user && currentUserGender === null) {
-      return;
-    }
-    // Otherwise proceed with fetch
-    fetchProfiles();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [options.search, options.ageFrom, options.ageTo, options.city, options.gender, user, currentUserGender, options.filterByOppositeGender, options.excludeCurrentUser]);
-
-  const fetchProfiles = async () => {
+  const fetchProfiles = useCallback(async () => {
     try {
       setLoading(true);
       let query = supabase
@@ -63,7 +53,6 @@ export function useProfiles(options: UseProfilesOptions = {}) {
 
       // Exclude current user's profile if logged in AND explicitly requested
       if (user && options.excludeCurrentUser === true) {
-        // profiles_public is keyed by profile id, so we exclude via RPC lookup
         const { data: myProfileId } = await supabase.rpc('get_my_profile_id');
         if (myProfileId) query = query.neq('id', myProfileId);
       }
@@ -75,18 +64,10 @@ export function useProfiles(options: UseProfilesOptions = {}) {
       }
 
       // Apply filters
-      if (options.ageFrom) {
-        query = query.gte('age', options.ageFrom);
-      }
-      if (options.ageTo) {
-        query = query.lte('age', options.ageTo);
-      }
-      if (options.city) {
-        query = query.ilike('city', `%${options.city}%`);
-      }
-      if (options.gender) {
-        query = query.eq('gender', options.gender);
-      }
+      if (options.ageFrom) query = query.gte('age', options.ageFrom);
+      if (options.ageTo) query = query.lte('age', options.ageTo);
+      if (options.city) query = query.ilike('city', `%${options.city}%`);
+      if (options.gender) query = query.eq('gender', options.gender);
       if (options.search) {
         query = query.or(`name.ilike.%${options.search}%,city.ilike.%${options.search}%`);
       }
@@ -97,9 +78,8 @@ export function useProfiles(options: UseProfilesOptions = {}) {
 
       const raw = data || [];
 
-      // Smart sort with slight randomization to avoid same profiles always on top:
-      // 1. Online with avatar  2. Online without avatar  3. Offline with avatar  4. Rest
-      // Within same tier, shuffle gently using a seeded offset based on time (changes each ~5 min)
+      // Smart sort: online-with-avatar → online → with-avatar → rest
+      // Seed changes every 5 min to rotate ordering gently
       const seed = Math.floor(Date.now() / (5 * 60 * 1000));
       const pseudoRandom = (id: string, index: number) =>
         ((id.charCodeAt(0) + seed + index) % 100) / 100;
@@ -109,9 +89,7 @@ export function useProfiles(options: UseProfilesOptions = {}) {
         if (p.is_online && p.avatar_url) base = 300;
         else if (p.is_online) base = 200;
         else if (p.avatar_url) base = 100;
-        // Add interest bonus
         base += Math.min((p.interests?.length || 0) * 5, 40);
-        // Add gentle jitter
         base += pseudoRandom(p.id, i) * 30;
         return base;
       };
@@ -127,7 +105,13 @@ export function useProfiles(options: UseProfilesOptions = {}) {
     } finally {
       setLoading(false);
     }
-  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, currentUserGender, options.search, options.ageFrom, options.ageTo, options.city, options.gender, options.filterByOppositeGender, options.excludeCurrentUser]);
+
+  useEffect(() => {
+    if (options.filterByOppositeGender === true && user && currentUserGender === null) return;
+    fetchProfiles();
+  }, [fetchProfiles, options.filterByOppositeGender, user, currentUserGender]);
 
   return { profiles, loading, error, refetch: fetchProfiles };
 }

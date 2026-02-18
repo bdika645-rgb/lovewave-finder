@@ -8,12 +8,11 @@ export function useLikes() {
   const [loading, setLoading] = useState(false);
   const { guardAction } = useImpersonationGuard();
 
-  const sendLike = async (likedProfileId: string): Promise<{
+  const sendLike = useCallback(async (likedProfileId: string): Promise<{
     error: Error | null;
     isMatch?: boolean;
     alreadyLiked?: boolean;
   }> => {
-    // Block action during impersonation
     if (!guardAction('like_profile', 'לבצע לייק')) {
       return { error: new Error('Action blocked during impersonation') };
     }
@@ -21,32 +20,22 @@ export function useLikes() {
     setLoading(true);
     try {
       const myProfileId = cachedProfileId || await getMyProfileId();
-      if (!myProfileId) {
-        throw new Error('Profile not found');
-      }
+      if (!myProfileId) throw new Error('Profile not found');
 
-      // Can't like yourself
       if (myProfileId === likedProfileId) {
         return { error: new Error("Can't like yourself"), alreadyLiked: false };
       }
 
       const { error } = await supabase
         .from('likes')
-        .insert({
-          liker_id: myProfileId,
-          liked_id: likedProfileId,
-        });
+        .insert({ liker_id: myProfileId, liked_id: likedProfileId });
 
       if (error) {
-        // Check if it's a duplicate (unique constraint violation)
-        if (error.code === '23505') {
-          return { error: null, alreadyLiked: true };
-        }
+        if (error.code === '23505') return { error: null, alreadyLiked: true };
         throw error;
       }
 
-      // Check if it's a match (mutual like) - the match is auto-created by trigger
-      // But we check here to notify the user
+      // Check for mutual like → match
       const { data: mutualLike } = await supabase
         .from('likes')
         .select('id')
@@ -60,10 +49,9 @@ export function useLikes() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [cachedProfileId, getMyProfileId, guardAction]);
 
-  const removeLike = async (likedProfileId: string): Promise<{ error: Error | null }> => {
-    // Block action during impersonation
+  const removeLike = useCallback(async (likedProfileId: string): Promise<{ error: Error | null }> => {
     if (!guardAction('unlike_profile', 'להסיר לייק')) {
       return { error: new Error('Action blocked during impersonation') };
     }
@@ -71,9 +59,7 @@ export function useLikes() {
     setLoading(true);
     try {
       const myProfileId = cachedProfileId || await getMyProfileId();
-      if (!myProfileId) {
-        throw new Error('Profile not found');
-      }
+      if (!myProfileId) throw new Error('Profile not found');
 
       const { error } = await supabase
         .from('likes')
@@ -88,9 +74,9 @@ export function useLikes() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [cachedProfileId, getMyProfileId, guardAction]);
 
-  const checkIfLiked = async (profileId: string): Promise<boolean> => {
+  const checkIfLiked = useCallback(async (profileId: string): Promise<boolean> => {
     const myProfileId = cachedProfileId || await getMyProfileId();
     if (!myProfileId) return false;
 
@@ -102,7 +88,7 @@ export function useLikes() {
       .maybeSingle();
 
     return !!data;
-  };
+  }, [cachedProfileId, getMyProfileId]);
 
   return { sendLike, removeLike, checkIfLiked, loading, getMyProfileId };
 }

@@ -102,7 +102,9 @@ const Discover = () => {
     (p) => !likedProfiles.has(p.id) && !passedProfiles.has(p.id) && (!filters.onlineOnly || p.is_online)
   );
 
-  const currentProfile = availableProfiles[currentIndex];
+  // Clamp currentIndex to valid range when profiles list changes
+  const safeIndex = Math.min(currentIndex, Math.max(0, availableProfiles.length - 1));
+  const currentProfile = availableProfiles[safeIndex];
 
   // Helper: fetch and cache profile details
   const fetchAndCacheProfile = useCallback(async (profileId: string, avatarUrl: string | null) => {
@@ -149,7 +151,7 @@ const Discover = () => {
       setCurrentProfileVerified(cached.verified);
 
       // Preload the next profile silently
-      const nextProfile = availableProfiles[currentIndex + 1];
+      const nextProfile = availableProfiles[safeIndex + 1];
       if (nextProfile) {
         fetchAndCacheProfile(nextProfile.id, nextProfile.avatar_url);
       }
@@ -160,12 +162,12 @@ const Discover = () => {
   }, [currentProfile?.id]);
 
   const goToNext = useCallback(() => {
-    if (currentIndex < availableProfiles.length - 1) {
-      setCurrentIndex(prev => prev + 1);
+    if (safeIndex < availableProfiles.length - 1) {
+      setCurrentIndex(safeIndex + 1);
     } else {
       setCurrentIndex(0);
     }
-  }, [currentIndex, availableProfiles.length]);
+  }, [safeIndex, availableProfiles.length]);
 
   const handleLike = useCallback(async () => {
     if (!user) {
@@ -231,25 +233,20 @@ const Discover = () => {
     }
 
     if (!currentProfile) return;
-
-    setLikedProfiles(prev => new Set([...prev, currentProfile.id]));
-    
-    // Send super like (with is_super flag)
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('id')
-      .eq('user_id', user.id)
-      .single();
-
-    if (!profile) {
+    // Use cached profile id from context — no extra DB round-trip needed
+    if (!myProfile?.id) {
       toast.error("שגיאה בשליחת הסופר לייק");
       return;
     }
 
+    setLikedProfiles(prev => new Set([...prev, currentProfile.id]));
+    setShowSuperLikeAnim(true);
+    setTimeout(() => setShowSuperLikeAnim(false), 800);
+
     const { error } = await supabase
       .from('likes')
       .insert({
-        liker_id: profile.id,
+        liker_id: myProfile.id,
         liked_id: currentProfile.id,
         is_super: true,
       });
@@ -268,35 +265,33 @@ const Discover = () => {
     setCanUndo(true);
 
     // Check for match - did the other person already like ME?
-    const { data: mutualLike } = await supabase
-      .from('likes')
-      .select('id')
-      .eq('liker_id', currentProfile.id)
-      .eq('liked_id', profile.id)
-      .maybeSingle();
-
-    // Also check reverse - did I already like them before?
-    const { data: reverseMutual } = await supabase
-      .from('matches')
-      .select('id')
-      .or(`and(profile1_id.eq.${profile.id},profile2_id.eq.${currentProfile.id}),and(profile1_id.eq.${currentProfile.id},profile2_id.eq.${profile.id})`)
-      .maybeSingle();
+    const myId = myProfile.id;
+    const [{ data: mutualLike }, { data: reverseMutual }] = await Promise.all([
+      supabase
+        .from('likes')
+        .select('id')
+        .eq('liker_id', currentProfile.id)
+        .eq('liked_id', myId)
+        .maybeSingle(),
+      supabase
+        .from('matches')
+        .select('id')
+        .or(`and(profile1_id.eq.${myId},profile2_id.eq.${currentProfile.id}),and(profile1_id.eq.${currentProfile.id},profile2_id.eq.${myId})`)
+        .maybeSingle(),
+    ]);
 
     if (mutualLike || reverseMutual) {
       setMatchedName(currentProfile.name);
       setMatchedImage(currentProfile.avatar_url || "/profiles/profile1.jpg");
       setShowMatchAnimation(true);
-      // Fire confetti for match celebration! 🎉
       fireConfetti();
       setTimeout(() => setShowMatchAnimation(false), 4000);
     } else {
       toast.success(`⭐ שלחת סופר לייק ל${currentProfile.name}!`);
-      setShowSuperLikeAnim(true);
-      setTimeout(() => setShowSuperLikeAnim(false), 1200);
     }
 
     goToNext();
-  }, [user, currentProfile, recordAction, goToNext]);
+  }, [user, currentProfile, myProfile, recordAction, goToNext, fireConfetti]);
 
   const handleUndo = useCallback(async () => {
     const { undoneAction, error } = await undoLastAction();

@@ -35,16 +35,15 @@ export function useCompatibility(
     };
     const matchReasons: string[] = [];
 
-    // 1. Shared interests (35% weight)
+    // 1. Shared interests (30% weight) — Jaccard similarity
     const currentInterests = (currentProfile.interests || []).map(i => i.toLowerCase());
     const targetInterests = (targetProfile.interests || []).map(i => i.toLowerCase());
     const sharedInterests = currentInterests.filter(i => targetInterests.includes(i));
 
     if (currentInterests.length > 0 && targetInterests.length > 0) {
-      // Use Jaccard similarity: intersection / union
       const union = new Set([...currentInterests, ...targetInterests]).size;
       const jaccardScore = sharedInterests.length / union;
-      breakdown.interests = Math.round(jaccardScore * 35);
+      breakdown.interests = Math.round(jaccardScore * 30);
 
       if (sharedInterests.length >= 3) {
         matchReasons.push(`${sharedInterests.length} תחומי עניין משותפים`);
@@ -52,43 +51,41 @@ export function useCompatibility(
         matchReasons.push(`תחומי עניין משותפים`);
       }
     } else {
-      // Neutral if no interests data
-      breakdown.interests = 12;
+      breakdown.interests = 10; // neutral
     }
 
-    // 2. Location match (20% weight)
+    // 2. Location match (15% weight)
     if (currentProfile.city && targetProfile.city) {
       if (currentProfile.city.toLowerCase() === targetProfile.city.toLowerCase()) {
-        breakdown.location = 20;
+        breakdown.location = 15;
         matchReasons.push(`גרים באותה עיר`);
       } else {
-        breakdown.location = 5;
+        breakdown.location = 4;
       }
     } else {
-      breakdown.location = 8;
+      breakdown.location = 7;
     }
 
-    // 3. Relationship goal match (25% weight) - boosted, core compatibility signal
+    // 3. Relationship goal match (25% weight) — core compatibility signal
     if (currentProfile.relationship_goal && targetProfile.relationship_goal) {
       if (currentProfile.relationship_goal === targetProfile.relationship_goal) {
         breakdown.relationshipGoal = 25;
         matchReasons.push(`מחפשים אותו דבר`);
       } else {
-        // Partial match: long-term & serious are closer than long-term & casual
         const longTermGoals = ['long_term', 'serious', 'marriage'];
         const casualGoals = ['casual', 'friendship', 'short_term'];
         const bothLong = longTermGoals.includes(currentProfile.relationship_goal) && longTermGoals.includes(targetProfile.relationship_goal);
         const bothCasual = casualGoals.includes(currentProfile.relationship_goal) && casualGoals.includes(targetProfile.relationship_goal);
-        breakdown.relationshipGoal = (bothLong || bothCasual) ? 15 : 5;
+        breakdown.relationshipGoal = (bothLong || bothCasual) ? 15 : 3;
       }
     } else {
-      breakdown.relationshipGoal = 12; // Neutral if unspecified
+      breakdown.relationshipGoal = 10; // neutral
     }
 
-    // 4. looking_for gender match (5% bonus)
+    // 4. Gender preference bonus (5%)
     if (currentProfile.looking_for && targetProfile.gender) {
       if (currentProfile.looking_for === targetProfile.gender) {
-        breakdown.ageRange += 5; // small bonus for gender preference match
+        breakdown.ageRange += 5;
       }
     }
 
@@ -106,11 +103,34 @@ export function useCompatibility(
       breakdown.ageRange += 3;
     }
 
-    // Calculate total score
+    // 6. Education match bonus (5%)
+    if (currentProfile.education && targetProfile.education) {
+      if (currentProfile.education === targetProfile.education) {
+        breakdown.ageRange += 5;
+        matchReasons.push(`רמת השכלה זהה`);
+      } else {
+        // Partial: academic levels are closer to each other
+        const academic = ['bachelors', 'masters', 'doctorate', 'phd'];
+        const bothAcademic = academic.includes(currentProfile.education) && academic.includes(targetProfile.education);
+        if (bothAcademic) breakdown.ageRange += 2;
+      }
+    }
+
+    // 7. Smoking compatibility (5%) — non-smokers strongly prefer non-smokers
+    if (currentProfile.smoking && targetProfile.smoking) {
+      if (currentProfile.smoking === targetProfile.smoking) {
+        breakdown.ageRange += 5;
+        if (currentProfile.smoking === 'never') matchReasons.push(`שניכם לא מעשנים`);
+      } else if (currentProfile.smoking === 'never' && targetProfile.smoking === 'smoker') {
+        breakdown.ageRange -= 3; // mismatch penalty
+      }
+    }
+
+    // Calculate total score — clamp 0–100
     const score = breakdown.interests + breakdown.location + breakdown.relationshipGoal + breakdown.ageRange;
 
     return {
-      score: Math.min(score, 100),
+      score: Math.max(0, Math.min(score, 100)),
       breakdown,
       matchReasons
     };
@@ -124,23 +144,23 @@ export function calculateCompatibility(
 ): number {
   let score = 0;
 
-  // Shared interests (35%) - Jaccard similarity
+  // Shared interests (30%) — Jaccard similarity
   const interests1 = (profile1.interests || []).map(i => i.toLowerCase());
   const interests2 = (profile2.interests || []).map(i => i.toLowerCase());
   const shared = interests1.filter(i => interests2.includes(i));
   if (interests1.length > 0 && interests2.length > 0) {
     const union = new Set([...interests1, ...interests2]).size;
-    score += Math.round((shared.length / union) * 35);
+    score += Math.round((shared.length / union) * 30);
   } else {
-    score += 12; // neutral
+    score += 10;
   }
 
-  // Same city (20%)
+  // Same city (15%)
   if (profile1.city && profile2.city &&
       profile1.city.toLowerCase() === profile2.city.toLowerCase()) {
-    score += 20;
+    score += 15;
   } else {
-    score += 5;
+    score += 4;
   }
 
   // Same relationship goal (25%)
@@ -152,13 +172,13 @@ export function calculateCompatibility(
       const casual = ['casual', 'friendship', 'short_term'];
       const close = (longTerm.includes(profile1.relationship_goal) && longTerm.includes(profile2.relationship_goal)) ||
                     (casual.includes(profile1.relationship_goal) && casual.includes(profile2.relationship_goal));
-      score += close ? 15 : 5;
+      score += close ? 15 : 3;
     }
   } else {
-    score += 12; // neutral
+    score += 10;
   }
 
-  // looking_for bonus (5%)
+  // Gender preference (5%)
   if (profile1.looking_for && profile2.gender && profile1.looking_for === profile2.gender) {
     score += 5;
   }
@@ -172,5 +192,21 @@ export function calculateCompatibility(
     else if (ageDiff <= 15) score += 3;
   }
 
-  return Math.min(score, 100);
+  // Education match (5%)
+  if (profile1.education && profile2.education) {
+    if (profile1.education === profile2.education) {
+      score += 5;
+    } else {
+      const academic = ['bachelors', 'masters', 'doctorate', 'phd'];
+      if (academic.includes(profile1.education) && academic.includes(profile2.education)) score += 2;
+    }
+  }
+
+  // Smoking compatibility (5%)
+  if (profile1.smoking && profile2.smoking) {
+    if (profile1.smoking === profile2.smoking) score += 5;
+    else if (profile1.smoking === 'never' && profile2.smoking === 'smoker') score -= 3;
+  }
+
+  return Math.max(0, Math.min(score, 100));
 }
