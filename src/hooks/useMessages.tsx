@@ -108,7 +108,7 @@ export function useMessages(conversationId: string | null) {
     // Fetch initial messages
     fetchMessages();
 
-    // Subscribe to new messages
+    // Subscribe to new messages and read status updates
     channelRef.current = supabase
       .channel(`messages:${conversationId}`)
       .on(
@@ -120,7 +120,26 @@ export function useMessages(conversationId: string | null) {
           filter: `conversation_id=eq.${conversationId}`,
         },
         (payload) => {
-          setMessages(prev => [...prev, payload.new as Message]);
+          setMessages(prev => {
+            // Avoid duplicates
+            if (prev.some(m => m.id === (payload.new as Message).id)) return prev;
+            return [...prev, payload.new as Message];
+          });
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'messages',
+          filter: `conversation_id=eq.${conversationId}`,
+        },
+        (payload) => {
+          // Update is_read and read_at in real time (e.g. the other side marked as read)
+          setMessages(prev => prev.map(m =>
+            m.id === (payload.new as Message).id ? { ...m, ...(payload.new as Message) } : m
+          ));
         }
       )
       .on(

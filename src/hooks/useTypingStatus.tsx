@@ -72,8 +72,17 @@ export function useTypingStatus(conversationId: string | null, myProfileId: stri
       if (channelRef.current) {
         supabase.removeChannel(channelRef.current);
       }
+      // Clear typing status when leaving conversation
+      if (myProfileId && conversationId) {
+        supabase
+          .from('typing_status')
+          .update({ is_typing: false, updated_at: new Date().toISOString() })
+          .eq('conversation_id', conversationId)
+          .eq('profile_id', myProfileId)
+          .then(() => {});
+      }
     };
-  }, [conversationId]);
+  }, [conversationId, myProfileId]);
 
   // Set typing status
   const setTyping = useCallback(async (isTyping: boolean) => {

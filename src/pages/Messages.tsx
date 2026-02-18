@@ -55,6 +55,7 @@ const Messages = () => {
   const [replyToMessage, setReplyToMessage] = useState<{ id: string; content: string; senderName: string } | null>(null);
   const [reportProfileId, setReportProfileId] = useState<string | null>(null);
   const [reportProfileName, setReportProfileName] = useState<string>("");
+  const typingStopTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { messages, loading: messagesLoading, sendMessage, markAsRead, refetch: refetchMessages } = useMessages(selectedConversationId);
   const { othersTyping, setTyping } = useTypingStatus(selectedConversationId, myProfileId);
@@ -107,7 +108,7 @@ const Messages = () => {
     getMyProfileId().then(setMyProfileId);
   }, [getMyProfileId]);
 
-  // Handle typing indicator
+  // Handle typing indicator with auto-stop after 2s of silence
   const handleMessageChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setMessageText(e.target.value);
     // Auto-resize textarea
@@ -116,6 +117,14 @@ const Messages = () => {
     textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
     if (e.target.value.length > 0) {
       setTyping(true);
+      // Clear existing stop-typing timer and reset it
+      if (typingStopTimeoutRef.current) clearTimeout(typingStopTimeoutRef.current);
+      typingStopTimeoutRef.current = setTimeout(() => {
+        setTyping(false);
+      }, 2000);
+    } else {
+      if (typingStopTimeoutRef.current) clearTimeout(typingStopTimeoutRef.current);
+      setTyping(false);
     }
   }, [setTyping]);
 
@@ -144,6 +153,9 @@ const Messages = () => {
   };
 
   const handleSelectConversation = (convId: string) => {
+    // Stop typing indicator when switching conversations
+    if (typingStopTimeoutRef.current) clearTimeout(typingStopTimeoutRef.current);
+    setTyping(false);
     setSelectedConversationId(convId);
     setReplyToMessage(null);
     setMessageText("");
@@ -385,10 +397,10 @@ const Messages = () => {
                       <button
                         key={conv.id}
                         onClick={() => handleSelectConversation(conv.id)}
-                        className={`w-full p-4 flex items-center gap-3 transition-all duration-200 ${
+                      className={`w-full p-4 flex items-center gap-3 transition-all duration-200 ${
                           selectedConversationId === conv.id 
                             ? "bg-accent shadow-sm" 
-                            : "hover:bg-muted/50 hover:translate-x-1"
+                            : "hover:bg-muted/50 hover:-translate-x-1"
                         } focus-ring`}
                         role="listitem"
                         aria-selected={selectedConversationId === conv.id}
